@@ -1,0 +1,12 @@
+{
+  "version": "1.0",
+  "description": "Kardia Lexicon — Translation-independent verse index. Tags word positions in original language text using Strong's IDs. No translation text is stored here. The app resolves to English at render time using its own interlinear alignment data.",
+  "license": "CC BY-NC-SA 4.0",
+  "project": "https://github.com/dad2jrn/kardia-bible-lexicon",
+  "generated": "",
+  "note": "verse_ref uses OSIS standard format. Examples: GEN.1.1, PS.23.1, 1JN.4.8. source_text values: masoretic | greek | aramaic. word_position is 1-indexed position in the original language verse.",
+  "status": {
+    "total_verses_indexed": 0
+  },
+  "entries": []
+}

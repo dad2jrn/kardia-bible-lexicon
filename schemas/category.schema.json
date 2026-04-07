@@ -1,0 +1,103 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dad2jrn/kardia-bible-lexicon/schemas/category.schema.json",
+  "title": "Kardia Lexicon Category Entry",
+  "description": "A single Hebrew thought category entry in the Kardia Lexicon",
+  "type": "object",
+  "required": [
+    "id", "hebrew_root", "transliteration", "testament_scope",
+    "category_label", "one_liner", "full_definition", "what_it_is_not",
+    "second_temple_context", "kardia_rendering", "surface_vehicles", "key_verses"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Lowercase transliterated Hebrew, URL-safe. Primary key.",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "hebrew_root": {
+      "type": "string",
+      "description": "The Hebrew characters of the root word."
+    },
+    "transliteration": {
+      "type": "string",
+      "description": "Readable phonetic rendering for non-Hebrew readers."
+    },
+    "testament_scope": {
+      "type": "string",
+      "enum": ["ot", "nt", "both"],
+      "description": "Which Testament(s) this category actively appears in."
+    },
+    "category_label": {
+      "type": "string",
+      "description": "Short English label for UI display.",
+      "maxLength": 40
+    },
+    "one_liner": {
+      "type": "string",
+      "description": "Single sentence. What this word does, not what it means. Max 25 words.",
+      "maxLength": 200
+    },
+    "full_definition": {
+      "type": "string",
+      "description": "2-4 paragraphs. Second Temple Hebrew perspective. No Western theological framing."
+    },
+    "what_it_does": {
+      "type": "string",
+      "description": "How this concept functions in covenant relationship. Action-oriented."
+    },
+    "what_it_is_not": {
+      "type": "string",
+      "description": "REQUIRED. Explicitly names the Western/Augustinian misreading and explains the distortion."
+    },
+    "second_temple_context": {
+      "type": "string",
+      "description": "How this concept functioned in Second Temple Jewish life."
+    },
+    "kardia_rendering": {
+      "type": "string",
+      "description": "Kardia translation preferred English rendering. Short phrase.",
+      "maxLength": 80
+    },
+    "surface_vehicles": {
+      "type": "object",
+      "required": ["hebrew_lexemes", "strongs_hebrew", "english_glosses"],
+      "properties": {
+        "hebrew_lexemes": { "type": "array", "items": { "type": "string" } },
+        "strongs_hebrew": { "type": "array", "items": { "type": "string", "pattern": "^H[0-9]+$" } },
+        "lxx_greek": { "type": "array", "items": { "type": "string" } },
+        "nt_greek": { "type": "array", "items": { "type": "string" } },
+        "strongs_greek": { "type": "array", "items": { "type": "string", "pattern": "^G[0-9]+$" } },
+        "english_glosses": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "illustrative_renderings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["translation", "text"],
+        "properties": {
+          "translation": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      }
+    },
+    "key_verses": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 10,
+      "items": { "type": "string" },
+      "description": "OSIS format verse references. Example: Ps.136.1"
+    },
+    "related_categories": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "theological_notes": { "type": "string" },
+    "version": { "type": "string", "default": "1.0" },
+    "reviewed_by": {
+      "type": "string",
+      "enum": ["ai-draft", "theologian-reviewed", "approved"]
+    }
+  }
+}

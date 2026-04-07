@@ -1,0 +1,55 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dad2jrn/kardia-bible-lexicon/schemas/verse.schema.json",
+  "title": "Kardia Lexicon Verse Index Entry",
+  "description": "Translation-independent verse tagging. No translation text stored.",
+  "type": "object",
+  "required": ["verse_ref", "source_text", "tagged_words"],
+  "properties": {
+    "verse_ref": {
+      "type": "string",
+      "description": "OSIS standard verse reference. Examples: GEN.1.1, PS.23.1, 1JN.4.8"
+    },
+    "source_text": {
+      "type": "string",
+      "enum": ["masoretic", "greek", "aramaic"],
+      "description": "Which original language text the word positions reference."
+    },
+    "tagged_words": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["original_word", "strongs_id", "word_position", "hebrew_category_id"],
+        "properties": {
+          "original_word": {
+            "type": "string",
+            "description": "Transliterated original language word at this position."
+          },
+          "original_script": {
+            "type": "string",
+            "description": "Word in original script characters."
+          },
+          "strongs_id": {
+            "type": "string",
+            "description": "Strong's ID. Used by app to resolve to English word via interlinear alignment.",
+            "pattern": "^[HG][0-9]+$"
+          },
+          "word_position": {
+            "type": "integer",
+            "minimum": 1,
+            "description": "1-indexed position of this word in the original language verse."
+          },
+          "hebrew_category_id": {
+            "type": "string",
+            "description": "Foreign key into categories.json. What fires when user taps this word."
+          },
+          "context_note": {
+            "type": "string",
+            "description": "Optional verse-specific note if category application needs contextual nuance."
+          }
+        }
+      }
+    }
+  }
+}

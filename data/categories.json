@@ -1,0 +1,13 @@
+{
+  "version": "1.0",
+  "description": "Kardia Lexicon — Hebrew thought category database. One entry per Hebrew thought category. The Hebrew category is always primary. Greek is the vehicle. Hebrew is the thought.",
+  "license": "CC BY-NC-SA 4.0",
+  "project": "https://github.com/dad2jrn/kardia-bible-lexicon",
+  "generated": "",
+  "status": {
+    "total_seed_categories": 30,
+    "complete": 0,
+    "pending": 30
+  },
+  "entries": []
+}

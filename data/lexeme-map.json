@@ -1,0 +1,11 @@
+{
+  "version": "1.0",
+  "description": "Kardia Lexicon — Lexeme map. Maps Strong's IDs (Hebrew and Greek) to Hebrew thought category IDs. Greek entries include their LXX source Hebrew, establishing the philological continuity between Testaments.",
+  "license": "CC BY-NC-SA 4.0",
+  "project": "https://github.com/dad2jrn/kardia-bible-lexicon",
+  "generated": "",
+  "status": {
+    "total_entries": 0
+  },
+  "entries": []
+}

@@ -1,0 +1,49 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/dad2jrn/kardia-bible-lexicon/schemas/lexeme.schema.json",
+  "title": "Kardia Lexicon Lexeme Map Entry",
+  "description": "Maps a Strong's ID to its Hebrew thought category",
+  "type": "object",
+  "required": ["strongs_id", "lexeme", "language", "hebrew_category_id"],
+  "properties": {
+    "strongs_id": {
+      "type": "string",
+      "description": "Strong's ID. H prefix for Hebrew, G prefix for Greek.",
+      "pattern": "^[HG][0-9]+$"
+    },
+    "lexeme": {
+      "type": "string",
+      "description": "Transliterated word."
+    },
+    "original_script": {
+      "type": "string",
+      "description": "Word in its original script characters."
+    },
+    "language": {
+      "type": "string",
+      "enum": ["hebrew", "greek", "aramaic"]
+    },
+    "lxx_source_hebrew": {
+      "type": "string",
+      "description": "For Greek entries: Strong's H ID of the Hebrew word this Greek renders in the LXX. Proves Hebrew category continuity into the NT.",
+      "pattern": "^H[0-9]+$"
+    },
+    "hebrew_category_id": {
+      "type": "string",
+      "description": "Foreign key into categories.json."
+    },
+    "category_confidence": {
+      "type": "string",
+      "enum": ["primary", "partial", "contextual"],
+      "description": "primary = almost always carries this category. partial = significant overlap. contextual = context governs."
+    },
+    "usage_notes": {
+      "type": "string",
+      "description": "How this lexeme carries the Hebrew category."
+    },
+    "exceptions": {
+      "type": "string",
+      "description": "Cases where this lexeme does NOT carry the category mapping."
+    }
+  }
+}

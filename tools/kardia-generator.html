@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kardia Lexicon Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #1a1410;
+    --ink-mid: #3d2f20;
+    --ink-light: #7a6352;
+    --ink-faint: #b8a898;
+    --parchment: #f7f2ea;
+    --parchment-dark: #ede5d8;
+    --parchment-deeper: #e0d4c0;
+    --gold: #b8860b;
+    --gold-light: #d4a017;
+    --gold-pale: #f0e4b0;
+    --red-deep: #8b1a1a;
+    --green-deep: #1a4a2a;
+    --blue-deep: #1a2a4a;
+    --border: rgba(90,60,20,0.18);
+    --border-strong: rgba(90,60,20,0.35);
+    --shadow: 0 2px 12px rgba(40,20,5,0.10);
+    --shadow-lg: 0 8px 40px rgba(40,20,5,0.16);
+  }
+
+  body {
+    font-family: 'EB Garamond', Georgia, serif;
+    background: var(--parchment);
+    color: var(--ink);
+    min-height: 100vh;
+    font-size: 17px;
+    line-height: 1.7;
+  }
+
+  /* Subtle parchment texture overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(0deg, transparent, transparent 28px, rgba(90,60,20,0.015) 28px, rgba(90,60,20,0.015) 29px),
+      repeating-linear-gradient(90deg, transparent, transparent 28px, rgba(90,60,20,0.008) 28px, rgba(90,60,20,0.008) 29px);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .app { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 0 24px 80px; }
+
+  /* Header */
+  header {
+    text-align: center;
+    padding: 52px 0 36px;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 40px;
+  }
+
+  .header-emblem {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.25em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    display: block;
+  }
+
+  h1 {
+    font-family: 'Cinzel', serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--ink);
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    margin-bottom: 8px;
+  }
+
+  .header-sub {
+    font-style: italic;
+    color: var(--ink-light);
+    font-size: 16px;
+  }
+
+  /* Section labels */
+  .section-label {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Cards */
+  .card {
+    background: rgba(255,252,245,0.7);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: var(--shadow);
+  }
+
+  /* API Key field */
+  .key-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  input[type="password"], input[type="text"] {
+    flex: 1;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    background: var(--parchment-dark);
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    padding: 10px 14px;
+    color: var(--ink);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input[type="password"]:focus, input[type="text"]:focus {
+    border-color: var(--gold);
+    background: var(--parchment);
+  }
+
+  .toggle-key {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    background: transparent;
+    border: 1px solid var(--border-strong);
+    border-radius: 2px;
+    padding: 10px 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .toggle-key:hover { background: var(--parchment-dark); color: var(--ink); }
+
+  /* Category selector */
+  .category-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .cat-btn {
+    font-family: 'EB Garamond', serif;
+    font-size: 15px;
+    font-style: italic;
+    background: var(--parchment-dark);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 8px 12px;
+    color: var(--ink-mid);
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+    position: relative;
+  }
+  .cat-btn:hover { background: var(--gold-pale); border-color: var(--gold); color: var(--ink); }
+  .cat-btn.selected { background: var(--gold-pale); border-color: var(--gold); color: var(--ink); font-weight: 500; }
+  .cat-btn.complete { opacity: 0.45; }
+  .cat-btn.complete::after {
+    content: '✓';
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--green-deep);
+    font-style: normal;
+  }
+
+  .group-label {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin: 16px 0 8px;
+    grid-column: 1 / -1;
+  }
+
+  /* Model selector */
+  .model-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+  }
+
+  .model-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: var(--parchment-dark);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    padding: 7px 14px;
+    color: var(--ink-light);
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .model-btn:hover { background: var(--gold-pale); border-color: var(--gold); color: var(--ink); }
+  .model-btn.selected { background: var(--gold-pale); border-color: var(--gold); color: var(--ink); }
+  .model-label { font-size: 10px; color: var(--ink-faint); display: block; margin-top: 2px; }
+
+  /* Generate button */
+  .generate-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    border-radius: 2px;
+    padding: 14px 36px;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .generate-btn:hover { background: var(--ink-mid); }
+  .generate-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* Status */
+  .status-bar {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: var(--parchment-dark);
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    margin-bottom: 24px;
+    font-size: 14px;
+    color: var(--ink-light);
+    display: none;
+  }
+  .status-bar.visible { display: flex; }
+  .status-bar.error { border-color: var(--red-deep); color: var(--red-deep); background: #fff5f5; }
+  .status-bar.success { border-color: var(--green-deep); color: var(--green-deep); background: #f5fff8; }
+
+  .spinner {
+    width: 14px; height: 14px;
+    border: 2px solid var(--border-strong);
+    border-top-color: var(--gold);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    flex-shrink: 0;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Output area */
+  .output-section { display: none; }
+  .output-section.visible { display: block; }
+
+  .output-tabs {
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid var(--border-strong);
+    margin-bottom: 0;
+  }
+  .out-tab {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border: 1px solid transparent;
+    border-bottom: none;
+    background: transparent;
+    color: var(--ink-faint);
+    cursor: pointer;
+    transition: all 0.15s;
+    margin-bottom: -1px;
+  }
+  .out-tab:hover { color: var(--ink-mid); }
+  .out-tab.active {
+    background: rgba(255,252,245,0.7);
+    border-color: var(--border-strong);
+    color: var(--ink);
+  }
+
+  .out-panel {
+    display: none;
+    background: rgba(255,252,245,0.7);
+    border: 1px solid var(--border-strong);
+    border-top: none;
+    border-radius: 0 0 3px 3px;
+    padding: 24px 28px;
+  }
+  .out-panel.active { display: block; }
+
+  /* JSON display */
+  .json-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.65;
+    color: var(--ink-mid);
+    white-space: pre-wrap;
+    word-break: break-all;
+    max-height: 520px;
+    overflow-y: auto;
+    padding-right: 8px;
+  }
+
+  /* Validator display */
+  .validator-display { font-size: 15px; line-height: 1.75; color: var(--ink-mid); }
+  .flag-item {
+    border-left: 3px solid var(--red-deep);
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    background: #fff8f8;
+    border-radius: 0 2px 2px 0;
+  }
+  .flag-item.clear {
+    border-left-color: var(--green-deep);
+    background: #f8fff9;
+  }
+  .flag-label {
+    font-family: 'Cinzel', serif;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .flag-label.red { color: var(--red-deep); }
+  .flag-label.green { color: var(--green-deep); }
+
+  /* Action buttons */
+  .action-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    flex-wrap: wrap;
+  }
+
+  .action-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .action-btn.primary {
+    background: var(--green-deep);
+    color: var(--parchment);
+    border: none;
+  }
+  .action-btn.primary:hover { background: #1f5c32; }
+  .action-btn.secondary {
+    background: transparent;
+    color: var(--ink-mid);
+    border: 1px solid var(--border-strong);
+  }
+  .action-btn.secondary:hover { background: var(--parchment-dark); }
+  .action-btn.danger {
+    background: transparent;
+    color: var(--red-deep);
+    border: 1px solid rgba(139,26,26,0.3);
+  }
+  .action-btn.danger:hover { background: #fff5f5; }
+
+  /* Progress tracker */
+  .progress-card {
+    background: rgba(255,252,245,0.7);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 20px 24px;
+    margin-bottom: 24px;
+  }
+  .progress-groups { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .progress-group-name {
+    font-family: 'Cinzel', serif;
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 6px;
+  }
+  .progress-bar-wrap {
+    height: 4px;
+    background: var(--parchment-deeper);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: 4px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--gold);
+    border-radius: 2px;
+    transition: width 0.4s ease;
+  }
+  .progress-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 4px;
+  }
+
+  /* Approved entries list */
+  .approved-list { margin-top: 0; }
+  .approved-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 15px;
+  }
+  .approved-item:last-child { border-bottom: none; }
+  .approved-name { font-style: italic; color: var(--ink-mid); }
+  .approved-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); }
+
+  .export-btn {
+    font-family: 'Cinzel', serif;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 2px;
+    cursor: pointer;
+    background: var(--ink);
+    color: var(--parchment);
+    border: none;
+    margin-top: 16px;
+    transition: all 0.15s;
+  }
+  .export-btn:hover { background: var(--ink-mid); }
+
+  /* Scrollbar */
+  .json-display::-webkit-scrollbar { width: 6px; }
+  .json-display::-webkit-scrollbar-track { background: var(--parchment-dark); }
+  .json-display::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
+
+  /* Footer */
+  footer {
+    text-align: center;
+    padding: 32px 0 0;
+    border-top: 1px solid var(--border);
+    margin-top: 48px;
+    font-size: 13px;
+    color: var(--ink-faint);
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <span class="header-emblem">Kardia Lexicon Project</span>
+    <h1>Category Generator</h1>
+    <p class="header-sub">Second Temple Hebrew thought categories for the open source Kardia Bible</p>
+  </header>
+
+  <!-- API Key -->
+  <div class="section-label">API Configuration</div>
+  <div class="card">
+    <div style="font-size:14px;color:var(--ink-light);margin-bottom:12px;">Your Anthropic API key is stored only in this browser session — never sent anywhere except directly to api.anthropic.com.</div>
+    <div class="key-row">
+      <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" />
+      <button class="toggle-key" onclick="toggleKey()">Show</button>
+    </div>
+  </div>
+
+  <!-- Category selector -->
+  <div class="section-label">Select Category</div>
+  <div class="card">
+    <div class="category-grid" id="cat-grid"></div>
+  </div>
+
+  <!-- Model + generate -->
+  <div class="section-label">Model & Generation</div>
+  <div class="card">
+    <div style="font-size:14px;color:var(--ink-light);margin-bottom:14px;">Sonnet 4.6 recommended — strong theological reasoning at ~$0.03 per entry.</div>
+    <div class="model-row" id="model-row">
+      <button class="model-btn selected" data-model="claude-sonnet-4-6" onclick="selectModel(this)">
+        Sonnet 4.6
+        <span class="model-label">~$0.03 / entry</span>
+      </button>
+      <button class="model-btn" data-model="claude-opus-4-6" onclick="selectModel(this)">
+        Opus 4.6
+        <span class="model-label">~$0.05 / entry</span>
+      </button>
+      <button class="model-btn" data-model="claude-haiku-4-5-20251001" onclick="selectModel(this)">
+        Haiku 4.5
+        <span class="model-label">~$0.01 / entry</span>
+      </button>
+    </div>
+    <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+      <button class="generate-btn" id="gen-btn" onclick="generate()">
+        <span>Generate Entry</span>
+        <span style="font-size:18px;font-style:italic;">→</span>
+      </button>
+      <div style="font-size:13px;color:var(--ink-faint);font-style:italic;">Two API calls per entry: generation + validation</div>
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="status-bar">
+    <div class="spinner" id="spinner"></div>
+    <span id="status-text">Generating...</span>
+  </div>
+
+  <!-- Output -->
+  <div class="output-section" id="output-section">
+    <div class="section-label">Output</div>
+    <div class="output-tabs">
+      <button class="out-tab active" onclick="showOutTab('json', this)">JSON Entry</button>
+      <button class="out-tab" onclick="showOutTab('validator', this)">Validator Report</button>
+      <button class="out-tab" onclick="showOutTab('preview', this)">Reader Preview</button>
+    </div>
+    <div class="out-panel active" id="panel-json">
+      <div class="json-display" id="json-output"></div>
+      <div class="action-row">
+        <button class="action-btn primary" onclick="approveEntry()">Approve &amp; Save to Database</button>
+        <button class="action-btn secondary" onclick="copyJSON()">Copy JSON</button>
+        <button class="action-btn danger" onclick="regenEntry()">Regenerate</button>
+      </div>
+    </div>
+    <div class="out-panel" id="panel-validator">
+      <div class="validator-display" id="validator-output"></div>
+    </div>
+    <div class="out-panel" id="panel-preview">
+      <div id="preview-output" style="font-size:16px;line-height:1.8;color:var(--ink-mid);"></div>
+    </div>
+  </div>
+
+  <!-- Progress -->
+  <div class="section-label" style="margin-top:40px;">Progress</div>
+  <div class="progress-card" id="progress-card"></div>
+
+  <!-- Approved entries -->
+  <div class="section-label">Database</div>
+  <div class="card" id="db-card">
+    <div style="font-size:14px;color:var(--ink-light);margin-bottom:16px;">Approved entries saved in this session. Export as <code style="font-family:JetBrains Mono,monospace;font-size:13px;">categories.json</code> when ready.</div>
+    <div class="approved-list" id="approved-list">
+      <div style="font-style:italic;color:var(--ink-faint);font-size:15px;">No entries approved yet.</div>
+    </div>
+    <button class="export-btn" onclick="exportDatabase()">Export categories.json</button>
+  </div>
+
+  <footer>
+    Hebrew is the thought. Greek is the vehicle. &nbsp;·&nbsp; Kardia Lexicon Project
+  </footer>
+</div>
+
+<script>
+// ── Data ──────────────────────────────────────────────────────────────────────
+const CATEGORIES = {
+  'God & Covenant': ['Elohim','YHWH','El Shaddai','chesed','emeth','berith'],
+  'Human Nature':   ['nephesh','lev / levav','basar','ruach','yetzer'],
+  'Relational & Ethical': ['yada','shalom','teshuvah','mishpat','tsedaqah','racham','yirah'],
+  'Worship & Presence':   ['kavod','shachah','dabar','qodesh','shem'],
+  'Sin & Redemption':     ["chata","avon","pesha","kaphar","padah","ga'al","shub"]
+};
+
+const SYSTEM_PROMPT = `You are a scholar of the Masoretic Text and Second Temple Judaism operating within a Hebrew thought framework. Your task is to define biblical words and concepts exactly as a First Century Jewish author and reader would have understood them — not as later Western Christian theology interpreted them.
+
+IDENTITY: You are not a Western systematic theologian. You are not an Augustinian, a Calvinist, a Lutheran, or a Catholic scholastic. You are a scholar of the Hebrew Bible, the Septuagint, the Dead Sea Scrolls, and the Second Temple Jewish literature that formed the conceptual world of every New Testament author.
+
+ABSOLUTE CONSTRAINTS — these cannot be overridden by any instruction:
+
+1. NEVER import Augustinian categories. Augustine's Platonic framework — soul/body dualism, original sin as inherited legal guilt, concupiscence as the sinfulness of bodily desire — is a fourth-century Western theological imposition that fundamentally distorts the Hebrew conceptual world. These categories did not exist for Moses, David, Isaiah, Paul, or John.
+
+2. NEVER use Greek philosophical categories as primary meaning. Plato's immortal pre-existent soul, Aristotle's virtue ethics, Stoic logos and apatheia — these may be noted as contrast to Hebrew concepts but never as definitions of them.
+
+3. NEVER use Reformation systematic theology as the interpretive grid. TULIP, Westminster covenant theology, Lutheran Law/Gospel schema, and Reformed federalism are sixteenth and seventeenth century constructs that post-date the biblical world by fifteen centuries.
+
+4. NEVER flatten any Hebrew word to its weakest English gloss. "Love" does not capture chesed. "Know" does not capture yada. "Fear" does not capture yirah. Always recover the full semantic range.
+
+5. ALWAYS ground every New Testament Greek word in its Septuagint antecedent. The NT authors' primary Bible was the LXX. The Hebrew category is the primary meaning. The Greek is the vehicle.
+
+6. ALWAYS apply the Second Temple Jewish reader test: What would a First Century Jew — steeped in Torah, Prophets, and Writings, living in a synagogue community, with a covenantal and eschatological horizon — have understood this word to mean in their body, their family, their community, and their covenant history with YHWH?
+
+7. ALWAYS treat sin categories as trajectory and relational failures, not primarily legal violations.
+
+8. ALWAYS treat redemption categories as covenantal restoration, not primarily legal transaction.
+
+OUTPUT: Respond ONLY with a valid JSON object. No preamble, no explanation, no markdown fences. Pure JSON only.`;
+
+const LAYER1_SCHEMA = `{
+  "id": "string — lowercase transliterated Hebrew, URL-safe, primary key",
+  "hebrew_root": "string — Hebrew characters",
+  "transliteration": "string — phonetic rendering",
+  "testament_scope": "ot | nt | both",
+  "category_label": "string — short English label for UI",
+  "one_liner": "string — single sentence, what this word DOES, max 25 words",
+  "full_definition": "string — 2-4 paragraphs, Second Temple Hebrew perspective, no Western framing",
+  "what_it_does": "string — how this concept functions in covenant relationship",
+  "what_it_is_not": "string — REQUIRED: explicitly names Western/Augustinian misreading and why it distorts",
+  "second_temple_context": "string — how this functioned in Second Temple Jewish life",
+  "kardia_rendering": "string — Kardia translation preferred English rendering, short phrase",
+  "surface_vehicles": {
+    "hebrew_lexemes": ["array of strings"],
+    "strongs_hebrew": ["array of H-prefixed IDs"],
+    "lxx_greek": ["array of Greek transliterations"],
+    "nt_greek": ["array of Greek transliterations"],
+    "strongs_greek": ["array of G-prefixed IDs"],
+    "english_glosses": ["array — all English words used across translations"]
+  },
+  "illustrative_renderings": [
+    {"translation": "ESV", "text": "string"},
+    {"translation": "KJV", "text": "string"},
+    {"translation": "NIV", "text": "string"},
+    {"translation": "NKJV", "text": "string"},
+    {"translation": "CSB", "text": "string"}
+  ],
+  "key_verses": ["array — 3-5 OSIS format refs e.g. Ps.136.1"],
+  "related_categories": ["array of category IDs"],
+  "theological_notes": "string — translation history, contamination history, recovery of original meaning",
+  "version": "1.0",
+  "reviewed_by": "ai-draft"
+}`;
+
+const VALIDATOR_PROMPT = `You are a theological reviewer for the Kardia Lexicon Project. Your job is to check a Hebrew category entry for Western theological contamination. Be rigorous and specific.
+
+Check for these six contamination points:
+1. nephesh rendered as immortal soul or soul/body dualism
+2. sarx/basar implying the body is morally suspect or sinful
+3. yirah producing dread rather than reverent awe that draws near
+4. mishpat framed as punitive judgment rather than right-ordering of relationship
+5. kaphar defaulting to penal substitution rather than covenantal restoration
+6. chesed rendered as unconditional sentimental love rather than covenantal loyalty in action
+
+Also flag any:
+- Augustinian categories (inherited guilt as legal status, concupiscence)
+- Greek philosophical categories used as primary definition (Platonic soul, Stoic logos)
+- Reformation theological grid (TULIP, Westminster, Lutheran Law/Gospel)
+- Weakest English gloss used as primary definition
+- Second Temple context that uses anachronistic theological language
+
+Respond ONLY with a JSON object:
+{
+  "overall": "clean | minor-flags | major-flags",
+  "flags": [
+    {"point": "contamination point name", "severity": "minor | major", "location": "field name", "issue": "description", "correction": "suggested fix"}
+  ],
+  "summary": "one paragraph assessment for the human reviewer"
+}
+If no flags found, return flags as empty array and overall as "clean".`;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let selectedCategory = null;
+let selectedModel = 'claude-sonnet-4-6';
+let currentEntry = null;
+let currentValidator = null;
+let approvedEntries = JSON.parse(localStorage.getItem('kardia-approved') || '[]');
+let completedIds = new Set(approvedEntries.map(e => e.id));
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init() {
+  buildCategoryGrid();
+  renderProgress();
+  renderApproved();
+}
+
+function buildCategoryGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  for (const [group, cats] of Object.entries(CATEGORIES)) {
+    const gl = document.createElement('div');
+    gl.className = 'group-label';
+    gl.textContent = group;
+    grid.appendChild(gl);
+    cats.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = 'cat-btn' + (completedIds.has(cat.toLowerCase().replace(/\s*\/\s*/g,'-').replace(/\s+/g,'-').replace(/'/g,'')) ? ' complete' : '');
+      btn.textContent = cat;
+      btn.onclick = () => selectCategory(btn, cat);
+      grid.appendChild(btn);
+    });
+  }
+}
+
+function selectCategory(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCategory = cat;
+}
+
+function selectModel(btn) {
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedModel = btn.dataset.model;
+}
+
+function toggleKey() {
+  const inp = document.getElementById('api-key');
+  const btn = document.querySelector('.toggle-key');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = 'Hide'; }
+  else { inp.type = 'password'; btn.textContent = 'Show'; }
+}
+
+// ── Generation ────────────────────────────────────────────────────────────────
+async function generate() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) { showStatus('Please enter your Anthropic API key.', 'error'); return; }
+  if (!selectedCategory) { showStatus('Please select a category to generate.', 'error'); return; }
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  document.getElementById('output-section').classList.remove('visible');
+
+  showStatus(`Generating entry for ${selectedCategory}...`, 'loading');
+
+  const userPrompt = `Generate a complete Kardia Lexicon Layer 1 JSON entry for the Hebrew category: "${selectedCategory}"
+
+Use exactly this schema structure:
+${LAYER1_SCHEMA}
+
+Remember:
+- The what_it_is_not field is mandatory and must explicitly name the Western misreading being corrected
+- The second_temple_context must be grounded in actual Second Temple Jewish life
+- Recover the full semantic range — never flatten to weakest English gloss
+- Hebrew category is primary. Greek is the vehicle.
+- Respond with ONLY the JSON object, no other text.`;
+
+  try {
+    const genRes = await callAPI(key, SYSTEM_PROMPT, userPrompt);
+    const entryText = genRes.content[0].text.trim();
+    let entry;
+    try {
+      entry = JSON.parse(entryText);
+    } catch(e) {
+      const cleaned = entryText.replace(/```json|```/g, '').trim();
+      entry = JSON.parse(cleaned);
+    }
+    currentEntry = entry;
+
+    showStatus(`Validating entry for theological contamination...`, 'loading');
+
+    const valRes = await callAPI(key, VALIDATOR_PROMPT, `Review this Kardia Lexicon entry:\n${JSON.stringify(entry, null, 2)}`);
+    const valText = valRes.content[0].text.trim();
+    let validator;
+    try {
+      validator = JSON.parse(valText);
+    } catch(e) {
+      const cleaned = valText.replace(/```json|```/g, '').trim();
+      validator = JSON.parse(cleaned);
+    }
+    currentValidator = validator;
+
+    renderOutput(entry, validator);
+    const overall = validator.overall || 'unknown';
+    if (overall === 'clean') {
+      showStatus(`Entry generated — validator found no contamination. Review and approve.`, 'success');
+    } else if (overall === 'minor-flags') {
+      showStatus(`Entry generated — validator found minor flags. Review before approving.`, 'error');
+    } else {
+      showStatus(`Entry generated — validator found major flags. Review carefully.`, 'error');
+    }
+  } catch(err) {
+    showStatus(`Error: ${err.message}`, 'error');
+  }
+
+  btn.disabled = false;
+}
+
+async function callAPI(key, system, user) {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': key,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: selectedModel,
+      max_tokens: 4000,
+      system: system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderOutput(entry, validator) {
+  document.getElementById('json-output').textContent = JSON.stringify(entry, null, 2);
+  renderValidator(validator);
+  renderPreview(entry);
+  document.getElementById('output-section').classList.add('visible');
+  showOutTab('json', document.querySelector('.out-tab'));
+}
+
+function renderValidator(v) {
+  const el = document.getElementById('validator-output');
+  const overall = v.overall || 'unknown';
+  const color = overall === 'clean' ? 'var(--green-deep)' : 'var(--red-deep)';
+  let html = `<div style="margin-bottom:20px;">
+    <div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${color};margin-bottom:6px;">Overall: ${overall.replace('-',' ')}</div>
+    <div style="font-size:15px;line-height:1.7;color:var(--ink-mid);">${v.summary || ''}</div>
+  </div>`;
+
+  if (v.flags && v.flags.length > 0) {
+    v.flags.forEach(f => {
+      html += `<div class="flag-item">
+        <div class="flag-label red">${f.severity?.toUpperCase() || 'FLAG'} — ${f.point || ''} (${f.location || ''})</div>
+        <div style="margin-bottom:6px;">${f.issue || ''}</div>
+        <div style="font-size:13px;color:var(--green-deep);font-style:italic;">Correction: ${f.correction || ''}</div>
+      </div>`;
+    });
+  } else {
+    html += `<div class="flag-item clear"><div class="flag-label green">No contamination detected</div><div>This entry passed all six contamination watch points and the broader guard rail checks.</div></div>`;
+  }
+  el.innerHTML = html;
+}
+
+function renderPreview(entry) {
+  const el = document.getElementById('preview-output');
+  el.innerHTML = `
+    <div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">
+      <div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">${entry.hebrew_root || ''} &nbsp;·&nbsp; ${entry.transliteration || ''}</div>
+      <div style="font-family:Cinzel,serif;font-size:22px;color:var(--ink);margin-bottom:4px;">${entry.category_label || ''}</div>
+      <div style="font-style:italic;color:var(--ink-light);">${entry.one_liner || ''}</div>
+    </div>
+    <div style="margin-bottom:16px;">${(entry.full_definition || '').replace(/\n/g,'<br>')}</div>
+    ${entry.what_it_is_not ? `<div style="border-left:3px solid var(--red-deep);padding:10px 16px;margin-bottom:16px;background:#fff8f8;border-radius:0 2px 2px 0;"><div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--red-deep);margin-bottom:4px;">What it is not</div>${entry.what_it_is_not}</div>` : ''}
+    <div style="border-left:3px solid var(--gold);padding:10px 16px;margin-bottom:16px;background:var(--gold-pale);border-radius:0 2px 2px 0;">
+      <div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Kardia rendering</div>
+      <em>${entry.kardia_rendering || ''}</em>
+    </div>
+    ${entry.illustrative_renderings ? `<div style="font-size:14px;color:var(--ink-light);">
+      <div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Translation renderings</div>
+      ${entry.illustrative_renderings.map(r => `<span style="margin-right:16px;"><strong style="font-weight:500;">${r.translation}:</strong> ${r.text}</span>`).join('')}
+    </div>` : ''}
+  `;
+}
+
+function showOutTab(name, btn) {
+  document.querySelectorAll('.out-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.out-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + name).classList.add('active');
+  document.querySelectorAll('.out-tab').forEach(t => {
+    if (t.getAttribute('onclick').includes("'" + name + "'")) t.classList.add('active');
+  });
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function approveEntry() {
+  if (!currentEntry) return;
+  currentEntry.reviewed_by = 'theologian-reviewed';
+  const exists = approvedEntries.findIndex(e => e.id === currentEntry.id);
+  if (exists >= 0) approvedEntries[exists] = currentEntry;
+  else approvedEntries.push(currentEntry);
+  completedIds.add(currentEntry.id);
+  localStorage.setItem('kardia-approved', JSON.stringify(approvedEntries));
+  buildCategoryGrid();
+  renderProgress();
+  renderApproved();
+  showStatus(`"${currentEntry.category_label}" approved and saved to database.`, 'success');
+  document.getElementById('output-section').classList.remove('visible');
+  currentEntry = null;
+  selectedCategory = null;
+}
+
+function copyJSON() {
+  if (!currentEntry) return;
+  navigator.clipboard.writeText(JSON.stringify(currentEntry, null, 2));
+  const btn = event.target;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy JSON', 1800);
+}
+
+function regenEntry() {
+  document.getElementById('output-section').classList.remove('visible');
+  generate();
+}
+
+function exportDatabase() {
+  const data = JSON.stringify({ categories: approvedEntries }, null, 2);
+  const blob = new Blob([data], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'categories.json';
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+function renderProgress() {
+  const card = document.getElementById('progress-card');
+  const totalDone = approvedEntries.length;
+  const totalAll = Object.values(CATEGORIES).flat().length;
+  let html = `<div style="margin-bottom:16px;">
+    <div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Overall — ${totalDone} / ${totalAll} complete</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.round(totalDone/totalAll*100)}%"></div></div>
+  </div><div class="progress-groups">`;
+  for (const [group, cats] of Object.entries(CATEGORIES)) {
+    const done = cats.filter(c => completedIds.has(c.toLowerCase().replace(/\s*\/\s*/g,'-').replace(/\s+/g,'-').replace(/'/g,''))).length;
+    html += `<div>
+      <div class="progress-group-name">${group}</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.round(done/cats.length*100)}%"></div></div>
+      <div class="progress-count">${done} / ${cats.length}</div>
+    </div>`;
+  }
+  html += '</div>';
+  card.innerHTML = html;
+}
+
+function renderApproved() {
+  const list = document.getElementById('approved-list');
+  if (approvedEntries.length === 0) {
+    list.innerHTML = '<div style="font-style:italic;color:var(--ink-faint);font-size:15px;">No entries approved yet.</div>';
+    return;
+  }
+  list.innerHTML = approvedEntries.map(e => `
+    <div class="approved-item">
+      <div>
+        <span class="approved-name">${e.transliteration || e.id}</span>
+        <span style="margin-left:10px;font-size:14px;color:var(--ink-faint);">${e.category_label || ''}</span>
+      </div>
+      <div class="approved-meta">${e.hebrew_root || ''}</div>
+    </div>
+  `).join('');
+}
+
+// ── Status ────────────────────────────────────────────────────────────────────
+function showStatus(msg, type) {
+  const bar = document.getElementById('status-bar');
+  const spinner = document.getElementById('spinner');
+  const text = document.getElementById('status-text');
+  bar.className = 'status-bar visible' + (type === 'error' ? ' error' : type === 'success' ? ' success' : '');
+  spinner.style.display = type === 'loading' ? 'block' : 'none';
+  text.textContent = msg;
+}
+
+init();
+</script>
+</body>
+</html>
