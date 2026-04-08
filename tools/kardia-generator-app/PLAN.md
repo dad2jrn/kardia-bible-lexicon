@@ -147,12 +147,13 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] `server/index.ts`: no changes needed — already correctly configured
 - [x] Smoke-test all endpoints with curl — all passing
 
-### Phase 2 — Types & Constants (client)
-- [ ] `src/types/index.ts`: interfaces for `CategoryEntry`, `ValidatorResult`, `ValidatorFlag`, `KardiaVerse`, `IllustrativeRendering`, `EnglishGlosses`
-- [ ] `src/constants/categories.ts`: `CATEGORIES` map (migrated from HTML)
-- [ ] `src/constants/prompts.ts`: migrate `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` **verbatim** from HTML — do not alter wording; then add `semantic_domain_id` and `textual_layer_id` to `LAYER1_SCHEMA` as the only permitted deviation. Confirm `KARDIA_VERSE_PROMPT` contains the full rendering principles content (natural phrasing, not gloss insertion, contextually fitted per verse — see `rendering-principles.md`) and not just the outer prompt wrapper.
-- [ ] `src/lib/utils.ts`: `catToId`, `escapeHTML`
-- [ ] `src/lib/anthropic.ts`: `callAPI`, `runGeneration`, `repairTruncatedJSON`, `runValidation`, `runKardiaVerseTranslation`
+### Phase 2 — Types & Constants (client) ✓
+- [x] `src/types/index.ts`: interfaces for `CategoryEntry`, `ValidatorResult`, `ValidatorFlag`, `KardiaVerse`, `IllustrativeRendering`, `EnglishGlosses`
+- [x] `src/constants/categories.ts`: `CATEGORIES` map (migrated from HTML)
+- [x] `src/constants/prompts.ts`: migrate `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` **verbatim** from HTML — do not alter wording; then add `semantic_domain_id` and `textual_layer_id` to `LAYER1_SCHEMA` as the only permitted deviation. Confirm `KARDIA_VERSE_PROMPT` contains the full rendering principles content (natural phrasing, not gloss insertion, contextually fitted per verse — see `rendering-principles.md`) and not just the outer prompt wrapper.
+- [x] `src/lib/utils.ts`: `catToId`, `escapeHTML`
+- [x] `src/lib/anthropic.ts`: `callAPI`, `runGeneration`, `repairTruncatedJSON`, `runValidation`, `runKardiaVerseTranslation`
+- [x] Vitest installed; 29 unit tests written and passing (utils.test.ts, anthropic.test.ts); TypeScript type-checks clean
 
 ### Phase 3 — Hooks
 - [ ] `useApiKey`: read/write/clear key in localStorage; derive `isConnected`, `maskedKey`
