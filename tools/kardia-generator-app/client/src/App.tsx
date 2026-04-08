@@ -1,25 +1,29 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ApiKeyModal } from '@/components/ApiKeyModal'
+import { CategoryGrid, type CategorySelection } from '@/components/CategoryGrid'
+import { ModelSelector } from '@/components/ModelSelector'
 import { SettingsDrawer } from '@/components/SettingsDrawer'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
+import { MODEL_OPTIONS, type ModelId } from '@/constants/models'
+import { CATEGORIES } from '@/constants/categories'
 import { useApiKey } from '@/hooks/useApiKey'
-
-const placeholderSections = [
-  { title: 'Select Category', copy: 'Category grid coming in Phase 5.' },
-  { title: 'Model & Generation', copy: 'Model selector + status panel coming in Phase 5.' },
-  {
-    title: 'Output & Validation',
-    copy: 'Generation output, validator report, and reader preview arrive in Phase 6.',
-  },
-]
+import { useEntries } from '@/hooks/useEntries'
 
 function App() {
   const { apiKey, maskedKey, isConnected, setApiKey, clearApiKey } = useApiKey()
+  const {
+    entries,
+    loading: entriesLoading,
+    error: entriesError,
+    refresh: refreshEntries,
+  } = useEntries()
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isModalOpen, setModalOpen] = useState(() => !apiKey)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<CategorySelection | null>(null)
+  const [selectedModel, setSelectedModel] = useState<ModelId>('claude-sonnet-4-6')
   const prevKey = useRef(apiKey)
 
   useEffect(() => {
@@ -81,6 +85,18 @@ function App() {
     setStatusMessage('API key cleared.')
   }, [clearApiKey])
 
+  const completedIds = useMemo(
+    () => new Set(entries.map(entry => entry.id)),
+    [entries],
+  )
+
+  const totalCategories = useMemo(
+    () => Object.values(CATEGORIES).reduce((acc, group) => acc + group.length, 0),
+    [],
+  )
+
+  const selectedModelMeta = MODEL_OPTIONS.find(option => option.id === selectedModel) ?? MODEL_OPTIONS[0]
+
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Header
@@ -111,17 +127,67 @@ function App() {
       )}
 
       <main className="flex-1 space-y-6 px-4 py-8 md:px-8">
-        {placeholderSections.map(section => (
-          <section key={section.title} className="space-y-3 rounded-2xl border bg-card p-6 shadow-sm">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-semibold tracking-tight">{section.title}</h2>
-              <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                Coming soon
-              </span>
-            </div>
-            <p className="text-sm text-muted-foreground">{section.copy}</p>
-          </section>
-        ))}
+        <section className="space-y-4 rounded-2xl border bg-card p-6 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+              Select Category
+            </span>
+            <p className="text-sm text-muted-foreground">
+              Pick any Hebrew seed category to start a run. {completedIds.size} / {totalCategories} complete.
+            </p>
+          </div>
+
+          <CategoryGrid
+            groups={CATEGORIES}
+            selectedId={selectedCategory?.id ?? null}
+            completedIds={completedIds}
+            disabled={!isConnected}
+            loading={entriesLoading}
+            error={entriesError}
+            onRetry={refreshEntries}
+            onSelect={selection =>
+              setSelectedCategory(prev => (prev?.id === selection.id ? null : selection))
+            }
+          />
+
+          <div className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm text-muted-foreground">
+            <span className="text-xs uppercase tracking-[0.3em] text-muted-foreground">Selected</span>
+            <span className="font-medium">
+              {selectedCategory ? `${selectedCategory.label} (${selectedCategory.group})` : 'No category selected'}
+            </span>
+          </div>
+        </section>
+
+        <section className="space-y-4 rounded-2xl border bg-card p-6 shadow-sm">
+          <div className="flex flex-col gap-1">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+              Model & Generation
+            </span>
+            <p className="text-sm text-muted-foreground">
+              Choose an Anthropic model before running generation. Pricing estimates mirror the legacy tool.
+            </p>
+          </div>
+
+          <ModelSelector
+            value={selectedModel}
+            onChange={model => setSelectedModel(model)}
+            disabled={!isConnected}
+          />
+
+          <p className="text-sm text-muted-foreground">
+            Currently using <strong className="font-semibold">{selectedModelMeta.label}</strong> ({selectedModelMeta.costHint})
+          </p>
+        </section>
+
+        <section className="space-y-3 rounded-2xl border bg-card p-6 shadow-sm">
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold tracking-tight">Output & Validation</h2>
+            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Phase 6</span>
+          </div>
+          <p className="text-sm text-muted-foreground">
+            Generation output, validator report, reader preview, and recovery tools arrive next in Phase 6.
+          </p>
+        </section>
       </main>
 
       <Footer />

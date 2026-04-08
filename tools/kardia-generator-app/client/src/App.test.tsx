@@ -24,6 +24,15 @@ function makeLocalStorageMock() {
 describe('App shell', () => {
   beforeEach(() => {
     vi.stubGlobal('localStorage', makeLocalStorageMock())
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve([]),
+        }) as Promise<Response>,
+      ),
+    )
   })
 
   afterEach(() => {
@@ -62,5 +71,23 @@ describe('App shell', () => {
 
     fireEvent.keyDown(window, { key: 'Escape' })
     expect(drawerSection?.getAttribute('aria-hidden')).toBe('true')
+  })
+
+  it('updates the selected pill when choosing a category', async () => {
+    localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
+    render(<App />)
+
+    const button = await screen.findByRole('button', { name: /Elohim/i })
+    fireEvent.click(button)
+
+    await waitFor(() =>
+      expect(screen.getByText(/Elohim \(God & Covenant\)/)).toBeInTheDocument(),
+    )
+    expect(screen.getByText(/Currently using Sonnet 4\.6/)).toBeInTheDocument()
+
+    fireEvent.click(button)
+    await waitFor(() =>
+      expect(screen.getByText(/No category selected/)).toBeInTheDocument(),
+    )
   })
 })

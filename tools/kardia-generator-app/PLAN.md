@@ -167,9 +167,9 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] `SettingsDrawer.tsx`: collapsible drawer under header, show/hide toggle, save button — Completed with validation + CTA + tests (`components/SettingsDrawer.test.tsx`).
 - [x] Wire: show modal if no key in localStorage on mount; pill shows connected/disconnected — Observed via manual sanity run and automated coverage in `App.test.tsx`; helper validation logic covered by `src/lib/validation.test.ts`.
 
-### Phase 5 — Category & Model Selection
-- [ ] `CategoryGrid.tsx`: renders groups + buttons from `CATEGORIES`; marks completed IDs; emits `onSelect`
-- [ ] `ModelSelector.tsx`: three model buttons (Sonnet 4.6, Opus 4.6, Haiku 4.5); emits `onSelect`
+### Phase 5 — Category & Model Selection ✓
+- [x] `CategoryGrid.tsx`: renders groups + buttons from `CATEGORIES`; marks completed IDs; emits `onSelect`
+- [x] `ModelSelector.tsx`: three model buttons (Sonnet 4.6, Opus 4.6, Haiku 4.5); emits `onSelect`
 
 ### Phase 6 — Generation Flow
 - [ ] `GeneratePanel.tsx`: Generate button + status bar (loading/error/success states)

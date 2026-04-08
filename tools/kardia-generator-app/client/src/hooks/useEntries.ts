@@ -5,6 +5,7 @@ export interface UseEntriesReturn {
   entries: CategoryEntry[]
   loading: boolean
   error: string | null
+  refresh: () => Promise<void>
   approve: (entry: CategoryEntry) => Promise<void>
   updateEntry: (id: string, patch: EntryPatch) => Promise<void>
   deleteEntry: (id: string) => Promise<void>
@@ -98,5 +99,5 @@ export function useEntries(): UseEntriesReturn {
     setEntries(prev => prev.filter(e => e.id !== id))
   }, [])
 
-  return { entries, loading, error, approve, updateEntry, deleteEntry }
+  return { entries, loading, error, refresh: fetchEntries, approve, updateEntry, deleteEntry }
 }
