@@ -7,20 +7,24 @@ import { SettingsDrawer } from './SettingsDrawer'
 
 const baseProps = {
   open: true,
-  apiKey: 'sk-ant-existing-1234',
-  maskedKey: 'sk-ant-ex••••1234',
+  anthropicKey: 'sk-ant-existing-1234',
+  openaiKey: 'sk-openai-existing-1234',
+  maskedActiveKey: 'sk-ant-ex••••1234',
   isConnected: true,
-  onSave: vi.fn(),
-  onClear: vi.fn(),
+  activeProvider: 'anthropic' as const,
+  onSaveAnthropic: vi.fn(),
+  onSaveOpenai: vi.fn(),
+  onSetActiveProvider: vi.fn(),
+  onClearAll: vi.fn(),
   onRequestModal: vi.fn(),
 }
 
 describe('SettingsDrawer', () => {
-  it('displays connection status and calls onSave only when valid input provided', () => {
-    const onSave = vi.fn()
-    render(<SettingsDrawer {...baseProps} onSave={onSave} />)
+  it('displays connection status and saves Anthropic keys when valid', () => {
+    const onSaveAnthropic = vi.fn()
+    render(<SettingsDrawer {...baseProps} onSaveAnthropic={onSaveAnthropic} />)
 
-    expect(screen.getByText(/connected as/i)).toHaveTextContent('sk-ant-ex')
+    expect(screen.getByText(/anthropic connected as/i)).toBeInTheDocument()
 
     const input = screen.getByPlaceholderText('sk-ant-...')
     fireEvent.change(input, { target: { value: 'invalid' } })
@@ -30,38 +34,63 @@ describe('SettingsDrawer', () => {
     ).toBeInTheDocument()
 
     fireEvent.change(input, { target: { value: 'sk-ant-new-key-9999' } })
-    fireEvent.click(screen.getByRole('button', { name: /save/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /save/i })[0])
 
-    expect(onSave).toHaveBeenCalledWith('sk-ant-new-key-9999')
+    expect(onSaveAnthropic).toHaveBeenCalledWith('sk-ant-new-key-9999')
   })
 
-  it('toggles password visibility and clears the key when requested', () => {
-    const onClear = vi.fn()
-    render(<SettingsDrawer {...baseProps} onClear={onClear} />)
+  it('manages OpenAI key visibility, validation, and clearing', () => {
+    const onSaveOpenai = vi.fn()
+    render(
+      <SettingsDrawer
+        {...baseProps}
+        openaiKey=""
+        onSaveOpenai={onSaveOpenai}
+      />,
+    )
 
-    const input = screen.getByPlaceholderText('sk-ant-...')
+    const input = screen.getByPlaceholderText('sk-...')
     expect(input).toHaveAttribute('type', 'password')
 
-    fireEvent.click(screen.getByRole('button', { name: /show/i }))
+    fireEvent.click(screen.getAllByRole('button', { name: /show/i })[1])
     expect(input).toHaveAttribute('type', 'text')
 
-    fireEvent.click(screen.getByRole('button', { name: /clear key/i }))
-    expect(onClear).toHaveBeenCalled()
+    fireEvent.change(input, { target: { value: 'bad-key' } })
+    fireEvent.blur(input)
+    expect(screen.getByText(/please enter a valid openai key/i)).toBeInTheDocument()
+
+    fireEvent.change(input, { target: { value: 'sk-valid-openai-key' } })
+    fireEvent.click(screen.getAllByRole('button', { name: /save/i })[1])
+    expect(onSaveOpenai).toHaveBeenCalledWith('sk-valid-openai-key')
+
+    fireEvent.click(screen.getAllByRole('button', { name: /^clear$/i })[1])
+    expect(onSaveOpenai).toHaveBeenCalledWith('')
   })
 
-  it('prompts to open the modal when disconnected', () => {
+  it('supports provider toggle, modal prompt, and clearing all keys', () => {
     const onRequestModal = vi.fn()
+    const onSetActiveProvider = vi.fn()
+    const onClearAll = vi.fn()
     render(
       <SettingsDrawer
         {...baseProps}
         isConnected={false}
-        apiKey=""
-        maskedKey=""
+        anthropicKey=""
+        openaiKey=""
+        maskedActiveKey=""
+        onSetActiveProvider={onSetActiveProvider}
+        onClearAll={onClearAll}
         onRequestModal={onRequestModal}
       />,
     )
 
     fireEvent.click(screen.getByRole('button', { name: /add api key via secure modal/i }))
     expect(onRequestModal).toHaveBeenCalled()
+
+    fireEvent.click(screen.getByRole('button', { name: /openai/i }))
+    expect(onSetActiveProvider).toHaveBeenCalledWith('openai')
+
+    fireEvent.click(screen.getByRole('button', { name: /clear all keys/i }))
+    expect(onClearAll).toHaveBeenCalled()
   })
 })

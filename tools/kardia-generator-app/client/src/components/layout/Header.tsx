@@ -2,12 +2,14 @@ import { Settings2 } from 'lucide-react'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import type { ApiProvider } from '@/types'
 import { cn } from '@/lib/utils'
 
 export type HeaderTone = 'success' | 'warning'
 
 export interface HeaderProps {
   isConnected: boolean
+  activeProvider: ApiProvider
   statusLabel: string
   statusTone: HeaderTone
   onToggleDrawer: () => void
@@ -21,11 +23,15 @@ const toneClasses: Record<HeaderTone, string> = {
 
 export function Header({
   isConnected,
+  activeProvider,
   statusLabel,
   statusTone,
   onToggleDrawer,
   onRequestApiKeyModal,
 }: HeaderProps) {
+  const providerLabel = activeProvider === 'anthropic' ? 'Anthropic' : 'OpenAI'
+  const pillText = statusLabel || (isConnected ? `${providerLabel} — Connected` : 'Not Connected')
+
   return (
     <header className="border-b bg-card/80 backdrop-blur px-4 py-6 shadow-sm md:px-8">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -53,7 +59,11 @@ export function Header({
               'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition',
               toneClasses[statusTone],
             )}
-            title={isConnected ? 'API key saved locally' : 'Connect your Anthropic API key'}
+            title={
+              isConnected
+                ? `${providerLabel} key saved locally`
+                : 'Connect an API key to start generating'
+            }
           >
             <span
               className={cn(
@@ -62,7 +72,7 @@ export function Header({
               )}
               aria-hidden="true"
             />
-            {statusLabel}
+            <span>{pillText}</span>
           </button>
 
           <Button

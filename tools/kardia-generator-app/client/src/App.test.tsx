@@ -26,6 +26,7 @@ const generatorMock = {
   generateFresh: vi.fn(),
   regenerateWithSameParams: vi.fn(),
   retryAfterFailure: vi.fn(),
+  requestCorrections: vi.fn(),
   abortInFlight: vi.fn(),
   resetOutputs: vi.fn(),
 }
@@ -69,6 +70,7 @@ describe('App shell', () => {
       status: baseGeneratorStatus,
       isBusy: false,
       error: null,
+      requestCorrections: vi.fn(),
     })
     vi.stubGlobal('localStorage', makeLocalStorageMock())
     vi.stubGlobal(
@@ -272,5 +274,62 @@ describe('App shell', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+
+  it('submits validator corrections through the generator hook', async () => {
+    generatorMock.entry = {
+      id: 'id',
+      hebrew_root: '',
+      transliteration: '',
+      testament_scope: 'ot',
+      category_label: 'Label',
+      one_liner: '',
+      full_definition: '',
+      what_it_does: '',
+      what_it_is_not: '',
+      second_temple_context: '',
+      kardia_rendering: '',
+      surface_vehicles: {
+        hebrew_lexemes: [],
+        strongs_hebrew: [],
+        lxx_greek: [],
+        nt_greek: [],
+        strongs_greek: [],
+        english_glosses: [],
+      },
+      illustrative_renderings: [],
+      key_verses: [],
+      related_categories: [],
+      theological_notes: '',
+      semantic_domain_id: 'god-covenant',
+      textual_layer_id: 'pre-exilic',
+      version: '1.0',
+      reviewed_by: '',
+    }
+    generatorMock.validator = {
+      overall: 'minor-flags',
+      summary: 'Needs tuning',
+      flags: [
+        {
+          flag_number: 1,
+          point: 'Glossa',
+          severity: 'major',
+          location: 'Definition',
+          issue: 'Issue',
+          correction: 'Fix',
+        },
+      ],
+    }
+    generatorMock.requestCorrections = vi.fn().mockResolvedValue(undefined)
+    localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
+
+    render(<App />)
+    fireEvent.click(screen.getByRole('tab', { name: /validator/i }))
+    await waitFor(() => expect(screen.getByText(/Queued corrections/i)).toBeInTheDocument())
+    fireEvent.click(screen.getByRole('button', { name: /select all flags/i }))
+    fireEvent.click(screen.getByRole('button', { name: /regenerate with corrections/i }))
+
+    await waitFor(() => expect(generatorMock.requestCorrections).toHaveBeenCalled())
+    expect(generatorMock.requestCorrections.mock.calls[0][0].combinedCorrections).toContain('AUTO-QUEUED')
   })
 })

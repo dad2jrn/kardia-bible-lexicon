@@ -1,152 +1,130 @@
 // @vitest-environment happy-dom
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { renderHook, act } from '@testing-library/react'
+
 import { useApiKey } from './useApiKey'
 
-const STORAGE_KEY = 'kardia_api_key'
+const ANTH_KEY = 'kardia_api_key'
+const OPENAI_KEY = 'kardia_openai_key'
+const PROVIDER_KEY = 'kardia_active_provider'
 
-function makeLocalStorageMock() {
+function makeStorageMock() {
   const store: Record<string, string> = {}
   return {
     getItem: (key: string) => store[key] ?? null,
-    setItem: (key: string, value: string) => { store[key] = value },
-    removeItem: (key: string) => { delete store[key] },
-    clear: () => { Object.keys(store).forEach(k => delete store[k]) },
+    setItem: (key: string, value: string) => {
+      store[key] = value
+    },
+    removeItem: (key: string) => {
+      delete store[key]
+    },
+    clear: () => {
+      Object.keys(store).forEach(key => delete store[key])
+    },
   }
 }
 
 describe('useApiKey', () => {
   beforeEach(() => {
-    vi.stubGlobal('localStorage', makeLocalStorageMock())
+    vi.stubGlobal('localStorage', makeStorageMock())
   })
 
   afterEach(() => {
     vi.unstubAllGlobals()
   })
 
-  // ── Initial state ─────────────────────────────────────────────────────────
-
-  it('starts empty when localStorage has no key', () => {
+  it('initializes empty when no keys exist', () => {
     const { result } = renderHook(() => useApiKey())
-    expect(result.current.apiKey).toBe('')
+    expect(result.current.anthropicKey).toBe('')
+    expect(result.current.openaiKey).toBe('')
+    expect(result.current.activeProvider).toBe('anthropic')
+    expect(result.current.activeKey).toBe('')
     expect(result.current.isConnected).toBe(false)
-    expect(result.current.maskedKey).toBe('')
+    expect(result.current.maskedActiveKey).toBe('')
   })
 
-  it('reads the key from localStorage on first render', () => {
-    localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-testkey-abcd1234')
+  it('reads stored values and derives active key from provider', () => {
+    localStorage.setItem(ANTH_KEY, 'sk-ant-existing-1234')
+    localStorage.setItem(OPENAI_KEY, 'sk-openai-existing-0001')
+    localStorage.setItem(PROVIDER_KEY, 'openai')
+
     const { result } = renderHook(() => useApiKey())
-    expect(result.current.apiKey).toBe('sk-ant-api01-testkey-abcd1234')
+    expect(result.current.anthropicKey).toBe('sk-ant-existing-1234')
+    expect(result.current.openaiKey).toBe('sk-openai-existing-0001')
+    expect(result.current.activeProvider).toBe('openai')
+    expect(result.current.activeKey).toBe('sk-openai-existing-0001')
+    expect(result.current.isConnected).toBe(true)
+    expect(result.current.maskedActiveKey.endsWith('0001')).toBe(true)
+  })
+
+  it('setAnthropicKey trims values and clears when empty', () => {
+    const { result } = renderHook(() => useApiKey())
+    act(() => {
+      result.current.setAnthropicKey('  sk-ant-fresh-0002  ')
+    })
+    expect(result.current.anthropicKey).toBe('sk-ant-fresh-0002')
+    expect(localStorage.getItem(ANTH_KEY)).toBe('sk-ant-fresh-0002')
+    expect(result.current.activeKey).toBe('sk-ant-fresh-0002')
+    expect(result.current.isConnected).toBe(true)
+
+    act(() => {
+      result.current.setAnthropicKey('')
+    })
+    expect(result.current.anthropicKey).toBe('')
+    expect(localStorage.getItem(ANTH_KEY)).toBeNull()
+    expect(result.current.isConnected).toBe(false)
+  })
+
+  it('setOpenaiKey updates state and respects active provider', () => {
+    const { result } = renderHook(() => useApiKey())
+    act(() => {
+      result.current.setOpenaiKey('  sk-openai-abc  ')
+    })
+    expect(result.current.openaiKey).toBe('sk-openai-abc')
+    expect(localStorage.getItem(OPENAI_KEY)).toBe('sk-openai-abc')
+    expect(result.current.isConnected).toBe(false)
+
+    act(() => {
+      result.current.setActiveProvider('openai')
+    })
+    expect(result.current.activeProvider).toBe('openai')
+    expect(result.current.activeKey).toBe('sk-openai-abc')
     expect(result.current.isConnected).toBe(true)
   })
 
-  // ── setApiKey ─────────────────────────────────────────────────────────────
-
-  it('setApiKey writes to localStorage and updates state', () => {
+  it('setActiveProvider switches without deleting stored keys', () => {
+    localStorage.setItem(ANTH_KEY, 'sk-ant-123')
+    localStorage.setItem(OPENAI_KEY, 'sk-openai-789')
     const { result } = renderHook(() => useApiKey())
-    act(() => { result.current.setApiKey('sk-ant-api01-mykey-1234') })
-    expect(result.current.apiKey).toBe('sk-ant-api01-mykey-1234')
-    expect(localStorage.getItem(STORAGE_KEY)).toBe('sk-ant-api01-mykey-1234')
+
+    expect(result.current.activeKey).toBe('sk-ant-123')
+    act(() => {
+      result.current.setActiveProvider('openai')
+    })
+    expect(result.current.activeKey).toBe('sk-openai-789')
+    expect(result.current.isConnected).toBe(true)
   })
 
-  it('setApiKey trims surrounding whitespace before saving', () => {
+  it('clearAll removes keys and resets provider', () => {
+    localStorage.setItem(ANTH_KEY, 'sk-ant-123')
+    localStorage.setItem(OPENAI_KEY, 'sk-openai-789')
+    localStorage.setItem(PROVIDER_KEY, 'openai')
     const { result } = renderHook(() => useApiKey())
-    act(() => { result.current.setApiKey('  sk-ant-api01-mykey-1234  ') })
-    expect(result.current.apiKey).toBe('sk-ant-api01-mykey-1234')
-    expect(localStorage.getItem(STORAGE_KEY)).toBe('sk-ant-api01-mykey-1234')
-  })
 
-  it('setApiKey with empty string removes the key from localStorage', () => {
-    localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-mykey-1234')
-    const { result } = renderHook(() => useApiKey())
-    act(() => { result.current.setApiKey('') })
-    expect(result.current.apiKey).toBe('')
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
+    act(() => {
+      result.current.clearAll()
+    })
+    expect(localStorage.getItem(ANTH_KEY)).toBeNull()
+    expect(localStorage.getItem(OPENAI_KEY)).toBeNull()
+    expect(localStorage.getItem(PROVIDER_KEY)).toBeNull()
+    expect(result.current.activeProvider).toBe('anthropic')
     expect(result.current.isConnected).toBe(false)
   })
 
-  it('setApiKey with whitespace-only string removes the key', () => {
-    localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-mykey-1234')
+  it('migrates legacy anthropic key by seeding provider default', () => {
+    localStorage.setItem(ANTH_KEY, 'sk-ant-legacy')
     const { result } = renderHook(() => useApiKey())
-    act(() => { result.current.setApiKey('   ') })
-    expect(result.current.apiKey).toBe('')
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
-  })
-
-  // ── clearApiKey ───────────────────────────────────────────────────────────
-
-  it('clearApiKey removes the key from localStorage and resets state', () => {
-    localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-mykey-1234')
-    const { result } = renderHook(() => useApiKey())
-    act(() => { result.current.clearApiKey() })
-    expect(result.current.apiKey).toBe('')
-    expect(localStorage.getItem(STORAGE_KEY)).toBeNull()
-    expect(result.current.isConnected).toBe(false)
-    expect(result.current.maskedKey).toBe('')
-  })
-
-  // ── isConnected ───────────────────────────────────────────────────────────
-
-  describe('isConnected', () => {
-    it('is true when the key starts with sk-ant-', () => {
-      localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-anything')
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.isConnected).toBe(true)
-    })
-
-    it('is false for a key without the sk-ant- prefix', () => {
-      localStorage.setItem(STORAGE_KEY, 'sk-live-invalid-key')
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.isConnected).toBe(false)
-    })
-
-    it('is false for an empty key', () => {
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.isConnected).toBe(false)
-    })
-
-    it('updates reactively when setApiKey is called', () => {
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.isConnected).toBe(false)
-      act(() => { result.current.setApiKey('sk-ant-api01-reactivetest-0000') })
-      expect(result.current.isConnected).toBe(true)
-      act(() => { result.current.clearApiKey() })
-      expect(result.current.isConnected).toBe(false)
-    })
-  })
-
-  // ── maskedKey ─────────────────────────────────────────────────────────────
-
-  describe('maskedKey', () => {
-    it('is empty string when no key is set', () => {
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.maskedKey).toBe('')
-    })
-
-    it('shows first 10 chars + •••• + last 4 for long keys', () => {
-      // 'sk-ant-api' is exactly 10 chars; last 4 are '1234'
-      localStorage.setItem(STORAGE_KEY, 'sk-ant-api01-mykey-1234')
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.maskedKey).toBe('sk-ant-api' + '••••' + '1234')
-    })
-
-    it('returns •••••••• for short keys (≤12 chars)', () => {
-      localStorage.setItem(STORAGE_KEY, 'sk-short')
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.maskedKey).toBe('••••••••')
-    })
-
-    it('returns •••••••• for exactly 12-char keys', () => {
-      localStorage.setItem(STORAGE_KEY, '123456789012')
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.maskedKey).toBe('••••••••')
-    })
-
-    it('updates reactively after setApiKey', () => {
-      const { result } = renderHook(() => useApiKey())
-      expect(result.current.maskedKey).toBe('')
-      act(() => { result.current.setApiKey('sk-ant-api01-mykey-abcd') })
-      expect(result.current.maskedKey).toBe('sk-ant-api' + '••••' + 'abcd')
-    })
+    expect(result.current.anthropicKey).toBe('sk-ant-legacy')
+    expect(localStorage.getItem(PROVIDER_KEY)).toBe('anthropic')
   })
 })

@@ -3,7 +3,7 @@
 // The model selection is passed in at call time; localStorage key handling
 // is the responsibility of the caller (useApiKey hook).
 
-import type { CategoryEntry, KardiaVerse, ValidatorResult } from '@/types'
+import type { ApiProvider, CategoryEntry, KardiaVerse, ValidatorResult } from '@/types'
 import { SYSTEM_PROMPT, VALIDATOR_PROMPT, KARDIA_VERSE_PROMPT, LAYER1_SCHEMA } from '@/constants/prompts'
 
 // ── Low-level fetch wrapper ───────────────────────────────────────────────────
@@ -17,32 +17,93 @@ export async function callAPI(
   key: string,
   system: string,
   user: string,
+  provider: ApiProvider,
   model: string,
   options?: { signal?: AbortSignal },
 ): Promise<AnthropicMessage> {
-  const res = await fetch('https://api.anthropic.com/v1/messages', {
+  if (provider === 'anthropic') {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': key,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true',
+      },
+      body: JSON.stringify({
+        model,
+        max_tokens: 8000,
+        system,
+        messages: [{ role: 'user', content: user }],
+      }),
+      signal: options?.signal,
+    })
+
+    if (!res.ok) {
+      const err = await res.json()
+      throw new Error(err.error?.message || `API error ${res.status}`)
+    }
+
+    return res.json()
+  }
+
+  const isOSeriesModel = /^o\d/i.test(model)
+  const messages = isOSeriesModel
+    ? [
+        {
+          role: 'user',
+          content: `${system}\n\n${user}`,
+        },
+      ]
+    : [
+        { role: 'system', content: system },
+        { role: 'user', content: user },
+      ]
+
+  const res = await fetch('https://api.openai.com/v1/chat/completions', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'x-api-key': key,
-      'anthropic-version': '2023-06-01',
-      'anthropic-dangerous-direct-browser-access': 'true',
+      Authorization: `Bearer ${key}`,
     },
     body: JSON.stringify({
       model,
+      messages,
       max_tokens: 8000,
-      system,
-      messages: [{ role: 'user', content: user }],
     }),
     signal: options?.signal,
   })
 
   if (!res.ok) {
-    const err = await res.json()
+    const err = await res.json().catch(() => ({}))
     throw new Error(err.error?.message || `API error ${res.status}`)
   }
 
-  return res.json()
+  const data = await res.json()
+  const choice = data.choices?.[0]
+  const messageContent = choice?.message?.content
+  let text = ''
+
+  if (typeof messageContent === 'string') {
+    text = messageContent
+  } else if (Array.isArray(messageContent)) {
+    text = messageContent
+      .map(part => {
+        if (typeof part === 'string') return part
+        if (typeof part?.text === 'string') return part.text
+        if (typeof part?.content === 'string') return part.content
+        return ''
+      })
+      .filter(Boolean)
+      .join('\n\n')
+  } else if (messageContent?.text) {
+    text = messageContent.text
+  }
+
+  return {
+    content: [{ type: 'text', text: typeof text === 'string' ? text.trim() : '' }],
+    stop_reason: choice?.finish_reason ?? 'unknown',
+  }
 }
 
 // ── JSON repair ───────────────────────────────────────────────────────────────
@@ -86,9 +147,10 @@ export async function runGeneration(
   key: string,
   userPrompt: string,
   model: string,
+  provider: ApiProvider,
   options?: { signal?: AbortSignal },
 ): Promise<CategoryEntry> {
-  const res = await callAPI(key, SYSTEM_PROMPT, userPrompt, model, options)
+  const res = await callAPI(key, SYSTEM_PROMPT, userPrompt, provider, model, options)
   const raw = res.content[0].text.trim()
   const stopReason = res.stop_reason
 
@@ -189,12 +251,14 @@ export async function runValidation(
   key: string,
   entry: CategoryEntry,
   model: string,
+  provider: ApiProvider,
   options?: { signal?: AbortSignal },
 ): Promise<ValidatorResult> {
   const res = await callAPI(
     key,
     VALIDATOR_PROMPT,
     `Review this Kardia Lexicon entry:\n${JSON.stringify(entry, null, 2)}`,
+    provider,
     model,
     options,
   )
@@ -216,6 +280,7 @@ export async function runKardiaVerseTranslation(
   key: string,
   entry: CategoryEntry,
   model: string,
+  provider: ApiProvider,
   options?: { signal?: AbortSignal },
 ): Promise<KardiaVerse[]> {
   const verses = entry.key_verses || []
@@ -248,7 +313,7 @@ export async function runKardiaVerseTranslation(
     'Respond ONLY with the JSON array. No preamble, no markdown fences.'
 
   try {
-    const res = await callAPI(key, KARDIA_VERSE_PROMPT, prompt, model, options)
+    const res = await callAPI(key, KARDIA_VERSE_PROMPT, prompt, provider, model, options)
     const text = res.content[0].text.trim()
     try {
       return JSON.parse(text) as KardiaVerse[]

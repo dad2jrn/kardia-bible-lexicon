@@ -9,14 +9,15 @@ describe('Header component', () => {
     render(
       <Header
         isConnected
-        statusLabel="API Connected"
+        activeProvider="anthropic"
+        statusLabel="Anthropic — Connected"
         statusTone="success"
         onToggleDrawer={vi.fn()}
         onRequestApiKeyModal={vi.fn()}
       />,
     )
 
-    const pill = screen.getByRole('button', { name: /api connected/i })
+    const pill = screen.getByRole('button', { name: /anthropic — connected/i })
     expect(pill).toHaveAttribute('aria-pressed', 'true')
     expect(pill.className).toContain('bg-emerald-50')
   })
@@ -27,14 +28,15 @@ describe('Header component', () => {
     render(
       <Header
         isConnected={false}
-        statusLabel="Connect API key"
+        activeProvider="openai"
+        statusLabel="Not Connected"
         statusTone="warning"
         onToggleDrawer={onToggleDrawer}
         onRequestApiKeyModal={onRequestModal}
       />,
     )
 
-    fireEvent.click(screen.getByRole('button', { name: /connect api key/i }))
+    fireEvent.click(screen.getByRole('button', { name: /not connected/i }))
     expect(onRequestModal).toHaveBeenCalled()
 
     fireEvent.click(screen.getByLabelText(/open api settings drawer/i))

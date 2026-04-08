@@ -8,34 +8,67 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { validateAnthropicKey } from '@/lib/validation'
+import type { ApiProvider } from '@/types'
+import { validateAnthropicKey, validateOpenAiKey } from '@/lib/validation'
 import { cn } from '@/lib/utils'
 
 export interface ApiKeyModalProps {
   open: boolean
+  anthropicKey: string
+  openaiKey: string
+  activeProvider: ApiProvider
   onClose: () => void
-  onSave: (value: string) => void
+  onSaveAnthropic: (value: string) => void
+  onSaveOpenai: (value: string) => void
+  onSelectProvider: (provider: ApiProvider) => void
 }
 
-export function ApiKeyModal({ open, onClose, onSave }: ApiKeyModalProps) {
-  const [value, setValue] = useState('')
-  const [touched, setTouched] = useState(false)
+export function ApiKeyModal({
+  open,
+  anthropicKey,
+  openaiKey,
+  activeProvider,
+  onClose,
+  onSaveAnthropic,
+  onSaveOpenai,
+  onSelectProvider,
+}: ApiKeyModalProps) {
+  const [anthropicValue, setAnthropicValue] = useState(anthropicKey)
+  const [openaiValue, setOpenaiValue] = useState(openaiKey)
+  const [touched, setTouched] = useState({ anthropic: false, openai: false })
 
   useEffect(() => {
     if (!open) {
-      setValue('')
-      setTouched(false)
+      setAnthropicValue(anthropicKey)
+      setOpenaiValue(openaiKey)
+      setTouched({ anthropic: false, openai: false })
+    } else {
+      setAnthropicValue(anthropicKey)
+      setOpenaiValue(openaiKey)
     }
-  }, [open])
+  }, [open, anthropicKey, openaiKey])
 
-  const isValid = validateAnthropicKey(value)
-  const showError = touched && !isValid
+  const isAnthropicValid = anthropicValue.trim() === '' || validateAnthropicKey(anthropicValue)
+  const isOpenaiValid = openaiValue.trim() === '' || validateOpenAiKey(openaiValue)
+  const showAnthropicError = touched.anthropic && !isAnthropicValid && anthropicValue.trim() !== ''
+  const showOpenaiError = touched.openai && !isOpenaiValid && openaiValue.trim() !== ''
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setTouched(true)
-    if (!isValid) return
-    onSave(value.trim())
+    setTouched({ anthropic: true, openai: true })
+    if (!isAnthropicValid || !isOpenaiValid) return
+
+    const trimmedAnthropic = anthropicValue.trim()
+    const trimmedOpenai = openaiValue.trim()
+
+    if (trimmedAnthropic !== anthropicKey) {
+      onSaveAnthropic(trimmedAnthropic)
+    }
+    if (trimmedOpenai !== openaiKey) {
+      onSaveOpenai(trimmedOpenai)
+    }
+
+    onClose()
   }
 
   return (
@@ -52,8 +85,7 @@ export function ApiKeyModal({ open, onClose, onSave }: ApiKeyModalProps) {
           </span>
           <DialogTitle>Connect your API key</DialogTitle>
           <DialogDescription>
-            Enter your Anthropic API key to begin generating Hebrew category entries. Your key stays
-            in this browser and is never shared.
+            Add your Anthropic or OpenAI API keys. Keys stay in this browser and are never shared.
           </DialogDescription>
         </DialogHeader>
 
@@ -64,34 +96,86 @@ export function ApiKeyModal({ open, onClose, onSave }: ApiKeyModalProps) {
               type="password"
               className={cn(
                 'rounded-lg border bg-muted/30 px-3 py-2 font-mono text-sm tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
-                showError && 'border-destructive focus-visible:ring-destructive/40',
+                showAnthropicError && 'border-destructive focus-visible:ring-destructive/40',
               )}
               placeholder="sk-ant-..."
               autoComplete="off"
-              value={value}
-              onChange={event => setValue(event.target.value)}
-              onBlur={() => setTouched(true)}
+              value={anthropicValue}
+              onChange={event => setAnthropicValue(event.target.value)}
+              onBlur={() => setTouched(prev => ({ ...prev, anthropic: true }))}
             />
           </label>
 
-          <p className="text-xs italic text-muted-foreground">
-            Your key is stored only in localStorage and sent directly to api.anthropic.com — nowhere
-            else.
-          </p>
-
-          {showError && (
+          {showAnthropicError && (
             <p className="text-sm text-destructive">
-              Please enter a valid API key starting with <code>sk-ant-</code>.
+              Please enter a valid Anthropic key starting with <code>sk-ant-</code>.
             </p>
           )}
+
+          <label className="flex flex-col gap-2 text-sm font-medium text-foreground">
+            OpenAI API key
+            <input
+              type="password"
+              className={cn(
+                'rounded-lg border bg-muted/30 px-3 py-2 font-mono text-sm tracking-wide focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring',
+                showOpenaiError && 'border-destructive focus-visible:ring-destructive/40',
+              )}
+              placeholder="sk-..."
+              autoComplete="off"
+              value={openaiValue}
+              onChange={event => setOpenaiValue(event.target.value)}
+              onBlur={() => setTouched(prev => ({ ...prev, openai: true }))}
+            />
+          </label>
+
+          {showOpenaiError && (
+            <p className="text-sm text-destructive">
+              Please enter a valid OpenAI key starting with <code>sk-</code>.
+            </p>
+          )}
+
+          <div className="space-y-2 rounded-xl border border-dashed border-muted-foreground/30 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+              Active Provider
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {(['anthropic', 'openai'] as ApiProvider[]).map(provider => {
+                const isActive = provider === activeProvider
+                return (
+                  <button
+                    key={provider}
+                    type="button"
+                    onClick={() => onSelectProvider(provider)}
+                    aria-pressed={isActive}
+                    className={cn(
+                      'rounded-lg border px-3 py-2 text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary',
+                      isActive
+                        ? 'border-primary bg-primary text-primary-foreground'
+                        : 'border-muted bg-background hover:border-primary/40',
+                    )}
+                  >
+                    {provider === 'anthropic' ? 'Anthropic' : 'OpenAI'}
+                  </button>
+                )
+              })}
+            </div>
+            <p className="text-xs text-muted-foreground">
+              The active provider&apos;s key is used for generation runs. Switch anytime without losing
+              saved keys.
+            </p>
+          </div>
+
+          <p className="text-xs italic text-muted-foreground">
+            Keys stay in localStorage and are sent only to their respective provider APIs.
+          </p>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button
               type="submit"
-              disabled={!isValid}
+              disabled={!isAnthropicValid || !isOpenaiValid}
               className="w-full sm:w-auto"
             >
-              Connect &amp; Begin →
+              Save Keys &amp; Continue →
             </Button>
             <Button
               type="button"

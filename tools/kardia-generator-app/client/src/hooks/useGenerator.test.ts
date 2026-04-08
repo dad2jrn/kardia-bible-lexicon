@@ -9,10 +9,11 @@ import type { ModelId } from '@/constants/models'
 import { JsonParseError } from '@/lib/anthropic'
 import { useGenerator } from './useGenerator'
 
-const { runGenerationMock, runValidationMock, runVerseMock } = vi.hoisted(() => ({
+const { runGenerationMock, runValidationMock, runVerseMock, buildCorrectionPromptMock } = vi.hoisted(() => ({
   runGenerationMock: vi.fn(),
   runValidationMock: vi.fn(),
   runVerseMock: vi.fn(),
+  buildCorrectionPromptMock: vi.fn(() => 'correction prompt'),
 }))
 
 vi.mock('@/lib/anthropic', async () => {
@@ -20,6 +21,7 @@ vi.mock('@/lib/anthropic', async () => {
   return {
     ...actual,
     buildGenerationPrompt: vi.fn(() => 'prompt'),
+    buildCorrectionPrompt: buildCorrectionPromptMock,
     runGeneration: runGenerationMock,
     runValidation: runValidationMock,
     runKardiaVerseTranslation: runVerseMock,
@@ -29,6 +31,7 @@ vi.mock('@/lib/anthropic', async () => {
 const category: CategorySelection = { id: 'elohim', label: 'Elohim', group: 'God & Covenant' }
 const model: ModelId = 'claude-sonnet-4-6'
 const apiKey = 'sk-ant-test'
+const provider = 'anthropic' as const
 
 const entry: CategoryEntry = {
   id: 'elohim',
@@ -84,13 +87,15 @@ describe('useGenerator', () => {
     runVerseMock.mockResolvedValue(verses)
 
     const { result } = renderHook(() => useGenerator())
-    await act(() => result.current.generateFresh(category, model, apiKey))
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
 
     await waitFor(() => expect(result.current.status.step).toBe('complete'))
     expect(result.current.entry).toEqual(entry)
     expect(result.current.validator).toEqual(validator)
     expect(result.current.kardiaVerses).toEqual(verses)
     expect(result.current.iteration).toBe(1)
+    expect(runGenerationMock).toHaveBeenCalled()
+    expect(runGenerationMock.mock.calls[0][3]).toBe('anthropic')
   })
 
   it('surfaces validator failures as errors', async () => {
@@ -98,7 +103,7 @@ describe('useGenerator', () => {
     runValidationMock.mockRejectedValue(new Error('validator broke'))
 
     const { result } = renderHook(() => useGenerator())
-    await act(() => result.current.generateFresh(category, model, apiKey))
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
 
     await waitFor(() => expect(result.current.status.step).toBe('error'))
     expect(result.current.error).toContain('validator broke')
@@ -110,7 +115,7 @@ describe('useGenerator', () => {
     runVerseMock.mockRejectedValue(new Error('verse boom'))
 
     const { result } = renderHook(() => useGenerator())
-    await act(() => result.current.generateFresh(category, model, apiKey))
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
 
     await waitFor(() => expect(result.current.status.step).toBe('complete'))
     expect(result.current.kardiaVerses).toEqual([])
@@ -120,7 +125,7 @@ describe('useGenerator', () => {
     runGenerationMock.mockRejectedValue(new JsonParseError('bad json', 'RAW TEXT'))
 
     const { result } = renderHook(() => useGenerator())
-    await act(() => result.current.generateFresh(category, model, apiKey))
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
 
     await waitFor(() => expect(result.current.status.step).toBe('error'))
     expect(result.current.rawRecovery).toBe('RAW TEXT')
@@ -131,8 +136,25 @@ describe('useGenerator', () => {
       Object.assign(new Error('Aborted'), { name: 'AbortError' }),
     )
     const { result } = renderHook(() => useGenerator())
-    await act(() => result.current.generateFresh(category, model, apiKey))
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
     await waitFor(() => expect(result.current.status.step).toBe('idle'))
     expect(result.current.error).toBe('Generation cancelled.')
+  })
+
+  it('rebuilds the prompt and reruns the pipeline for corrections', async () => {
+    runGenerationMock.mockResolvedValue(entry)
+    runValidationMock.mockResolvedValue(validator)
+    runVerseMock.mockResolvedValue([])
+    const { result } = renderHook(() => useGenerator())
+
+    await act(() => result.current.generateFresh(category, model, apiKey, provider))
+    await waitFor(() => expect(result.current.iteration).toBe(1))
+
+    await act(() =>
+      result.current.requestCorrections({ combinedCorrections: 'AUTO NOTES' }),
+    )
+    await waitFor(() => expect(buildCorrectionPromptMock).toHaveBeenCalledWith(entry, validator.summary, 'AUTO NOTES'))
+    await waitFor(() => expect(result.current.iteration).toBe(2))
+    expect(runGenerationMock).toHaveBeenCalledTimes(2)
   })
 })

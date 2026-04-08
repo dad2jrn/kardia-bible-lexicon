@@ -1,23 +1,31 @@
-import { MODEL_OPTIONS, type ModelId } from '@/constants/models'
+import { MODEL_OPTIONS_BY_PROVIDER, type ModelId } from '@/constants/models'
+import type { ApiProvider } from '@/types'
 import { cn } from '@/lib/utils'
 
 export interface ModelSelectorProps {
+  provider: ApiProvider
   value: ModelId
   onChange: (model: ModelId) => void
   disabled?: boolean
   className?: string
 }
 
-export function ModelSelector({ value, onChange, disabled, className }: ModelSelectorProps) {
+export function ModelSelector({ provider, value, onChange, disabled, className }: ModelSelectorProps) {
+  const options = MODEL_OPTIONS_BY_PROVIDER[provider]
+  const recommended = options[0]
+  const helperCopy =
+    provider === 'anthropic'
+      ? 'Sonnet 4.6 recommended — holds complex theological guard rails reliably at roughly $0.03 per entry including validation.'
+      : 'GPT-5.4 recommended — flagship reasoning tier with best default accuracy for multi-step batches.'
+
   return (
     <div className={cn('space-y-4', className)}>
       <div className="rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100">
-        Sonnet 4.6 recommended — holds complex theological guard rails reliably at roughly $0.03
-        per entry including validation.
+        {helperCopy}
       </div>
 
-      <div className="flex flex-col gap-3 md:flex-row">
-        {MODEL_OPTIONS.map(option => {
+      <div className="grid gap-3 md:grid-cols-2">
+        {options.map(option => {
           const isSelected = value === option.id
           return (
             <button

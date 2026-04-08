@@ -1,14 +1,22 @@
 import { useEffect, useMemo, useState } from 'react'
-import { AlertTriangle } from 'lucide-react'
 
 import type { ValidatorFlag, ValidatorResult } from '@/types'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import { Textarea } from '@/components/ui/textarea'
 import { cn } from '@/lib/utils'
 
 export interface ValidatorPanelProps {
   validator: ValidatorResult | null
-  onRequestCorrections: (selectedFlags: number[]) => void
+  isBusy: boolean
+  onRequestCorrections: (payload: CorrectionsPayload) => void | Promise<void>
+}
+
+export interface CorrectionsPayload {
+  combinedCorrections: string
+  autoCorrections: string
+  manualNotes: string
+  queuedFlagCount: number
 }
 
 const overallCopy: Record<ValidatorResult['overall'], { label: string; tone: string }> = {
@@ -28,11 +36,15 @@ const severityTone: Record<ValidatorFlag['severity'], string> = {
   major: 'bg-rose-100 text-rose-900 dark:bg-rose-400/10 dark:text-rose-100',
 }
 
-export function ValidatorPanel({ validator, onRequestCorrections }: ValidatorPanelProps) {
+export function ValidatorPanel({ validator, isBusy, onRequestCorrections }: ValidatorPanelProps) {
   const [selectedFlags, setSelectedFlags] = useState<Set<number>>(new Set())
+  const [manualNotes, setManualNotes] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
     setSelectedFlags(new Set())
+    setManualNotes('')
+    setIsSubmitting(false)
   }, [validator])
 
   const flags = validator?.flags ?? []
@@ -67,12 +79,46 @@ export function ValidatorPanel({ validator, onRequestCorrections }: ValidatorPan
     )
   }, [validator])
 
+  const selectedFlagObjects = useMemo(() => {
+    return flags.filter(flag => selectedFlags.has(flag.flag_number))
+  }, [flags, selectedFlags])
+
+  const autoCorrectionsText = selectedFlagObjects
+    .map(flag => {
+      return `Flag ${flag.flag_number} (${flag.location}) — ${flag.point}:\n  Issue: ${flag.issue}\n  Apply this fix: ${flag.correction}`
+    })
+    .join('\n\n')
+
+  const autoSection = selectedFlagObjects.length
+    ? `AUTO-QUEUED FLAG CORRECTIONS (${selectedFlagObjects.length} flag${selectedFlagObjects.length === 1 ? '' : 's'}):\n${autoCorrectionsText}`
+    : ''
+
+  const trimmedManual = manualNotes.trim()
+  const manualSection = trimmedManual ? `ADDITIONAL REVIEWER NOTES:\n${trimmedManual}` : ''
+  const combinedCorrections = [autoSection, manualSection].filter(Boolean).join('\n\n---\n\n')
+  const canSubmit = Boolean(combinedCorrections) && !isBusy && !isSubmitting
+
   if (!validator) {
     return (
       <div className="rounded-xl border border-dashed bg-muted/40 px-4 py-8 text-center text-sm text-muted-foreground">
         Validator output will appear here after the first run.
       </div>
     )
+  }
+
+  const handleSubmit = async () => {
+    if (!combinedCorrections) return
+    setIsSubmitting(true)
+    try {
+      await onRequestCorrections({
+        combinedCorrections,
+        autoCorrections: autoSection,
+        manualNotes: trimmedManual,
+        queuedFlagCount: selectedFlagObjects.length,
+      })
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -122,25 +168,52 @@ export function ValidatorPanel({ validator, onRequestCorrections }: ValidatorPan
         ))}
       </ul>
 
-      <div className="rounded-xl border border-dashed px-4 py-3 text-sm text-muted-foreground">
-        <div className="flex items-center gap-2 font-semibold text-foreground">
-          <AlertTriangle className="h-4 w-4" />
-          Correction loop lands in Phase 8
+      <div className="space-y-3 rounded-2xl border border-dashed bg-muted/30 p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <span className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">
+            Correction Instructions
+          </span>
+          <Badge variant="outline" className="text-xs">
+            {selectedFlagObjects.length} flag{selectedFlagObjects.length === 1 ? '' : 's'} queued
+          </Badge>
         </div>
         <p className="text-sm text-muted-foreground">
-          Selecting flags now cues the corrections summary so we can hand it directly to the next pass.
+          Check flags above to auto-queue their fixes. Add reviewer overrides below. Both sections are merged and
+          sent directly back to Anthropic for the correction pass.
         </p>
-        <Button
-          type="button"
-          variant="outline"
-          className="mt-3"
-          onClick={() => onRequestCorrections(Array.from(selectedFlags))}
-          aria-disabled="true"
-        >
-          Regenerate with Corrections
-        </Button>
+        <div className="rounded-xl bg-background/80 p-3 text-xs text-muted-foreground">
+          <strong>Examples:</strong>
+          <br />
+          "Flag 2 — reduce the Augustinian description to one sentence then pivot into covenantal framing."
+          <br />
+          "Flag 5 — remove 'faithless generation', reframe Qumran as priestly-purity community."
+          <br />
+          "The one_liner should emphasize chesed as covenant interior life, not voluntary beneficence."
+        </div>
+        <Textarea
+          value={manualNotes}
+          onChange={event => setManualNotes(event.target.value)}
+          placeholder="Describe the corrections needed..."
+          rows={5}
+        />
+        <div className="flex flex-wrap gap-3">
+          <Button
+            type="button"
+            disabled={!canSubmit}
+            onClick={handleSubmit}
+          >
+            {isBusy || isSubmitting ? 'Regenerating…' : 'Regenerate with Corrections'}
+          </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={() => setManualNotes('')}
+            disabled={!manualNotes}
+          >
+            Clear Notes
+          </Button>
+        </div>
       </div>
     </div>
   )
 }
-

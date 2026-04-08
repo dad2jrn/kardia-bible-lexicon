@@ -4,7 +4,7 @@ import type { CategoryEntry, KardiaVerse, ValidatorResult } from '@/types'
 import type { ApprovalState } from '@/types/ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { JsonPanel } from './JsonPanel'
-import { ValidatorPanel } from './ValidatorPanel'
+import { ValidatorPanel, type CorrectionsPayload } from './ValidatorPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { RecoveryPanel } from './RecoveryPanel'
 
@@ -19,7 +19,7 @@ export interface OutputSectionProps {
   onCopyJson: (json: string) => void
   onRegenerate: () => void
   onRetryRecovery: () => void
-  onRequestCorrections: (selectedFlagIds: number[]) => void
+  onRequestCorrections: (payload: CorrectionsPayload) => void | Promise<void>
 }
 
 export function OutputSection({
@@ -79,6 +79,7 @@ export function OutputSection({
         <TabsContent value="validator" className="mt-4">
           <ValidatorPanel
             validator={validator}
+            isBusy={isBusy}
             onRequestCorrections={onRequestCorrections}
           />
         </TabsContent>

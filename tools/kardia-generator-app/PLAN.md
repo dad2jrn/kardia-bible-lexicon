@@ -189,10 +189,10 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] Import `categories.json`: file picker parses categories payloads, bulk upserts via `POST /api/entries`, and reports success/failure counts inline + via toast.
 
 ### Phase 8 — Correction Loop
-- [ ] Flag checkboxes in `ValidatorPanel` build `autoCorrections` string on submit
-- [ ] Combine auto-corrections + manual textarea into `combinedCorrections`
-- [ ] Send correction prompt to `runGeneration`, then re-validate, then re-translate verses
-- [ ] Increment `iterationCount`, update iteration badge
+- [x] Flag checkboxes in `ValidatorPanel` build `autoCorrections` string on submit
+- [x] Combine auto-corrections + manual textarea into `combinedCorrections`
+- [x] Send correction prompt to `runGeneration`, then re-validate, then re-translate verses
+- [x] Increment `iterationCount`, update iteration badge
 
 ### Phase 9 — Generate Missing Verses (Database section)
 - [ ] "Generate Verse Translations" button on approved entries that have no `_kardia_verses`

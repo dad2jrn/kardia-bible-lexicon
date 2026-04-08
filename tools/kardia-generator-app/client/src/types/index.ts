@@ -1,5 +1,13 @@
 // ── Kardia Generator — shared TypeScript interfaces ───────────────────────────
 
+export type ApiProvider = 'anthropic' | 'openai';
+
+export interface ApiKeyStore {
+  anthropicKey: string;
+  openaiKey: string;
+  activeProvider: ApiProvider;
+}
+
 export interface AttestatedGloss {
   gloss: string;
   found_in: string[];

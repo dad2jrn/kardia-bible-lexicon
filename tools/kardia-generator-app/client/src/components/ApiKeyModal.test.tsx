@@ -7,34 +7,60 @@ import { ApiKeyModal } from './ApiKeyModal'
 
 const defaultProps = {
   open: true,
+  anthropicKey: '',
+  openaiKey: '',
+  activeProvider: 'anthropic' as const,
   onClose: vi.fn(),
-  onSave: vi.fn(),
+  onSaveAnthropic: vi.fn(),
+  onSaveOpenai: vi.fn(),
+  onSelectProvider: vi.fn(),
 }
 
 describe('ApiKeyModal', () => {
-  it('shows an error for invalid keys and keeps submit disabled', () => {
+  it('shows errors for invalid keys and disables submit', () => {
     render(<ApiKeyModal {...defaultProps} />)
 
-    const input = screen.getByPlaceholderText('sk-ant-...')
-    fireEvent.change(input, { target: { value: 'invalid-key' } })
-    fireEvent.blur(input)
+    const anthropicInput = screen.getByPlaceholderText('sk-ant-...')
+    fireEvent.change(anthropicInput, { target: { value: 'invalid-key' } })
+    fireEvent.blur(anthropicInput)
+
+    const openaiInput = screen.getByPlaceholderText('sk-...')
+    fireEvent.change(openaiInput, { target: { value: 'bad' } })
+    fireEvent.blur(openaiInput)
 
     expect(
-      screen.getByText(/please enter a valid api key starting with/i),
+      screen.getByText(/please enter a valid anthropic key starting with/i),
     ).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /connect & begin/i })).toBeDisabled()
+    expect(
+      screen.getByText(/please enter a valid openai key starting with/i),
+    ).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /save keys/i })).toBeDisabled()
   })
 
-  it('calls onSave with the trimmed key when submit succeeds', () => {
-    const onSave = vi.fn()
-    render(<ApiKeyModal {...defaultProps} onSave={onSave} />)
+  it('saves trimmed keys and closes on submit', () => {
+    const onSaveAnthropic = vi.fn()
+    const onSaveOpenai = vi.fn()
+    const onClose = vi.fn()
+    render(
+      <ApiKeyModal
+        {...defaultProps}
+        onSaveAnthropic={onSaveAnthropic}
+        onSaveOpenai={onSaveOpenai}
+        onClose={onClose}
+      />,
+    )
 
     fireEvent.change(screen.getByPlaceholderText('sk-ant-...'), {
       target: { value: '  sk-ant-valid-123456789  ' },
     })
-    fireEvent.click(screen.getByRole('button', { name: /connect & begin/i }))
+    fireEvent.change(screen.getByPlaceholderText('sk-...'), {
+      target: { value: '  sk-openai-valid-0001  ' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: /save keys/i }))
 
-    expect(onSave).toHaveBeenCalledWith('sk-ant-valid-123456789')
+    expect(onSaveAnthropic).toHaveBeenCalledWith('sk-ant-valid-123456789')
+    expect(onSaveOpenai).toHaveBeenCalledWith('sk-openai-valid-0001')
+    expect(onClose).toHaveBeenCalled()
   })
 
   it('invokes onClose when the Later button is pressed', () => {
@@ -43,5 +69,13 @@ describe('ApiKeyModal', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /later/i }))
     expect(onClose).toHaveBeenCalled()
+  })
+
+  it('notifies when provider selection changes', () => {
+    const onSelectProvider = vi.fn()
+    render(<ApiKeyModal {...defaultProps} onSelectProvider={onSelectProvider} />)
+
+    fireEvent.click(screen.getByRole('button', { name: /openai/i }))
+    expect(onSelectProvider).toHaveBeenCalledWith('openai')
   })
 })

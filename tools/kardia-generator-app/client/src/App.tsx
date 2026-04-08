@@ -10,7 +10,7 @@ import { DatabaseSection } from '@/components/database/DatabaseSection'
 import { SettingsDrawer } from '@/components/SettingsDrawer'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
-import { MODEL_OPTIONS, type ModelId } from '@/constants/models'
+import { DEFAULT_MODEL_BY_PROVIDER, MODEL_META_BY_ID, type ModelId } from '@/constants/models'
 import { CATEGORIES } from '@/constants/categories'
 import { useApiKey } from '@/hooks/useApiKey'
 import { useEntries } from '@/hooks/useEntries'
@@ -18,9 +18,22 @@ import { useGenerator } from '@/hooks/useGenerator'
 import type { CategorySelection } from '@/types/category'
 import type { CategoryEntry } from '@/types'
 import type { ApprovalState } from '@/types/ui'
+import type { CorrectionsPayload } from '@/components/output/ValidatorPanel'
 
 function App() {
-  const { apiKey, maskedKey, isConnected, setApiKey, clearApiKey } = useApiKey()
+  const {
+    anthropicKey,
+    openaiKey,
+    activeProvider,
+    activeKey,
+    isConnected,
+    maskedActiveKey,
+    setAnthropicKey,
+    setOpenaiKey,
+    setActiveProvider,
+    clearAll,
+  } = useApiKey()
+  const hasAnyKey = Boolean(anthropicKey || openaiKey)
   const {
     entries,
     loading: entriesLoading,
@@ -31,12 +44,14 @@ function App() {
     importEntries,
   } = useEntries()
   const [isDrawerOpen, setDrawerOpen] = useState(false)
-  const [isModalOpen, setModalOpen] = useState(() => !apiKey)
+  const [isModalOpen, setModalOpen] = useState(() => !hasAnyKey)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<CategorySelection | null>(null)
-  const [selectedModel, setSelectedModel] = useState<ModelId>('claude-sonnet-4-6')
+  const [selectedModel, setSelectedModel] = useState<ModelId>(
+    DEFAULT_MODEL_BY_PROVIDER[activeProvider],
+  )
   const [approvalState, setApprovalState] = useState<ApprovalState>({ status: 'idle', message: null })
-  const prevKey = useRef(apiKey)
+  const prevHasKeys = useRef(hasAnyKey)
   const prevCategoryId = useRef<string | null>(null)
   const {
     entry,
@@ -51,21 +66,16 @@ function App() {
     regenerateWithSameParams,
     retryAfterFailure,
     abortInFlight,
+    requestCorrections,
     resetOutputs,
   } = useGenerator()
 
   useEffect(() => {
-    if (isConnected) {
-      setModalOpen(false)
-    }
-  }, [isConnected])
-
-  useEffect(() => {
-    if (!apiKey && prevKey.current) {
+    if (!hasAnyKey && prevHasKeys.current) {
       setModalOpen(true)
     }
-    prevKey.current = apiKey
-  }, [apiKey])
+    prevHasKeys.current = hasAnyKey
+  }, [hasAnyKey])
 
   useEffect(() => {
     if (!statusMessage) return
@@ -84,34 +94,41 @@ function App() {
     return () => window.removeEventListener('keydown', handleKey)
   }, [isDrawerOpen])
 
+  const providerLabel = activeProvider === 'anthropic' ? 'Anthropic' : 'OpenAI'
   const apiStatus = useMemo(
     () =>
       isConnected
         ? {
-            label: 'API Connected',
+            label: `${providerLabel} — Connected`,
             tone: 'success' as const,
-            tooltip: 'Anthropic key saved locally',
           }
         : {
-            label: 'Connect API key',
+            label: 'Not Connected',
             tone: 'warning' as const,
-            tooltip: 'Add a valid Anthropic key to start generating entries',
           },
-    [isConnected],
+    [hasAnyKey, isConnected, providerLabel],
   )
 
-  const handleSaveKey = useCallback(
+  const handleSaveAnthropicKey = useCallback(
     (value: string) => {
-      setApiKey(value)
-      setStatusMessage('API key saved securely.')
+      setAnthropicKey(value)
+      setStatusMessage(value ? 'Anthropic key saved securely.' : 'Anthropic key cleared.')
     },
-    [setApiKey],
+    [setAnthropicKey],
   )
 
-  const handleClearKey = useCallback(() => {
-    clearApiKey()
-    setStatusMessage('API key cleared.')
-  }, [clearApiKey])
+  const handleSaveOpenaiKey = useCallback(
+    (value: string) => {
+      setOpenaiKey(value)
+      setStatusMessage(value ? 'OpenAI key saved securely.' : 'OpenAI key cleared.')
+    },
+    [setOpenaiKey],
+  )
+
+  const handleClearAllKeys = useCallback(() => {
+    clearAll()
+    setStatusMessage('All API keys cleared.')
+  }, [clearAll])
 
   const completedIds = useMemo(
     () => new Set(entries.map(entry => entry.id)),
@@ -123,7 +140,12 @@ function App() {
     [],
   )
 
-  const selectedModelMeta = MODEL_OPTIONS.find(option => option.id === selectedModel) ?? MODEL_OPTIONS[0]
+  const selectedModelMeta =
+    MODEL_META_BY_ID[selectedModel] ?? MODEL_META_BY_ID[DEFAULT_MODEL_BY_PROVIDER[activeProvider]]
+
+  useEffect(() => {
+    setSelectedModel(DEFAULT_MODEL_BY_PROVIDER[activeProvider])
+  }, [activeProvider])
 
   useEffect(() => {
     if (!selectedCategory) {
@@ -144,9 +166,9 @@ function App() {
   }, [entry])
 
   const handleGenerate = useCallback(() => {
-    if (!selectedCategory || !apiKey) return
-    void generateFresh(selectedCategory, selectedModel, apiKey)
-  }, [selectedCategory, selectedModel, apiKey, generateFresh])
+    if (!selectedCategory || !activeKey) return
+    void generateFresh(selectedCategory, selectedModel, activeKey, activeProvider)
+  }, [activeKey, activeProvider, selectedCategory, selectedModel, generateFresh])
 
   const handleCopyJson = useCallback((_json: string) => {
     setStatusMessage('JSON copied to clipboard.')
@@ -176,13 +198,30 @@ function App() {
     }
   }, [approve, entry, kardiaVerses, resetOutputs])
 
-  const handleCorrections = useCallback((flagIds: number[]) => {
-    if (flagIds.length === 0) {
-      setStatusMessage('Select validator flags before drafting corrections.')
+  const handleCorrections = useCallback(async (payload: CorrectionsPayload) => {
+    if (!entry || !validator || !selectedCategory || !activeKey) {
+      setStatusMessage('Generate an entry before running corrections.')
       return
     }
-    setStatusMessage('Corrections queued — Phase 8 will send them to Anthropic.')
-  }, [])
+
+    if (!payload.combinedCorrections) {
+      setStatusMessage('Add reviewer notes or select validator flags before regenerating.')
+      return
+    }
+
+    const flagLabel =
+      payload.queuedFlagCount > 0
+        ? `${payload.queuedFlagCount} flag${payload.queuedFlagCount === 1 ? '' : 's'}`
+        : 'reviewer notes'
+    const noteSuffix = payload.manualNotes ? ' + reviewer notes' : ''
+    setStatusMessage(`Regenerating with ${flagLabel}${noteSuffix}.`)
+
+    try {
+      await requestCorrections({ combinedCorrections: payload.combinedCorrections })
+    } catch (err) {
+      setStatusMessage((err as Error).message ?? 'Failed to run corrections.')
+    }
+  }, [activeKey, entry, validator, selectedCategory, requestCorrections])
 
   const handleDeleteEntry = useCallback(async (id: string) => {
     await deleteEntry(id)
@@ -203,6 +242,7 @@ function App() {
     <div className="flex min-h-screen flex-col bg-background text-foreground">
       <Header
         isConnected={isConnected}
+        activeProvider={activeProvider}
         statusLabel={apiStatus.label}
         statusTone={apiStatus.tone}
         onToggleDrawer={() => setDrawerOpen(prev => !prev)}
@@ -211,14 +251,15 @@ function App() {
 
       <SettingsDrawer
         open={isDrawerOpen}
-        apiKey={apiKey}
-        maskedKey={maskedKey}
+        anthropicKey={anthropicKey}
+        openaiKey={openaiKey}
+        maskedActiveKey={maskedActiveKey}
         isConnected={isConnected}
-        onSave={key => {
-          handleSaveKey(key)
-          setDrawerOpen(false)
-        }}
-        onClear={handleClearKey}
+        activeProvider={activeProvider}
+        onSaveAnthropic={handleSaveAnthropicKey}
+        onSaveOpenai={handleSaveOpenaiKey}
+        onSetActiveProvider={setActiveProvider}
+        onClearAll={handleClearAllKeys}
         onRequestModal={() => setModalOpen(true)}
       />
 
@@ -266,11 +307,13 @@ function App() {
               Model & Generation
             </span>
             <p className="text-sm text-muted-foreground">
-              Choose an Anthropic model before running generation. Pricing estimates mirror the legacy tool.
+              Choose a {providerLabel} model before running generation. Options update automatically when
+              you switch providers.
             </p>
           </div>
 
           <ModelSelector
+            provider={activeProvider}
             value={selectedModel}
             onChange={model => setSelectedModel(model)}
             disabled={!isConnected}
@@ -331,8 +374,13 @@ function App() {
 
       <ApiKeyModal
         open={isModalOpen}
+        anthropicKey={anthropicKey}
+        openaiKey={openaiKey}
+        activeProvider={activeProvider}
         onClose={() => setModalOpen(false)}
-        onSave={handleSaveKey}
+        onSaveAnthropic={handleSaveAnthropicKey}
+        onSaveOpenai={handleSaveOpenaiKey}
+        onSelectProvider={setActiveProvider}
       />
     </div>
   )
