@@ -5,16 +5,25 @@ import type { CategoryEntry } from '@/types'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import type { ApprovalState } from '@/types/ui'
 
 export interface JsonPanelProps {
   entry: CategoryEntry | null
   isBusy: boolean
   onApprove: () => void
+  approvalState: ApprovalState
   onCopy?: (json: string) => void
   onRegenerate: () => void
 }
 
-export function JsonPanel({ entry, isBusy, onApprove, onCopy, onRegenerate }: JsonPanelProps) {
+export function JsonPanel({
+  entry,
+  isBusy,
+  onApprove,
+  approvalState,
+  onCopy,
+  onRegenerate,
+}: JsonPanelProps) {
   const json = entry ? JSON.stringify(entry, null, 2) : ''
 
   const copyJson = useCallback(async () => {
@@ -43,10 +52,9 @@ export function JsonPanel({ entry, isBusy, onApprove, onCopy, onRegenerate }: Js
         <Button
           type="button"
           onClick={onApprove}
-          aria-disabled
-          title="Approve & Save arrives in Phase 7"
+          disabled={!entry || approvalState.status === 'saving'}
         >
-          Approve &amp; Save
+          {approvalState.status === 'saving' ? 'Saving…' : 'Approve & Save'}
         </Button>
         <Button
           type="button"
@@ -71,12 +79,18 @@ export function JsonPanel({ entry, isBusy, onApprove, onCopy, onRegenerate }: Js
           </Badge>
         )}
       </div>
+      {approvalState.message && (
+        <p
+          className={`text-sm ${
+            approvalState.status === 'error' ? 'text-destructive' : 'text-emerald-600'
+          }`}
+        >
+          {approvalState.message}
+        </p>
+      )}
       <ScrollArea className="h-[420px] rounded-xl border bg-muted/30 p-4">
         <pre className="text-sm leading-relaxed">{json}</pre>
       </ScrollArea>
-      <p className="text-xs text-muted-foreground">
-        Approve &amp; Save will persist to SQLite in Phase 7. For now, copy the JSON when needed.
-      </p>
     </div>
   )
 }

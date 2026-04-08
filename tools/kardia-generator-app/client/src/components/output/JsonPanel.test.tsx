@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { CategoryEntry } from '@/types'
 import { JsonPanel } from './JsonPanel'
+import type { ApprovalState } from '@/types/ui'
 
 const entry: CategoryEntry = {
   id: 'id',
@@ -36,6 +37,8 @@ const entry: CategoryEntry = {
   _truncation_warning: true,
 }
 
+const approvalIdle: ApprovalState = { status: 'idle', message: null }
+
 describe('JsonPanel', () => {
   it('shows placeholder when entry missing', () => {
     render(
@@ -43,6 +46,7 @@ describe('JsonPanel', () => {
         entry={null}
         isBusy={false}
         onApprove={vi.fn()}
+        approvalState={approvalIdle}
         onRegenerate={vi.fn()}
       />,
     )
@@ -61,6 +65,7 @@ describe('JsonPanel', () => {
         entry={entry}
         isBusy={false}
         onApprove={onApprove}
+        approvalState={approvalIdle}
         onRegenerate={vi.fn()}
         onCopy={onCopy}
       />,
@@ -73,5 +78,17 @@ describe('JsonPanel', () => {
     fireEvent.click(screen.getByRole('button', { name: /approve/i }))
     expect(onApprove).toHaveBeenCalled()
   })
-})
 
+  it('shows approval status messaging', () => {
+    render(
+      <JsonPanel
+        entry={entry}
+        isBusy={false}
+        onApprove={vi.fn()}
+        approvalState={{ status: 'error', message: 'Failed to save' }}
+        onRegenerate={vi.fn()}
+      />,
+    )
+    expect(screen.getByText(/Failed to save/)).toBeInTheDocument()
+  })
+})

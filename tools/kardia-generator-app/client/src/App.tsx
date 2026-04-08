@@ -5,6 +5,8 @@ import { CategoryGrid } from '@/components/CategoryGrid'
 import { ModelSelector } from '@/components/ModelSelector'
 import { GeneratePanel } from '@/components/GeneratePanel'
 import { OutputSection } from '@/components/output/OutputSection'
+import { ProgressSection } from '@/components/ProgressSection'
+import { DatabaseSection } from '@/components/database/DatabaseSection'
 import { SettingsDrawer } from '@/components/SettingsDrawer'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -14,6 +16,8 @@ import { useApiKey } from '@/hooks/useApiKey'
 import { useEntries } from '@/hooks/useEntries'
 import { useGenerator } from '@/hooks/useGenerator'
 import type { CategorySelection } from '@/types/category'
+import type { CategoryEntry } from '@/types'
+import type { ApprovalState } from '@/types/ui'
 
 function App() {
   const { apiKey, maskedKey, isConnected, setApiKey, clearApiKey } = useApiKey()
@@ -22,12 +26,16 @@ function App() {
     loading: entriesLoading,
     error: entriesError,
     refresh: refreshEntries,
+    approve,
+    deleteEntry,
+    importEntries,
   } = useEntries()
   const [isDrawerOpen, setDrawerOpen] = useState(false)
   const [isModalOpen, setModalOpen] = useState(() => !apiKey)
   const [statusMessage, setStatusMessage] = useState<string | null>(null)
   const [selectedCategory, setSelectedCategory] = useState<CategorySelection | null>(null)
   const [selectedModel, setSelectedModel] = useState<ModelId>('claude-sonnet-4-6')
+  const [approvalState, setApprovalState] = useState<ApprovalState>({ status: 'idle', message: null })
   const prevKey = useRef(apiKey)
   const prevCategoryId = useRef<string | null>(null)
   const {
@@ -131,6 +139,10 @@ function App() {
     prevCategoryId.current = selectedCategory.id
   }, [selectedCategory, resetOutputs, entry, rawRecovery])
 
+  useEffect(() => {
+    setApprovalState({ status: 'idle', message: null })
+  }, [entry])
+
   const handleGenerate = useCallback(() => {
     if (!selectedCategory || !apiKey) return
     void generateFresh(selectedCategory, selectedModel, apiKey)
@@ -140,9 +152,29 @@ function App() {
     setStatusMessage('JSON copied to clipboard.')
   }, [])
 
-  const handleApproveStub = useCallback(() => {
-    setStatusMessage('Approve & Save arrives in Phase 7.')
-  }, [])
+  const handleApprove = useCallback(async () => {
+    if (!entry) return
+    const label = entry.category_label
+    const versesToPersist = kardiaVerses.length > 0 ? kardiaVerses : entry._kardia_verses ?? []
+    const payload: CategoryEntry = {
+      ...entry,
+      _kardia_verses: versesToPersist,
+    }
+    setApprovalState({ status: 'saving', message: 'Saving entry…' })
+    try {
+      await approve(payload)
+      setApprovalState({ status: 'success', message: `${label} saved to SQLite.` })
+      setStatusMessage('Entry approved and saved.')
+      setTimeout(() => {
+        resetOutputs()
+      }, 1000)
+    } catch (err) {
+      setApprovalState({
+        status: 'error',
+        message: (err as Error).message ?? 'Failed to save entry.',
+      })
+    }
+  }, [approve, entry, kardiaVerses, resetOutputs])
 
   const handleCorrections = useCallback((flagIds: number[]) => {
     if (flagIds.length === 0) {
@@ -150,6 +182,21 @@ function App() {
       return
     }
     setStatusMessage('Corrections queued — Phase 8 will send them to Anthropic.')
+  }, [])
+
+  const handleDeleteEntry = useCallback(async (id: string) => {
+    await deleteEntry(id)
+    setStatusMessage('Entry removed from database.')
+  }, [deleteEntry])
+
+  const handleImportEntries = useCallback(async (incoming: CategoryEntry[]) => {
+    const summary = await importEntries(incoming)
+    setStatusMessage(`Import finished: ${summary.success} succeeded, ${summary.failure} failed.`)
+    return summary
+  }, [importEntries])
+
+  const handleGenerateVerses = useCallback((approvedEntry: CategoryEntry) => {
+    setStatusMessage(`Verse translation backfill for ${approvedEntry.category_label} arrives in Phase 9.`)
   }, [])
 
   return (
@@ -253,11 +300,30 @@ function App() {
           kardiaVerses={kardiaVerses}
           rawRecovery={rawRecovery}
           isBusy={generatorBusy}
-          onApprove={handleApproveStub}
+          onApprove={handleApprove}
+          approvalState={approvalState}
           onCopyJson={handleCopyJson}
           onRegenerate={regenerateWithSameParams}
           onRetryRecovery={retryAfterFailure}
           onRequestCorrections={handleCorrections}
+        />
+
+        <ProgressSection
+          groups={CATEGORIES}
+          completedIds={completedIds}
+          loading={entriesLoading}
+        />
+
+        <DatabaseSection
+          entries={entries}
+          loading={entriesLoading}
+          error={entriesError}
+          totalCategories={totalCategories}
+          onDeleteEntry={handleDeleteEntry}
+          onImportEntries={handleImportEntries}
+          onCopyJson={handleCopyJson}
+          onGenerateVerses={handleGenerateVerses}
+          onNotify={setStatusMessage}
         />
       </main>
 

@@ -34,6 +34,14 @@ vi.mock('@/hooks/useGenerator', () => ({
   useGenerator: () => generatorMock,
 }))
 
+function mockResponse(data: unknown, ok = true, status = 200) {
+  return {
+    ok,
+    status,
+    json: () => Promise.resolve(data),
+  } as Response
+}
+
 function makeLocalStorageMock() {
   const store: Record<string, string> = {}
   return {
@@ -163,5 +171,106 @@ describe('App shell', () => {
     localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
     render(<App />)
     expect(screen.getByText(/Copy JSON/i)).toBeInTheDocument()
+  })
+
+  it('shows progress once entries load', async () => {
+    const entry: CategoryEntry = {
+      id: 'chesed',
+      hebrew_root: '',
+      transliteration: '',
+      testament_scope: 'ot',
+      category_label: 'Label',
+      one_liner: '',
+      full_definition: '',
+      what_it_does: '',
+      what_it_is_not: '',
+      second_temple_context: '',
+      kardia_rendering: '',
+      surface_vehicles: {
+        hebrew_lexemes: [],
+        strongs_hebrew: [],
+        lxx_greek: [],
+        nt_greek: [],
+        strongs_greek: [],
+        english_glosses: [],
+      },
+      illustrative_renderings: [],
+      key_verses: [],
+      related_categories: [],
+      theological_notes: '',
+      semantic_domain_id: 'god-covenant',
+      textual_layer_id: 'pre-exilic',
+      version: '1.0',
+      reviewed_by: '',
+    }
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(mockResponse([entry])),
+    )
+    localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
+    render(<App />)
+    await waitFor(() =>
+      expect(screen.getByText(/1 \/ 30 categories approved/i)).toBeInTheDocument(),
+    )
+  })
+
+  it('approves an entry and resets the generator outputs', async () => {
+    const approvedEntry: CategoryEntry = {
+      id: 'chesed',
+      hebrew_root: 'root',
+      transliteration: 'root',
+      testament_scope: 'ot',
+      category_label: 'Chesed',
+      one_liner: 'one',
+      full_definition: 'full',
+      what_it_does: 'does',
+      what_it_is_not: 'not',
+      second_temple_context: 'ctx',
+      kardia_rendering: 'render',
+      surface_vehicles: {
+        hebrew_lexemes: [],
+        strongs_hebrew: [],
+        lxx_greek: [],
+        nt_greek: [],
+        strongs_greek: [],
+        english_glosses: [],
+      },
+      illustrative_renderings: [],
+      key_verses: [],
+      related_categories: [],
+      theological_notes: '',
+      semantic_domain_id: 'god-covenant',
+      textual_layer_id: 'pre-exilic',
+      version: '1.0',
+      reviewed_by: '',
+    }
+    generatorMock.entry = approvedEntry
+    generatorMock.kardiaVerses = [
+      {
+        verse_ref: 'Ps.136.1',
+        standard_rendering: 'His love endures forever',
+        kardia_translation: 'His covenant faithfulness endures forever',
+      },
+    ]
+    generatorMock.resetOutputs = vi.fn()
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(mockResponse([])) // initial GET
+      .mockResolvedValueOnce(mockResponse({ ok: true, id: 'chesed' })) // POST
+      .mockResolvedValueOnce(mockResponse([approvedEntry])) // refresh GET
+    vi.stubGlobal('fetch', fetchMock)
+    localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
+
+    vi.useFakeTimers()
+    try {
+      render(<App />)
+      await waitFor(() => expect(screen.getByText(/Approve & Save/i)).toBeInTheDocument())
+      fireEvent.click(screen.getByRole('button', { name: /Approve & Save/i }))
+      await waitFor(() => expect(screen.getByText(/saved to SQLite/i)).toBeInTheDocument())
+      vi.runAllTimers()
+      await waitFor(() => expect(generatorMock.resetOutputs).toHaveBeenCalled())
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

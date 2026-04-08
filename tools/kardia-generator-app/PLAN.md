@@ -182,11 +182,11 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] Truncation warning + Recovery tab auto-switch implemented (`OutputSection.test.tsx` guards behavior).
 
 ### Phase 7 — Approve & Persist
-- [ ] Approve & Save: call `POST /api/entries` (upsert), mark category complete, clear output section, update progress
-- [ ] `ProgressSection.tsx`: overall bar + per-group bars from entry list
-- [ ] `DatabaseSection.tsx` + `ApprovedEntry.tsx`: accordion list of approved entries; sub-tabs JSON / Reader Preview; Copy JSON button; Generate Missing Verse Translations button; **Remove from database button** (calls `DELETE /api/entries/:id`, prompts for confirmation, removes from accordion on success)
-- [ ] Export `categories.json`: reconstruct export envelope (version, description, license, etc.) and trigger download
-- [ ] Import `categories.json`: file input, parse, upsert all entries via `POST /api/entries`, show result banner (n imported, n failed)
+- [x] Approve & Save: JSON panel now wires to `useEntries.approve` (POST `/api/entries`), surfaces inline success/error states, refreshes the entries list, updates category completion state, and clears generator output shortly after persistence.
+- [x] `ProgressSection.tsx`: new component visualizes total completion percent plus per-group progress using live DB entries.
+- [x] `DatabaseSection.tsx` + `ApprovedEntry.tsx`: accordion view of approved entries with JSON/Preview tabs, Copy JSON, Phase 9 verse-generation stub CTA, and destructive Remove action (DELETE `/api/entries/:id` with confirmation).
+- [x] Export `categories.json`: Database section rebuilds the canonical export payload (metadata + entries) and triggers a browser download.
+- [x] Import `categories.json`: file picker parses categories payloads, bulk upserts via `POST /api/entries`, and reports success/failure counts inline + via toast.
 
 ### Phase 8 — Correction Loop
 - [ ] Flag checkboxes in `ValidatorPanel` build `autoCorrections` string on submit

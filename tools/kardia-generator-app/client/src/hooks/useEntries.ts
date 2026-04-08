@@ -1,6 +1,11 @@
 import { useState, useEffect, useCallback } from 'react'
 import type { CategoryEntry, KardiaVerse } from '@/types'
 
+export interface ImportSummary {
+  success: number
+  failure: number
+}
+
 export interface UseEntriesReturn {
   entries: CategoryEntry[]
   loading: boolean
@@ -9,6 +14,7 @@ export interface UseEntriesReturn {
   approve: (entry: CategoryEntry) => Promise<void>
   updateEntry: (id: string, patch: EntryPatch) => Promise<void>
   deleteEntry: (id: string) => Promise<void>
+  importEntries: (entries: CategoryEntry[]) => Promise<ImportSummary>
 }
 
 export interface EntryPatch {
@@ -39,8 +45,10 @@ export function useEntries(): UseEntriesReturn {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const fetchEntries = useCallback(async () => {
-    setLoading(true)
+  const fetchEntries = useCallback(async (options?: { silent?: boolean }) => {
+    if (!options?.silent) {
+      setLoading(true)
+    }
     setError(null)
     try {
       const res = await apiFetch('')
@@ -49,7 +57,9 @@ export function useEntries(): UseEntriesReturn {
     } catch (e) {
       setError((e as Error).message)
     } finally {
-      setLoading(false)
+      if (!options?.silent) {
+        setLoading(false)
+      }
     }
   }, [])
 
@@ -58,17 +68,12 @@ export function useEntries(): UseEntriesReturn {
   }, [fetchEntries])
 
   const approve = useCallback(async (entry: CategoryEntry) => {
-    const res = await apiFetch('', {
+    await apiFetch('', {
       method: 'POST',
       body: JSON.stringify(entry),
     })
-    const { id } = (await res.json()) as { ok: boolean; id: string }
-    // Optimistic: re-fetch to get the fully reconstructed row from the DB
-    const refreshed = await apiFetch('')
-    const data = (await refreshed.json()) as CategoryEntry[]
-    setEntries(data)
-    void id
-  }, [])
+    await fetchEntries({ silent: true })
+  }, [fetchEntries])
 
   const updateEntry = useCallback(async (id: string, patch: EntryPatch) => {
     // Normalise kardia_verses field name — API expects kardia_verses, not _kardia_verses
@@ -99,5 +104,24 @@ export function useEntries(): UseEntriesReturn {
     setEntries(prev => prev.filter(e => e.id !== id))
   }, [])
 
-  return { entries, loading, error, refresh: fetchEntries, approve, updateEntry, deleteEntry }
+  const importEntries = useCallback(async (incoming: CategoryEntry[]) => {
+    let success = 0
+    let failure = 0
+    for (const entry of incoming) {
+      try {
+        await apiFetch('', {
+          method: 'POST',
+          body: JSON.stringify(entry),
+        })
+        success += 1
+      } catch (err) {
+        console.error('Import failed for entry', entry.id, err)
+        failure += 1
+      }
+    }
+    await fetchEntries({ silent: true })
+    return { success, failure }
+  }, [fetchEntries])
+
+  return { entries, loading, error, refresh: fetchEntries, approve, updateEntry, deleteEntry, importEntries }
 }

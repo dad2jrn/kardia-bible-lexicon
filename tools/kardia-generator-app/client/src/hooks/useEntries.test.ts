@@ -263,4 +263,41 @@ describe('useEntries', () => {
     // State must not change on error
     expect(result.current.entries).toHaveLength(1)
   })
+
+  it('importEntries posts each entry and reports summary', async () => {
+    const entries = [makeEntry('chesed'), makeEntry('emet')]
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: [] })) // initial GET
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: { ok: true } })) // POST 1
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: { ok: true } })) // POST 2
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: entries })) // refresh
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { result } = renderHook(() => useEntries())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const summary = await act(() => result.current.importEntries(entries))
+    expect(summary).toEqual({ success: 2, failure: 0 })
+    expect(fetchMock).toHaveBeenCalledTimes(4)
+  })
+
+  it('importEntries continues when an entry fails to import', async () => {
+    const entries = [makeEntry('chesed'), makeEntry('emet')]
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: [] })) // initial GET
+      .mockResolvedValueOnce(mockResponse({ ok: false, data: { error: 'Bad entry' }, status: 400 })) // POST fail
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: { ok: true } })) // POST success
+      .mockResolvedValueOnce(mockResponse({ ok: true, data: [entries[1]] })) // refresh
+
+    vi.stubGlobal('fetch', fetchMock)
+
+    const { result } = renderHook(() => useEntries())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    const summary = await act(() => result.current.importEntries(entries))
+    expect(summary).toEqual({ success: 1, failure: 1 })
+  })
 })

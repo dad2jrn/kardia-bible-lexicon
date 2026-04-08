@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { CategoryEntry, ValidatorResult } from '@/types'
 import { OutputSection } from './OutputSection'
+import type { ApprovalState } from '@/types/ui'
 
 const entry = {
   id: 'id',
@@ -42,6 +43,8 @@ const validator: ValidatorResult = {
 }
 
 describe('OutputSection', () => {
+  const approvalState: ApprovalState = { status: 'idle', message: null }
+
   it('shows placeholder before first run', () => {
     render(
       <OutputSection
@@ -51,6 +54,7 @@ describe('OutputSection', () => {
         rawRecovery={null}
         isBusy={false}
         onApprove={vi.fn()}
+        approvalState={approvalState}
         onCopyJson={vi.fn()}
         onRegenerate={vi.fn()}
         onRetryRecovery={vi.fn()}
@@ -69,6 +73,7 @@ describe('OutputSection', () => {
         rawRecovery={null}
         isBusy={false}
         onApprove={vi.fn()}
+        approvalState={approvalState}
         onCopyJson={vi.fn()}
         onRegenerate={vi.fn()}
         onRetryRecovery={vi.fn()}
@@ -85,6 +90,7 @@ describe('OutputSection', () => {
         rawRecovery="RAW"
         isBusy={false}
         onApprove={vi.fn()}
+        approvalState={approvalState}
         onCopyJson={vi.fn()}
         onRegenerate={vi.fn()}
         onRetryRecovery={vi.fn()}

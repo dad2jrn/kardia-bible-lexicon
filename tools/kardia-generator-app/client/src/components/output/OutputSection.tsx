@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 
 import type { CategoryEntry, KardiaVerse, ValidatorResult } from '@/types'
+import type { ApprovalState } from '@/types/ui'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { JsonPanel } from './JsonPanel'
 import { ValidatorPanel } from './ValidatorPanel'
@@ -14,6 +15,7 @@ export interface OutputSectionProps {
   rawRecovery: string | null
   isBusy: boolean
   onApprove: () => void
+  approvalState: ApprovalState
   onCopyJson: (json: string) => void
   onRegenerate: () => void
   onRetryRecovery: () => void
@@ -27,6 +29,7 @@ export function OutputSection({
   rawRecovery,
   isBusy,
   onApprove,
+  approvalState,
   onCopyJson,
   onRegenerate,
   onRetryRecovery,
@@ -68,6 +71,7 @@ export function OutputSection({
             entry={entry}
             isBusy={isBusy}
             onApprove={onApprove}
+            approvalState={approvalState}
             onCopy={onCopyJson}
             onRegenerate={onRegenerate}
           />
@@ -94,4 +98,3 @@ export function OutputSection({
     </section>
   )
 }
-
