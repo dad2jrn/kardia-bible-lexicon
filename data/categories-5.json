@@ -1,0 +1,906 @@
+{
+  "version": "1.0",
+  "description": "Kardia Lexicon — Hebrew thought category database",
+  "license": "CC BY-NC-SA 4.0",
+  "project": "https://github.com/dad2jrn/kardia-bible-lexicon",
+  "generated": "2026-04-07T22:28:42.731Z",
+  "status": {
+    "total_seed_categories": 30,
+    "complete": 6,
+    "pending": 24
+  },
+  "entries": [
+    {
+      "id": "chesed",
+      "hebrew_root": "חֶסֶד",
+      "transliteration": "cḥesed",
+      "testament_scope": "both",
+      "category_label": "Covenant Loyalty / Steadfast Love",
+      "one_liner": "Chesed is the living sinew of covenant — the enacted faithfulness that holds the bond between YHWH and Israel from the inside.",
+      "full_definition": "Chesed names the quality of faithfulness that is intrinsic to covenant relationship and that expresses itself as sustained, concrete loyalty in action. It is not sentiment or disposition alone but the enacted content of the covenant bond — what it looks like when YHWH or Israel actually lives within the terms of their binding relationship. When YHWH shows chesed, he is not exceeding the covenant's demands; he is inhabiting them fully, expressed as rescue, remembrance, and pursuit. The word carries the density of a relationship that has history, obligation, memory, and future horizon all compressed into a single present act of faithfulness.\n\nThe root implies not only loyalty but the covenant structure itself generates an orientation toward the vulnerable partner — not as emotional stooping but as the form faithful loyalty necessarily takes when one party holds greater power within the bond. This is why chesed appears so often in contexts of rescue and restoration: YHWH's chesed toward Israel is inseparable from Israel's covenant history of failure and return. Chesed does not cancel obligation; it is the form obligation takes when it is enacted by a whole person rather than performed mechanically — expressed concretely as the act of returning, restoring, and holding open. In the Psalms especially, chesed is the ground beneath the suppliant's feet — the reason appeal to YHWH is not futile even from the depths.\n\nChesed has a communal and horizontal dimension as well. Micah 6:8 places it alongside justice and humility as the summary of what YHWH requires of Israel — chesed here is not charity but the faithful loyalty that members of the covenant community owe one another. Hosea's devastating indictment that there is 'no chesed in the land' (Hos 4:1) is a description of covenant dissolution from within: when chesed collapses, the community's binding tissue is gone. The word thus operates at every level — divine-human, human-human, familial, political — wherever covenant structure exists and requires living out.\n\nIn the Septuagint, chesed is most frequently rendered eleos, which carries connotations of mercy toward the suffering — a narrowing that already begins the drift from covenantal loyalty toward unilateral compassion. The fuller Hebrew category, however, always presupposes a structured relationship as the context within which the quality of chesed operates and makes sense.",
+      "what_it_does": "Chesed holds the covenant together from the inside when external pressure, failure, or distance would otherwise fracture it. It acts: it rescues the perishing partner, it remembers the covenant when the other party has forgotten, it pursues the one who has strayed. Chesed is what David appeals to when he has no claim left but the relationship itself (Ps 51:1). It is what Ruth performs toward Naomi when every social obligation has technically expired (Ruth 1:8, 3:10). It sustains the covenant not by ignoring its structure but by animating that structure with full personal investment expressed as concrete acts of loyalty. In liturgical use, the refrain 'his chesed endures forever' (Ps 136) is not mere sentiment — it is a recitation of the covenant's durability through the entire sweep of Israel's history, anchoring present worship in demonstrated past faithfulness.",
+      "what_it_is_not": "Chesed is not mercy in the sense of a judge's discretionary compassion toward the suffering — unilateral, relational only in the direction of need — which is what the Latin theological tradition came to mean by misericordia (mercy understood as the pathos of a superior moved by another's misery). Chesed is the interior life of an existing bond: it is what loyal love looks like when covenant partners — especially the stronger one — hold the relationship together through every circumstance the covenant traverses, expressed as rescue, remembrance, and return.",
+      "second_temple_context": "In the synagogue and Torah-centered life of Second Temple Judaism, chesed was encountered primarily through the daily and Sabbath recitation of psalms, the reading of Torah, and the liturgical memory of YHWH's acts toward Israel. The Amidah and the Shema's surrounding blessings drew heavily on chesed language, framing Israel's ongoing relationship with YHWH as a covenant sustained by his demonstrated faithfulness across generations. The Eighteen Benedictions invoke YHWH as 'the one who remembers the chesed of the fathers' — rooting present petition in the covenant's accumulated history rather than in merit.\n\nAt Qumran, chesed language appears in the Hodayot (Thanksgiving Hymns) and the Community Rule in the context of covenantal observance and eschatological faithfulness: YHWH's chesed is the ground of the community's covenant standing before YHWH in the final age. The Damascus Document frames correct observance of Torah as the community's response to YHWH's chesed — covenant loyalty answered by covenant loyalty. Sirach (Ben Sira) uses chesed to describe both YHWH's faithfulness and the obligations of social solidarity within the Torah community, particularly care for the poor, the widow, and the orphan as acts of lived chesed. For every Second Temple Jewish reader, chesed named the reality that the covenant between YHWH and Israel was not contingent on Israel's performance alone but was held open by YHWH's own character — a truth that simultaneously humbled and emboldened covenant petition.",
+      "kardia_rendering": "faithful covenant love",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "חֶסֶד",
+          "חָסִיד"
+        ],
+        "strongs_hebrew": [
+          "H2617",
+          "H2623"
+        ],
+        "lxx_greek": [
+          "eleos",
+          "charis",
+          "dikaiosynē",
+          "agathōsynē"
+        ],
+        "nt_greek": [
+          "eleos",
+          "charis",
+          "agapē"
+        ],
+        "strongs_greek": [
+          "G1656",
+          "G5485",
+          "G26"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "steadfast love",
+            "faithful covenant love",
+            "loyal love",
+            "covenant faithfulness in action"
+          ],
+          "attested": [
+            {
+              "gloss": "mercy",
+              "found_in": [
+                "KJV",
+                "NKJV",
+                "DRA"
+              ],
+              "loses": "The covenantal structure within which chesed operates — mercy implies unilateral discretionary clemency rather than faithful loyalty within a binding relationship"
+            },
+            {
+              "gloss": "kindness",
+              "found_in": [
+                "NASB",
+                "NIV",
+                "NLT"
+              ],
+              "loses": "The obligatory weight and covenantal context of chesed — kindness suggests voluntary benevolence without relational history or binding structure"
+            },
+            {
+              "gloss": "love",
+              "found_in": [
+                "NIV",
+                "NLT",
+                "GNT"
+              ],
+              "loses": "The specific quality of loyalty-within-covenant that distinguishes chesed from generic affection or emotion"
+            },
+            {
+              "gloss": "grace",
+              "found_in": [
+                "older liturgical renderings"
+              ],
+              "loses": "The bilateral covenant context — grace in Western theological usage implies purely unilateral divine gift, erasing the relational structure chesed always presupposes"
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "Psalm 136:1 — 'Give thanks to the LORD, for he is good, for his steadfast love endures forever.'"
+        },
+        {
+          "translation": "KJV",
+          "text": "Psalm 136:1 — 'O give thanks unto the LORD; for he is good: for his mercy endureth for ever.'"
+        },
+        {
+          "translation": "NIV",
+          "text": "Psalm 136:1 — 'Give thanks to the LORD, for he is good. His love endures forever.'"
+        },
+        {
+          "translation": "NKJV",
+          "text": "Psalm 136:1 — 'Oh, give thanks to the LORD, for He is good! For His mercy endures forever.'"
+        },
+        {
+          "translation": "CSB",
+          "text": "Psalm 136:1 — 'Give thanks to the LORD, for he is good. His faithful love endures forever.'"
+        }
+      ],
+      "key_verses": [
+        "Ps.136.1",
+        "Ps.51.1",
+        "Hos.6.6",
+        "Mic.6.8",
+        "Ruth.1.8"
+      ],
+      "related_categories": [
+        "emunah",
+        "berit",
+        "emet",
+        "rachamim",
+        "tsedaqah",
+        "shalom"
+      ],
+      "theological_notes": "The translation history of chesed is one of the clearest cases of systematic narrowing in the English Bible. The Septuagint's dominant rendering as eleos — mercy, compassion toward the suffering — was already a partial translation, capturing one register of chesed (its orientation toward the vulnerable partner) while losing the covenantal structure that gives that orientation its meaning. This LXX narrowing became the channel through which Latin Vulgate misericordia entered Western theological vocabulary: misericordia names the pathos of a heart moved by another's misery, a psychological disposition directed toward suffering, not a covenantal commitment within a bond. From misericordia, the trajectory ran into medieval Catholic moral theology where mercy became a virtue of the superior toward the inferior — shaped by the way medieval theology adapted Aristotelian virtue ethics to frame virtues as stable interior dispositions rather than relational acts within a bond, pulling misericordia still further from chesed's covenantal structure.\n\nThe Melanchthonian forensic trajectory in confessional Lutheranism reframed the entire divine-human relationship in juridical terms borrowed from Roman law: the sinner as defendant, God as judge, grace as acquittal. Within this framework, chesed's covenantal loyalty was either collapsed into grace-as-unilateral-gift or entirely subordinated to the mercy-of-the-judge category. Calvin himself showed considerably more sensitivity to chesed's relational weight than the Melanchthonian forensic tradition, attending more carefully to the covenant's organic structure. However, the covenant-of-works / covenant-of-grace schema as developed in later Reformed federal theology (Cocceius onward) operated with a contractual logic that still moved at some distance from the enacted covenant-loyalty that chesed names — trading the living bond for a scheme of bilateral legal agreements.\n\nThe KJV's pervasive rendering of chesed as 'mercy' locked that narrowing into English-speaking Christianity for four centuries, shaping prayers, hymns, and theological categories around a word that — however beautiful in its own right — does not carry the covenantal interiority of chesed. The ESV's adoption of 'steadfast love' represents a significant and welcome recovery of the relational and enduring dimensions of the word. The CSB's 'faithful love' is also well-oriented. Neither, however, fully signals the covenantal structure as the primary register — the risk remains that 'steadfast love' sounds like intensified emotion rather than enacted covenant loyalty. The Kardia rendering 'faithful covenant love' attempts to hold both the relational warmth and the structural ground together in a single phrase.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_iterations": 3,
+      "_kardia_verses": [
+        {
+          "verse_ref": "Ps.136.1",
+          "standard_rendering": "Give thanks to the LORD, for he is good, for his steadfast love endures forever.",
+          "kardia_translation": "Give thanks to YHWH, for he is good — for his faithful covenant love endures forever."
+        },
+        {
+          "verse_ref": "Ps.51.1",
+          "standard_rendering": "Have mercy on me, O God, according to your steadfast love; according to your abundant mercy blot out my transgressions.",
+          "kardia_translation": "Have mercy on me, O God, according to your faithful covenant love; according to the fullness of your compassion, blot out my transgressions."
+        },
+        {
+          "verse_ref": "Hos.6.6",
+          "standard_rendering": "For I desire steadfast love and not sacrifice, the knowledge of God rather than burnt offerings.",
+          "kardia_translation": "For I desire faithful covenant love and not sacrifice, the knowledge of God rather than burnt offerings."
+        },
+        {
+          "verse_ref": "Mic.6.8",
+          "standard_rendering": "He has told you, O man, what is good; and what does the LORD require of you but to do justice, and to love kindness, and to walk humbly with your God?",
+          "kardia_translation": "He has told you, O man, what is good — and what does YHWH require of you but to do justice, to love faithful covenant love, and to walk humbly with your God?"
+        },
+        {
+          "verse_ref": "Ruth.1.8",
+          "standard_rendering": "But Naomi said to her two daughters-in-law, 'Go, return each of you to her mother's house. May the LORD deal kindly with you, as you have dealt with the dead and with me.'",
+          "kardia_translation": "But Naomi said to her two daughters-in-law, 'Go, return each of you to her mother's house. May YHWH show you faithful covenant love, as you have shown it to the dead and to me.'"
+        }
+      ]
+    },
+    {
+      "id": "yada",
+      "hebrew_root": "יָדַע",
+      "transliteration": "yāḏaʿ",
+      "testament_scope": "both",
+      "category_label": "Covenant Knowing",
+      "one_liner": "Yāḏaʿ is the covenant's active interior bond — the full-person, mutually obligating engagement by which YHWH and Israel are held in participated, embodied relationship.",
+      "full_definition": "Yāḏaʿ in the Hebrew Bible is not the acquisition of data about a subject. It is the act of entering into the reality of another — to know as one who has been shaped by, accountable to, and in living relationship with the one known. When YHWH says 'I have known you by name' (Exod 33:17) or 'Before I formed you in the womb I knew you' (Jer 1:5), the knowing is not divine omniscience cataloguing facts. It is YHWH's elective, relational engagement — the covenantal attention that constitutes calling and commissioning. To be known by YHWH is to stand in the field of covenantal obligation and care.\n\nYāḏaʿ carries the full range of human knowing-through-participation: a man knows his wife (Gen 4:1) in the act of union that produces new life; Israel is to know YHWH by remembering and enacting the Exodus (Deut 4:39); the nations will know YHWH when his acts of judgment and redemption are visible in history (Ezek 36:23). In every register — intimate, communal, historical — yāḏaʿ is knowing as participated presence, not knowing as detached cognition. The Shema itself presupposes this: to know that YHWH is one is not theological proposition but covenant orientation, the alignment of one's whole life toward the One whose name defines the covenant.\n\nIn the prophetic tradition, yāḏaʿ becomes the diagnostic word for Israel's covenant condition. 'My people do not know' (Isa 1:3) is not an indictment of ignorance but of covenant rupture — Israel has broken the relational bond that constitutes knowing YHWH. Hosea's rib-oracle (Hos 4:1-6) makes the connection explicit: lack of daʿat (knowledge) is inseparable from lack of chesed and emet. These are not parallel items on a list; they are the same covenant reality viewed from different angles. The New Covenant promise (Jer 31:34) — 'they shall all know me' — is therefore not a promise of better theological education. It is the eschatological restoration of the broken covenant bond itself, YHWH's direct engagement with every person within the covenant community.\n\nIn Second Temple usage, yāḏaʿ and its noun daʿat carried this same covenantal weight. The Hodayot from Qumran praise YHWH for granting the speaker daʿat — not information but the experiential reception of YHWH's covenantal self-disclosure. The Wisdom tradition's 'fear of YHWH is the beginning of knowledge' (Prov 1:7) orients daʿat entirely within the covenant relationship: right knowing begins with right standing before YHWH, which is the posture of a covenant member who takes YHWH's claim on their life with full seriousness.",
+      "what_it_does": "Yāḏaʿ constitutes and sustains the covenant bond from the inside. It is the active, participatory engagement that makes the covenant real in the life of persons and communities. YHWH's knowing of Israel is his elective attention that calls, commissions, and holds Israel accountable. Israel's knowing of YHWH is their lived orientation toward his character, his acts, his instruction, and his claim on every domain of life. When yāḏaʿ operates in both directions — YHWH knowing Israel and Israel knowing YHWH — the covenant is alive. When Israel's yāḏaʿ collapses, the covenant is functionally broken even if the formal structure remains. Yāḏaʿ thus functions as the relational current that runs through every other covenant category: without it, chesed is formal performance, Torah is hollow compliance, and worship is empty ritual.",
+      "what_it_is_not": "Yāḏaʿ is not intellectual assent to propositions — that reduction belongs to Western epistemology, not to the Hebrew covenantal world. Daʿat is the living current of a relationship enacted in body, memory, community, and covenant history — which is why Hosea's indictment is not a complaint about theological illiteracy but a declaration that the covenant bond itself has gone dead.",
+      "second_temple_context": "In the synagogue world of the first century, the regular reading of Torah and Prophets was understood as Israel's ongoing act of covenant knowing — hearing YHWH's word was not merely education but the communal renewal of the covenant bond. The Shema, recited daily, was an act of yāḏaʿ: the whole person orienting toward YHWH in acknowledgment of the covenant. Priestly and scribal communities emphasized that correct performance of Torah was the embodied form of knowing YHWH — daʿat enacted in the scribal and priestly ordering of communal life according to Torah. The Qumran community's Hodayot reflect a conviction that YHWH had granted the speaker daʿat as a covenant gift — a theme the hymns register doxologically, the speaker prostrating before YHWH in gratitude for the reception of his revealed ways. As the community's own hymns describe it, this daʿat was received from YHWH rather than achieved through human effort. The prophetic expectation of Jer 31:34 was alive in eschatological hope: the coming age would bring a restored and universal daʿat of YHWH, ending the need for human mediation of the covenant bond.",
+      "kardia_rendering": "covenant knowing",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "יָדַע",
+          "דַּעַת",
+          "מַדָּע"
+        ],
+        "strongs_hebrew": [
+          "H3045",
+          "H1847",
+          "H4093"
+        ],
+        "lxx_greek": [
+          "ginōskō",
+          "oida",
+          "gnōsis",
+          "epignōsis"
+        ],
+        "nt_greek": [
+          "ginōskō",
+          "oida",
+          "gnōsis",
+          "epignōsis",
+          "epiginōskō"
+        ],
+        "strongs_greek": [
+          "G1097",
+          "G1492",
+          "G1108",
+          "G1922",
+          "G1921"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "covenant knowing",
+            "relational knowing",
+            "participatory knowledge",
+            "lived knowledge of YHWH"
+          ],
+          "attested": [
+            {
+              "gloss": "know",
+              "found_in": [
+                "ESV",
+                "KJV",
+                "NKJV",
+                "NIV",
+                "CSB"
+              ],
+              "loses": "The covenantal, participatory, whole-person character of yāḏaʿ; collapses it into generic English cognitive knowing"
+            },
+            {
+              "gloss": "knowledge",
+              "found_in": [
+                "ESV",
+                "NIV",
+                "CSB",
+                "NKJV"
+              ],
+              "loses": "The relational and embodied dimension; renders daʿat as propositional content rather than covenant bond"
+            },
+            {
+              "gloss": "understand",
+              "found_in": [
+                "NIV",
+                "CSB"
+              ],
+              "loses": "The mutuality and participatory presence implied by yāḏaʿ; substitutes cognitive comprehension for relational engagement"
+            },
+            {
+              "gloss": "acknowledge",
+              "found_in": [
+                "ESV",
+                "NIV"
+              ],
+              "loses": "The depth of relational knowing; reduces covenant recognition to a formal or minimal act of acknowledgment"
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "Hosea 4:6 — 'My people are destroyed for lack of knowledge; because you have rejected knowledge, I reject you from being a priest to me.'"
+        },
+        {
+          "translation": "KJV",
+          "text": "Hosea 4:6 — 'My people are destroyed for lack of knowledge: because thou hast rejected knowledge, I will also reject thee, that thou shalt be no priest to me.'"
+        },
+        {
+          "translation": "NIV",
+          "text": "Hosea 4:6 — 'My people are destroyed from lack of knowledge. Because you have rejected knowledge, I also reject you as my priests.'"
+        },
+        {
+          "translation": "NKJV",
+          "text": "Hosea 4:6 — 'My people are destroyed for lack of knowledge. Because you have rejected knowledge, I also will reject you from being priest for Me.'"
+        },
+        {
+          "translation": "CSB",
+          "text": "Hosea 4:6 — 'My people are destroyed for lack of knowledge. Because you have rejected knowledge, I will reject you from serving as my priest.'"
+        }
+      ],
+      "key_verses": [
+        "Hos.4.6",
+        "Jer.31.34",
+        "Jer.1.5",
+        "Exod.33.17",
+        "Isa.1.3"
+      ],
+      "related_categories": [
+        "chesed",
+        "emet",
+        "berith",
+        "shema",
+        "daath",
+        "torah"
+      ],
+      "theological_notes": "The primary contamination of yāḏaʿ in Western theology comes through the Latin scholastic tradition, which processed daʿat through the abstractive epistemology of high medieval Scholasticism — specifically, the tendency of that tradition to treat knowing as the intellect's accurate apprehension of an object from which the knower remains fundamentally distinct. This is a distortion generated by Scholastic Aristotelianism rather than by Aristotle himself: Aristotle's own account of cognition is more complex, and the sharp abstraction of the knowing intellect from body, history, and community is properly located in the scholastic reception of Aristotle — particularly as developed through the via moderna and the late medieval debates over abstractive and intuitive cognition — rather than in Aristotle's own texts. The distinction matters because the contamination is not Greek metaphysics as such but the specific scholastic framework that received and institutionalized it. When this framework shaped the translation and interpretation of biblical categories, the covenant bond that Hebrew knowing assumes was progressively flattened into a cognitive transaction between a knowing subject and a known object.\n\nIt is important to distinguish the Reformation from the post-Reformation scholastic period (c. 1580–1700) that followed it, because the systematization most responsible for distorting yāḏaʿ in Protestant theology is a product of that later scholastic development, not of the Reformation itself. The notitia/assensus/fiducia schema for analyzing saving knowledge — associated with Melanchthon's loci tradition and fully systematized by figures such as Johann Gerhard — belongs to seventeenth-century Lutheran scholasticism, not to Luther's own usage. While fiducia preserved a relational dimension, the schema as a whole organized knowing within a cognitive framework foreign to the Hebrew category. Luther's own emphasis on the pro me character of faith carried relational and existential resonances closer to Hebrew participatory knowing; it was his scholastic successors who progressively systematized this into a tripartite cognitive structure.\n\nCocceian federal theology, with its strongly historical and typological emphasis originating in Utrecht and Leiden, and the Westminster-era Reformed scholastic tradition, with its more juridical and systematic structure shaped by Perkins, Ames, and the Westminster divines, both moved closer to Hebrew covenantal categories than Lutheran scholasticism had done — but each in different ways and with different remaining distortions. These two streams had significant internal debates and represent distinct Reformed trajectories rather than a single continuous development. Calvin's own account of knowing God was often more participatory and affective than either stream that followed him; the conflation of Calvin with post-Calvin scholastic federalism distorts both.\n\nThe result in most English translations is that words like 'knowledge' and 'know' carry a primarily cognitive register, while the Hebrew reader of Hosea 4:6 or Jeremiah 31:34 heard the breaking and restoration of the covenant bond itself.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_iterations": 4,
+      "_kardia_verses": [
+        {
+          "verse_ref": "Hos.4.6",
+          "standard_rendering": "My people are destroyed for lack of knowledge; because you have rejected knowledge, I reject you from being a priest to me. And since you have forgotten the law of your God, I also will forget your children.",
+          "kardia_translation": "My people are destroyed for lack of covenant knowing; because you have rejected covenant knowing, I reject you from being a priest to me. And since you have forgotten the law of your God, I also will forget your children."
+        },
+        {
+          "verse_ref": "Jer.31.34",
+          "standard_rendering": "And no longer shall each one teach his neighbor and each his brother, saying, 'Know the LORD,' for they shall all know me, from the least of them to the greatest, declares the LORD. For I will forgive their iniquity, and I will remember their sin no more.",
+          "kardia_translation": "And no longer shall each one teach his neighbor and each his brother, saying, 'Come into covenant knowing of the LORD,' for they shall all hold covenant knowing of me, from the least of them to the greatest, declares the LORD. For I will forgive their iniquity, and I will remember their sin no more."
+        },
+        {
+          "verse_ref": "Jer.1.5",
+          "standard_rendering": "Before I formed you in the womb I knew you, and before you were born I consecrated you; I appointed you a prophet to the nations.",
+          "kardia_translation": "Before I formed you in the womb I held you in covenant knowing, and before you were born I consecrated you; I appointed you a prophet to the nations."
+        },
+        {
+          "verse_ref": "Exod.33.17",
+          "standard_rendering": "And the LORD said to Moses, 'This very thing that you have spoken I will do, for you have found favor in my sight, and I know you by name.'",
+          "kardia_translation": "And the LORD said to Moses, 'This very thing that you have spoken I will do, for you have found favor in my sight, and I hold you in covenant knowing by name.'"
+        },
+        {
+          "verse_ref": "Isa.1.3",
+          "standard_rendering": "The ox knows its owner, and the donkey its master's crib, but Israel does not know, my people do not understand.",
+          "kardia_translation": "The ox holds covenant knowing of its owner, and the donkey its master's crib, but Israel does not covenant-know, my people do not understand."
+        }
+      ]
+    },
+    {
+      "id": "elohim",
+      "hebrew_root": "אֱלֹהִים",
+      "transliteration": "ʾĕlōhîm",
+      "testament_scope": "both",
+      "category_label": "The Divine Name: God as Sovereign Creator and Covenant Lord",
+      "one_liner": "YHWH as the sovereign whose very lordship over all creation is expressed through and oriented toward covenant relationship with Israel and, through Israel, all nations.",
+      "full_definition": "ʾĔlōhîm is the primary generic term for deity in biblical Hebrew, morphologically plural in form yet grammatically singular in its dominant covenantal usage when referring to Israel's God. The form almost certainly reflects an ancient Semitic plural of majesty or an intensive plural — signaling the fullness and overwhelming totality of divine power — rather than numerical plurality. It appears over 2,500 times in the Hebrew Bible, from the opening declaration of Genesis 1:1 through the prophetic literature, and it functions both as a name for YHWH and as a common noun applicable to other gods, heavenly beings, and even human judges or rulers vested with divine authority (Ps. 82:6; Ex. 21:6). This semantic range is not confusion but deliberate Hebrew precision: the term identifies the category of sovereign, transcendent, commanding power, and YHWH occupies that category absolutely.\n\nIn the creation narrative of Genesis 1, ʾĔlōhîm is the sole sovereign agent who speaks the cosmos into ordered existence. Each creative act is presented as sovereign fiat — God speaks, and structured reality answers. This is not philosophical reflection on ontology in the Greek sense; it is testimony to YHWH's sovereign lordship over every domain that Israel's neighbors attributed to competing deities. The Babylonian Marduk, the Canaanite Baal, the Egyptian Amun — ʾĔlōhîm renders them all not merely subordinate but categorically displaced. There is one sovereign ordering power behind sun, sea, and storm, and that power is in covenant with Israel.\n\nThe theological weight of ʾĔlōhîm intensifies when read alongside the divine name YHWH. The Hebrew Bible consistently uses both names, often together as YHWH ʾĔlōhîm (LORD God), to hold in tension the universal sovereignty of the Creator and the particular covenantal intimacy of the God who made promises to Abraham, Isaac, and Jacob. ʾĔlōhîm without YHWH describes raw sovereign power over all nations and creation; YHWH alone emphasizes covenantal fidelity and personal presence. Together they declare that the sovereign of all creation is precisely and specifically the covenant partner of Israel — and that this covenant is not a local arrangement between a tribal deity and his people, but the sovereign ordering of all reality toward its redemptive telos.\n\nIn Second Temple usage, ʾĔlōhîm continued to carry its full covenantal-sovereignty register. The Shema (Deut. 6:4) — ʾĔlōhênû, 'our God' — was not merely a claim about numerical monotheism but a covenantal confession: the sovereign of all creation is specifically ours, the one with whom we are in binding relationship. To say ʾĔlōhîm was to invoke the one who created, commands, judges, redeems, and will ultimately restore all things. This is not a philosophical definition of the divine essence; it is a covenantal and eschatological declaration about who holds sovereign power over heaven, earth, and the future of Israel.",
+      "what_it_does": "ʾĔlōhîm establishes and sustains the covenantal order by naming YHWH as the sole sovereign whose word creates reality, whose commands structure covenant life, and whose judgment and redemption determine the ultimate trajectory of creation and Israel. It functions as the foundation of all covenantal obligation: because YHWH is ʾĔlōhîm — sovereign creator and lord — Israel owes total covenant loyalty. It also functions as the anchor of eschatological hope: the one who created all things will also restore all things. In the legal and judicial contexts of the Hebrew Bible, ʾĔlōhîm names the ultimate court of appeal, before whom all human judgments are accountable. In the psalms of praise, it grounds every act of worship in the recognition that sovereign power and covenantal faithfulness belong to the same person.",
+      "what_it_is_not": "ʾĔlōhîm is not the abstract Supreme Being of later philosophical theology. ʾĔlōhîm is the living sovereign who speaks, acts, commands, judges, grieves, and redeems within the texture of covenant history — grounding divinity in sovereign agency and covenantal relationship rather than ontological abstraction.",
+      "second_temple_context": "In Second Temple contexts — from the Jerusalem Temple cultus to diaspora prayer-houses and the covenant community at Qumran — ʾĔlōhîm was embedded in doxological and covenantal usage wherever Jewish communities gathered for Torah, prayer, and communal life. The blessing formula ʾĔlōhê ʾAbrāhām, ʾĔlōhê Yiṣḥāq, wəʾĔlōhê Yaʿăqōb — 'God of Abraham, God of Isaac, and God of Jacob' — is attested in liturgical contexts of the period and reflected in early synagogue practice; it survives in standardized form in the later rabbinic Amidah, whose pre-70 antecedents are debated among scholars, with some evidence for pre-destruction antecedents in Jewish prayer tradition (cf. the discussions in Heinemann, Prayer in the Talmud, and Flusser's work on early Jewish liturgy), while its fixed form belongs to the post-destruction consolidation at Yavneh. This formula rehearsed the covenantal specificity of divine sovereignty: YHWH is not a generic divine power but the sovereign who entered particular covenant relationships with particular persons in covenant history. The term also carried eschatological freight in this period: the God who is ʾĔlōhîm over all nations will vindicate Israel, judge her oppressors, and establish the kingdom where YHWH's sovereignty is universally acknowledged. This eschatological dimension is visible in Daniel's use of ʾĔlōhê šəmayyāʾ — God of heaven — as a way of asserting YHWH's sovereignty over Babylonian and Persian imperial claims. At Qumran, the Community Rule and the War Scroll invoke ʾĔlōhîm in the register of cosmic sovereignty and priestly holiness; the community understood themselves as the faithful remnant of the covenant, called to priestly purity and covenantally precise calendrical practice as the proper creaturely response to divine sovereignty. In all these contexts, the term is fundamentally doxological and covenantal rather than speculative or philosophical.",
+      "kardia_rendering": "The Sovereign God",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "אֱלֹהִים",
+          "אֵל",
+          "אֱלוֹהַּ",
+          "אֱלָהּ"
+        ],
+        "strongs_hebrew": [
+          "H430",
+          "H410",
+          "H433",
+          "H426"
+        ],
+        "lxx_greek": [
+          "theos",
+          "kyrios"
+        ],
+        "nt_greek": [
+          "theos"
+        ],
+        "strongs_greek": [
+          "G2316"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "the Sovereign God",
+            "God the Creator-Lord",
+            "the Living God",
+            "the LORD God"
+          ],
+          "attested": [
+            {
+              "gloss": "God",
+              "found_in": [
+                "ESV",
+                "KJV",
+                "NIV",
+                "NKJV",
+                "CSB",
+                "NASB",
+                "NLT"
+              ],
+              "loses": "The majesty-plural intensity, the covenantal-sovereignty register, and the distinction from YHWH as personal covenant name — reducing the term to a flat English proper noun"
+            },
+            {
+              "gloss": "gods",
+              "found_in": [
+                "ESV",
+                "NIV",
+                "NRSV"
+              ],
+              "loses": "When applied to YHWH contexts, this rendering of the plural form destroys the intensive-majesty reading and introduces false polytheistic implication; legitimate only in explicit non-YHWH referent contexts"
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "In the beginning, God created the heavens and the earth. (Gen. 1:1)"
+        },
+        {
+          "translation": "KJV",
+          "text": "In the beginning God created the heaven and the earth. (Gen. 1:1)"
+        },
+        {
+          "translation": "NIV",
+          "text": "In the beginning God created the heavens and the earth. (Gen. 1:1)"
+        },
+        {
+          "translation": "NKJV",
+          "text": "In the beginning God created the heavens and the earth. (Gen. 1:1)"
+        },
+        {
+          "translation": "CSB",
+          "text": "In the beginning God created the heavens and the earth. (Gen. 1:1)"
+        }
+      ],
+      "key_verses": [
+        "Gen.1.1",
+        "Deut.6.4",
+        "Ps.82.1",
+        "Dan.2.44",
+        "Ps.96.5"
+      ],
+      "related_categories": [
+        "yhwh",
+        "adonai",
+        "shaddai",
+        "elyon",
+        "kavod",
+        "malkhut"
+      ],
+      "theological_notes": "What the Hebrew covenantal-sovereignty register of ʾĔlōhîm actually declares is this: YHWH is the living sovereign who grieves over a creation gone wrong (Gen. 6:6), who relents from judgment when the covenant people turn (Ex. 32:14), who is moved to fierce compassion that overrides even righteous anger (Hos. 11:8), and who acts with sovereign power precisely in order to restore broken covenant relationship. For the Hebrew authors, divine transcendence and relational engagement are not in tension — they are mutually constitutive. YHWH's sovereignty is not expressed despite covenant relationship but through it. The one who speaks galaxies into existence is the same one who hears the cry of the enslaved in Egypt and comes down to deliver. That is the covenantal-sovereignty register of ʾĔlōhîm.\n\nThe primary contamination vector for this term in Western theology was the patristic and medieval synthesis of Hebrew covenantal-sovereignty language with Neoplatonic metaphysical categories. Neoplatonism — the philosophical tradition flowing from Plotinus and his interpreters — understood ultimate divine reality as the One beyond all being and relation: a transcendent first principle so absolute that it could not properly be said to act, respond, or be affected by anything in the created order. Divine transcendence, in this framework, meant ontological remoteness — the absence of genuine responsiveness to creaturely reality. This framework, not apophatic theology as such (which has legitimate roots including in Jewish thought), is what contaminated the doctrine of God: when Neoplatonic ontological remoteness became the controlling metaphysical commitment, theological categories were introduced that structurally conflict with the Hebrew portrait of YHWH.\n\nThree scholastic concepts crystallized this contamination. Divine simplicity — the claim that God has no internal distinctions, parts, or composition — made it theologically awkward to speak of God responding, grieving, or relenting without extensive qualification. Impassibility — the claim that God is literally incapable of being affected by anything outside himself — is a category that would have been incoherent to any author of the Hebrew Bible, where YHWH grieves (Gen. 6:6), relents (Ex. 32:14), and is moved to compassion (Hos. 11:8). Pure actuality (Latin: actus purus, the Aristotelian concept that God is fully realized being with no unrealized potential) left no conceptual room for the responsive, relenting, grieving YHWH of the Psalms and Prophets. Thomas Aquinas's synthesis in the Summa Theologica identified ʾĔlōhîm with ipsum esse subsistens — 'subsistent being itself,' meaning God understood as existence as such, the pure act of being, rather than as a living covenantal agent who acts within a specific history with a specific people. This is philosophically sophisticated but exegetically disconnected from the Hebrew covenantal-sovereignty register of the term, which describes not what God is in himself as ontological first principle but who YHWH is in relation to Israel and creation.\n\nThe Latin Vulgate's consistent rendering of ʾĔlōhîm as Deus — a term already laden with Roman religious associations and subsequently with Aristotelian philosophical freight — accelerated this drift. When the Reformers encountered ʾĔlōhîm through the lens of Deus, they substantially inherited the scholastic philosophical framework in their doctrine of God even as they sought to recover biblical categories in soteriology. Luther's reforming energy focused primarily on soteriology rather than the doctrine of God, leaving much of the inherited metaphysical vocabulary intact — though Lutheran scholastic figures such as Johann Gerhard engaged the metaphysical questions in ways that complicate any simple generalization about the Lutheran tradition. Reformed scholasticism — represented most systematically by Francis Turretin and others in the post-Reformation orthodox tradition — reproduced and in some respects intensified the scholastic metaphysical framework for the doctrine of God, even as it recovered covenantal structure in Scripture and election. Calvin's own exegetical and homiletical practice sometimes recovers a more relationally engaged register for divine sovereignty, straining against the inherited Latin vocabulary; but the Reformed scholastic tradition that followed largely consolidated the metaphysical inheritance rather than pressing Calvin's more biblical instincts forward. Zwingli's trajectory is shaped by a distinct humanist engagement with classical sources that deserves separate treatment; this survey does not give it adequate space and should not be read as a complete taxonomy of Reformation approaches. The Anglican and Radical Reformation streams are likewise not addressed here.\n\nModern evangelical translation — using the flat gloss 'God' uniformly across every occurrence of ʾĔlōhîm, ʾĒl, ʾĔlôah, and even YHWH ʾĔlōhîm — further flattens the distinctions the Hebrew text carefully preserves between sovereign power, covenantal intimacy, and particular historical fidelity. A reader of English translations has no way of perceiving that the ʾĔlōhîm of Genesis 1 and the YHWH ʾĔlōhîm of Genesis 2 are doing distinct theological work in their juxtaposition.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_iterations": 6,
+      "_kardia_verses": [
+        {
+          "verse_ref": "Gen.1.1",
+          "standard_rendering": "In the beginning, God created the heavens and the earth.",
+          "kardia_translation": "In the beginning, The Sovereign God created the heavens and the earth."
+        },
+        {
+          "verse_ref": "Deut.6.4",
+          "standard_rendering": "Hear, O Israel: The LORD our God, the LORD is one.",
+          "kardia_translation": "Hear, O Israel: YHWH is our Sovereign God, YHWH alone."
+        },
+        {
+          "verse_ref": "Ps.82.1",
+          "standard_rendering": "God stands in the divine assembly; he renders judgment among the gods.",
+          "kardia_translation": "The Sovereign God takes his stand in the assembly of the mighty; in the midst of the sovereign gods he renders judgment."
+        },
+        {
+          "verse_ref": "Dan.2.44",
+          "standard_rendering": "In the time of those kings, the God of heaven will set up a kingdom that will never be destroyed.",
+          "kardia_translation": "In the days of those kings, the Sovereign God of heaven will establish a kingdom that shall never be destroyed."
+        },
+        {
+          "verse_ref": "Ps.96.5",
+          "standard_rendering": "For all the gods of the nations are idols, but the LORD made the heavens.",
+          "kardia_translation": "For all the sovereign gods of the peoples are mere idols, but YHWH — he made the heavens."
+        }
+      ]
+    },
+    {
+      "id": "nephesh",
+      "hebrew_root": "נֶפֶשׁ",
+      "transliteration": "nefesh",
+      "testament_scope": "both",
+      "category_label": "Living Self / Animate Being",
+      "one_liner": "Nephesh is the whole living self as covenant participant — breathing, desiring, striving toward YHWH or away from him.",
+      "full_definition": "Nephesh denotes the whole animated self — the living person as a unified, breathing, desiring, experiencing being. It is not a component part of a human being; it is the human being as a living whole. When Genesis 2:7 declares that Adam became a nephesh chayyah — a living being — the text is not describing the arrival of a soul into a body. It is describing the animation of the whole person: dust breathed into by YHWH's own breath becomes a single, undivided living self. The nephesh is not an immaterial substance housed in the body; it is the whole living person — embodied, relational, and oriented toward YHWH.\n\nThe semantic range of nephesh moves across physical, emotional, volitional, and relational registers with complete fluency. The nephesh hungers (Deut 12:20), thirsts (Ps 42:2), grieves (1 Sam 1:10), loves (Song 1:7), hates (2 Sam 5:8), longs and waits (Ps 130:5-6), and cries out to YHWH from depths of distress (Ps 25:1). These are not metaphors for a detached inner life. They are the whole person in motion — engaged with creation, with covenant community, and with the God who breathed life into the dust. To say 'my nephesh thirsts for you' (Ps 63:1) is to say: I, in the full weight of my physical and relational existence, am oriented toward YHWH.\n\nIn its covenantal register, nephesh is the self that stands before YHWH as the subject of covenant obligation, covenant longing, and covenant vulnerability. The nephesh can be bound by oath (Num 30:2), can be unjustly taken (Ps 31:13), and can be redeemed by a kinsman (Ps 49:15). YHWH is addressed as the one who 'redeems my nephesh from the pit' (Ps 103:4) — not a spiritual soul from hell, but the whole living self from destruction and covenant abandonment. The Psalter is the prayer book of the nephesh: its laments, its praises, its waiting and its rest are all the whole-self speech of covenant persons addressing their covenant God.\n\nIn the LXX, nephesh is rendered primarily as psyche, which carried Platonic freight that the Hebrew never intended. The NT authors inherit this vehicle but operate within the Hebrew conceptual world: when Jesus speaks of 'losing one's psyche to save it' (Mark 8:35), he is speaking in the register of nephesh — the whole self, one's very life as a covenant person — not the Greek philosophical soul. Paul's use of psychikos in 1 Corinthians 15 similarly must be read against the Hebrew background: the psychikos anthrōpos is the merely-living-self, the Adam-before-full-eschatological-restoration, not the 'soulish' person in a Platonic hierarchy.",
+      "what_it_does": "Nephesh functions as the subject of all covenant action and covenant longing. It is the whole self that enters covenant (Deut 26:16), that cries out in lament and praise (Ps 42-43), that is offered to YHWH in love (Deut 6:5 — 'with all your nephesh'), and that receives YHWH's redemptive action. In covenant relationship, nephesh is never passive: it hungers and waits, it trusts and clings, it mourns and celebrates. It is the covenant partner as a living, breathing, experiencing whole. The nephesh also marks vulnerability: to threaten someone's nephesh is to threaten their very life and existence within the covenant community. To restore someone's nephesh (Ps 23:3) is to bring the whole disoriented self back onto the path of covenant faithfulness.",
+      "what_it_is_not": "Nephesh is not a Platonic immortal soul — an immaterial substance distinct from and superior to the body. That category belongs to Greek philosophical anthropology, not to the Hebrew Bible. The nephesh does not escape the body at death; Hebrew hope is the restoration and resurrection of the whole living self in covenant relationship with YHWH. In the Hebrew world, the whole animate self is nephesh: embodied, embedded in community, mortal apart from YHWH's sustaining breath. The nephesh that 'departs' at death (Gen 35:18) is the vitality of the whole person ceasing — and the covenant hope is its reconstitution, not its release from physicality.",
+      "second_temple_context": "In the covenant communities gathered around Torah in the first century, nephesh functioned as the whole self's orientation toward YHWH and toward covenant life. The Shema's command — 'you shall love YHWH your God with all your heart, with all your nephesh, and with all your strength' (Deut 6:5) — was recited daily as the total-self pledge of covenant loyalty, not a compartmentalized inner devotion. The Psalms, read and sung in communal liturgical life, were the nephesh's vocabulary for lament, trust, and praise: the whole community's living selves crying out together from exile, oppression, or illness, and trusting YHWH's restoration. Martyrological texts of the Second Temple period — particularly 4 Maccabees and Daniel — spoke of giving one's nephesh for Torah faithfulness, meaning the surrender of one's whole physical life rather than compromise of covenant identity. The Qumran community's regulations concerning ritual purity and holiness addressed the nephesh in its full embodied sense: bodily states, contact with the dead, and ritual defilement were all nephesh-level concerns because the whole person stood before YHWH's holiness. Within the streams of Second Temple Judaism that maintained Torah-covenantal hope — including Pharisaic, Qumranic, and apocalyptic circles — eschatological expectation centered on the resurrection of the whole self, not the immortality of a detached soul. Other Second Temple voices, influenced by Hellenistic categories, nuanced this differently: the Wisdom of Solomon, shaped by contact with diaspora philosophical culture, moves toward a language of soul-immortality that reflects the Platonic environment more than the Mosaic covenantal framework. The Sadducees, for their part, rejected bodily resurrection entirely. The diversity of the period should not be flattened; what can be said is that the resurrection of the whole nephesh, not the escape of an inner soul, was the dominant horizon of Torah-covenantal hope.",
+      "kardia_rendering": "living self",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "נֶפֶשׁ",
+          "נְשָׁמָה"
+        ],
+        "strongs_hebrew": [
+          "H5315",
+          "H5397"
+        ],
+        "lxx_greek": [
+          "psychē",
+          "pneuma",
+          "bios"
+        ],
+        "nt_greek": [
+          "psychē",
+          "psychikos"
+        ],
+        "strongs_greek": [
+          "G5590",
+          "G5591"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "living self",
+            "whole self",
+            "life",
+            "person",
+            "being"
+          ],
+          "attested": [
+            {
+              "gloss": "soul",
+              "found_in": [
+                "KJV",
+                "NKJV",
+                "ESV",
+                "NIV",
+                "CSB"
+              ],
+              "loses": "The embodied, unified wholeness of the living person; imports a Greek dualist framework of immaterial soul versus material body that is entirely foreign to the Hebrew concept"
+            },
+            {
+              "gloss": "mind",
+              "found_in": [
+                "NIV"
+              ],
+              "loses": "The physical and volitional fullness of nephesh; reduces it to a cognitive faculty rather than the whole animated self"
+            },
+            {
+              "gloss": "heart",
+              "found_in": [
+                "ESV",
+                "NIV"
+              ],
+              "loses": "The full register of embodied desire and life-orientation; collapses nephesh into lev (heart), losing the distinction between total animate selfhood and the inner directional center"
+            },
+            {
+              "gloss": "life",
+              "found_in": [
+                "ESV",
+                "NIV",
+                "CSB",
+                "NKJV"
+              ],
+              "loses": "The personal, relational, and desiring dimensions of nephesh; 'life' as an English word trends toward biological existence rather than covenantal selfhood in action"
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "Psalm 42:1 — 'As a deer pants for flowing streams, so pants my soul for you, O God.'"
+        },
+        {
+          "translation": "KJV",
+          "text": "Psalm 42:1 — 'As the hart panteth after the water brooks, so panteth my soul after thee, O God.'"
+        },
+        {
+          "translation": "NIV",
+          "text": "Psalm 42:1 — 'As the deer pants for streams of water, so my soul pants for you, my God.'"
+        },
+        {
+          "translation": "NKJV",
+          "text": "Psalm 42:1 — 'As the deer pants for the water brooks, so pants my soul for You, O God.'"
+        },
+        {
+          "translation": "CSB",
+          "text": "Psalm 42:1 — 'As a deer longs for flowing streams, so I long for you, God.'"
+        }
+      ],
+      "key_verses": [
+        "Gen.2.7",
+        "Deut.6.5",
+        "Ps.42.1",
+        "Ps.103.1",
+        "Mark.8.35"
+      ],
+      "related_categories": [
+        "lev",
+        "ruach",
+        "neshamah",
+        "basar",
+        "chayyim"
+      ],
+      "theological_notes": "The translation history of nephesh is among the most consequential distortion pathways in the entire biblical lexicon. When the LXX translators rendered nephesh as psychē, they selected a Greek word already carrying Platonic associations: the immortal, pre-existent, immaterial soul that Plato describes in the Phaedo — his dialogue on the soul's immortality — as the true self, temporarily housed in the body and yearning for release at death. This Platonic psychē is the ontological opposite of nephesh: where nephesh is the whole person alive, psychē in Plato is the person minus the body. The LXX choice was a vehicle of translation necessity, not theological endorsement, but the vehicle carried its cargo into patristic theology.\n\nAugustine of Hippo, working through Neoplatonic categories — the late antique synthesis of Platonic thought developed by Plotinus, in which the soul is the true self yearning for return to the divine One — systematized the body-soul dualism that the LXX had inadvertently imported. For Augustine, the soul is the immaterial locus of the image of God, while the body is its mortal housing. This framework, which owes far more to Plotinus than to Moses, became the dominant anthropological grid of Western Christianity and permanently distorted the reading of nephesh. Augustine's full position goes further still: his doctrine of concupiscence — disordered bodily desire as an inherited guilt-bearing condition, not merely a tendency toward sin but a legal-status defect transmitted through physical generation — further entrenched suspicion of the body in Western theology, making the body itself a carrier of juridical guilt-status. This is the sharpest inversion of the Hebrew nephesh, in which embodied desire is not structurally suspect but is the whole self's proper instrument of covenant orientation. When the Vulgate rendered nephesh as anima, it locked this anthropology into the Latin church's theological vocabulary for a millennium.\n\nThe magisterial Reformation streams did not substantially challenge the inherited body-soul framework, though their reasons and emphases differed. Lutheran dogmatics, organized around forensic categories of guilt and justification before a divine tribunal, left biblical anthropology largely unexamined; the immortal soul remained an unquestioned anthropological presupposition. Calvin retained the body-soul distinction largely intact in the Institutes, despite his more careful covenantal work elsewhere, and Reformed federal theology — while recovering covenant as the structuring category of redemptive history — did not revisit the anthropological inheritance at the level of nephesh. Anabaptist traditions, with their emphasis on the gathered embodied community and their martyrological witness of surrendering the whole bodily self for covenant faithfulness, were in some respects closer to the Hebrew nephesh register — though this convergence was practical and ecclesial rather than exegetically driven.\n\nThe practical consequence for translation is that every major English Bible renders nephesh as 'soul' in its most prominent occurrences, and English readers invariably hear a Platonic category — the inner immaterial self that survives death. This causes cascading misreadings: the Psalms' lament of the nephesh becomes inner spiritual anguish rather than the whole person's cry from physical and relational suffering; Deuteronomy 6:5's call to love God with all your nephesh becomes a call to inner spiritual devotion rather than total-self covenantal commitment; and the New Testament's promise of psychē salvation becomes promise of immortal-soul rescue rather than whole-self redemptive restoration. Recovering nephesh requires not merely a better gloss but a reconstruction of the embodied, relational, whole-person anthropology of the Hebrew Bible.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_iterations": 3,
+      "_kardia_verses": [
+        {
+          "verse_ref": "Gen.2.7",
+          "standard_rendering": "then the LORD God formed the man of dust from the ground and breathed into his nostrils the breath of life, and the man became a living creature.",
+          "kardia_translation": "then the LORD God formed the man of dust from the ground and breathed into his nostrils the breath of life, and the man became a living self."
+        },
+        {
+          "verse_ref": "Deut.6.5",
+          "standard_rendering": "You shall love the LORD your God with all your heart and with all your soul and with all your might.",
+          "kardia_translation": "You shall love the LORD your God with all your heart and with all your living self and with all your might."
+        },
+        {
+          "verse_ref": "Ps.42.1",
+          "standard_rendering": "As a deer pants for flowing streams, so pants my soul for you, O God.",
+          "kardia_translation": "As a deer pants for flowing streams, so my living self pants for you, O God."
+        },
+        {
+          "verse_ref": "Ps.103.1",
+          "standard_rendering": "Bless the LORD, O my soul, and all that is within me, bless his holy name.",
+          "kardia_translation": "Bless the LORD, O my living self, and all that is within me, bless his holy name."
+        },
+        {
+          "verse_ref": "Mark.8.35",
+          "standard_rendering": "For whoever would save his life will lose it, but whoever loses his life for my sake and the gospel's will save it.",
+          "kardia_translation": "For whoever would save his living self will lose it, but whoever loses his living self for my sake and the gospel's will save it."
+        }
+      ]
+    },
+    {
+      "id": "kavod",
+      "hebrew_root": "כָּבוֹד",
+      "transliteration": "kavod",
+      "testament_scope": "both",
+      "category_label": "Weightiness / Manifest Presence",
+      "one_liner": "Kavod is the palpable, covenant-inhabiting weight of YHWH's presence that establishes his dwelling among his people and reorders all creaturely reality around his revealed name.",
+      "full_definition": "Kavod derives from the root כָּבַד (kaved), meaning to be heavy, weighty, or burdensome. In the ancient Near Eastern world, weight signified substance, honor, and social gravity — a person of kavod was one whose presence commanded recognition because of the real power and status they embodied. When applied to YHWH, kavod is not an abstract attribute but the perceptible, manifest reality of his presence pressing into the created order: the pillar of fire and cloud, the consuming fire on Sinai, the shekinah filling the Tabernacle and Temple so that the priests could not stand to minister. Kavod is YHWH showing up in a way that reorganizes everything around him.\n\nIn the covenant framework, kavod functions as the relational counterpart to YHWH's name. His shem declares who he is; his kavod declares that he is here. The two are inseparable in Exodus 33–34, where Moses requests to see YHWH's kavod and receives instead the proclamation of his name — his covenant character: compassionate, gracious, slow to anger, abounding in chesed and emet. Kavod is therefore not raw luminosity divorced from covenant identity; it is the radiant weight of the covenanting God's actual character made visible and inescapable. This covenantal character is nowhere more concrete than in Exodus 40: when the kavod fills the completed Tabernacle, it is not mere ratification of a legal compact — it is YHWH taking up residence among his people, transforming the Tabernacle from a human construction into the place where heaven and earth meet. The kavod inhabiting the Tabernacle is what makes the Sinai covenant a dwelling-covenant, a relationship of presence and not merely of contractual obligation. This is also why the Prophets can speak of the kavod departing from Israel (Ezekiel 10–11) as the most catastrophic possible event — not aesthetic loss but the dissolution of the covenant's living center.\n\nThe human dimension of kavod operates within the same covenantal logic. To give kavod to YHWH is not flattery but the recognition of what is objectively real — an act of properly ordered perception and response. When Israel fails to give kavod to YHWH (Malachi 1:6), they are not merely rude; they are denying the weight of the One who constituted them as a people. Conversely, YHWH promises to kavod those who honor him (1 Samuel 2:30), a covenant reciprocity in which proper relational alignment produces the kind of social and creaturely substance that human beings were designed to carry as image-bearers. The human being bearing kavod is the image-bearer functioning as intended — reflecting the weight of the One in whose image they were made.\n\nIn Second Temple expectation, kavod took on intense eschatological valence. The return of the kavod to Zion — anticipated since its departure in Ezekiel — became the organizing hope of restoration theology. Isaiah 40:5 promises that all flesh shall see the kavod of YHWH together. This was understood not merely as future spectacle but as the completion of covenant: YHWH returning to dwell among his people, vindicating his name before the nations, and filling the earth as the waters cover the sea (Habakkuk 2:14). The community at Qumran, shaped by the priestly traditions of Ezekiel, understood their liturgical life as anticipatory participation in this coming kavod.",
+      "what_it_does": "Kavod functions as the covenant's visible weight-bearing structure. It establishes YHWH's presence as a physical, communal, and relational reality that cannot be ignored or abstracted. In the Tabernacle and Temple, kavod orients all priestly and communal life around the actual indwelling presence of YHWH — liturgy, purity, sacrifice, and calendar all derive their logic from the kavod that inhabits the Holy of Holies. Kavod compels creaturely reorientation: when it appears, human beings fall on their faces not from arbitrary protocol but from genuine encounter with the weight of ultimate reality. In prophetic address, kavod indicts a covenant people who have assigned weight to things other than YHWH — idols, nations, wealth — and thereby disordered their entire relational world. The restoration of kavod is therefore the restoration of right order: YHWH again at the center, his presence again constituting the community, his name again the heaviest thing in the cosmos.",
+      "what_it_is_not": "Kavod is not the static divine attribute Western theology calls glory. A static attribute cannot depart — but kavod departs in Ezekiel 10 and returns in Ezekiel 43, and that movement of departure and return is the irreducible covenantal logic the word carries. Kavod is dynamic, relational, and directional: it moves, it fills, it departs, it returns — the living covenant God's real presence enacting itself within the history of his people.",
+      "second_temple_context": "In Second Temple Jewish life, kavod structured both liturgical and eschatological imagination simultaneously. In the Temple, the kavod was understood to be present above the ark and between the cherubim, making the Temple the place where heaven and earth met — the locus of direct contact between YHWH's dwelling and the created order, as traditions from Jubilees and later texts also expressed. The synagogue — whose precise pre-70 form remains debated among historians — eventually re-centered Torah reading and the prayers invoking YHWH's name as the community's ongoing means of orientation toward the kavod even at a distance. Communities in diaspora prayed toward Jerusalem, toward the place where kavod dwelt. The Shema's insistence on YHWH's oneness (Deuteronomy 6:4) was functionally an insistence on the singularity of kavod: only one source of ultimate weight, only one whose presence constitutes reality. The priestly traditions preserved in texts like the Songs of the Sabbath Sacrifice from Qumran show a community that understood their worship as participation in the angelic liturgy surrounding the heavenly throne of kavod — the merkavah. The prophetic promise of kavod's return to Zion (Isaiah 40:5; 60:1–3; Ezekiel 43:1–5) was the eschatological horizon that gave meaning to both present suffering and faithful observance: the world's reordering around the returning weight of YHWH was the goal toward which covenant history moved.",
+      "kardia_rendering": "the manifest weight of YHWH's presence",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "כָּבוֹד",
+          "כָּבֵד",
+          "כָּבַד"
+        ],
+        "strongs_hebrew": [
+          "H3519",
+          "H3515",
+          "H3513"
+        ],
+        "lxx_greek": [
+          "doxa",
+          "time"
+        ],
+        "nt_greek": [
+          "doxa",
+          "doxazo"
+        ],
+        "strongs_greek": [
+          "G1391",
+          "G1392"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "manifest weight",
+            "weighty presence",
+            "the weight of YHWH's presence",
+            "covenant weightiness",
+            "manifest honor"
+          ],
+          "attested": [
+            {
+              "gloss": "glory",
+              "found_in": [
+                "ESV",
+                "KJV",
+                "NKJV",
+                "NIV",
+                "CSB",
+                "NASB"
+              ],
+              "loses": "The dynamic, relational, and covenantal character of kavod — 'glory' in English connotes aesthetic luminosity or vague praise, stripping out the weight, the presence, the historical movement of YHWH into and out of his community"
+            },
+            {
+              "gloss": "honor",
+              "found_in": [
+                "NIV",
+                "CSB",
+                "NLT"
+              ],
+              "loses": "The divine-presence dimension entirely — 'honor' renders only the human-social register of kavod and cannot carry the Tabernacle-filling, pillar-of-fire reality of YHWH's manifest presence"
+            },
+            {
+              "gloss": "splendor",
+              "found_in": [
+                "ESV",
+                "NIV",
+                "CSB"
+              ],
+              "loses": "Substitutes aesthetic beauty for covenantal substance — splendor is visual and passive, while kavod is weighty, active, and relationally constituting"
+            },
+            {
+              "gloss": "majesty",
+              "found_in": [
+                "NIV",
+                "NLT",
+                "NRSV"
+              ],
+              "loses": "Imports a royal-aesthetic category that abstracts YHWH's presence into regal distance, losing the bodily, communal, covenant-specific reality of kavod pressing into Israel's historical life"
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "Exodus 40:34 — 'Then the cloud covered the tent of meeting, and the glory of the LORD filled the tabernacle.'"
+        },
+        {
+          "translation": "KJV",
+          "text": "Exodus 40:34 — 'Then a cloud covered the tent of the congregation, and the glory of the LORD filled the tabernacle.'"
+        },
+        {
+          "translation": "NIV",
+          "text": "Exodus 40:34 — 'Then the cloud covered the tent of meeting, and the glory of the LORD filled the tabernacle.'"
+        },
+        {
+          "translation": "NKJV",
+          "text": "Exodus 40:34 — 'Then the cloud covered the tabernacle of meeting, and the glory of the LORD filled the tabernacle.'"
+        },
+        {
+          "translation": "CSB",
+          "text": "Exodus 40:34 — 'The cloud covered the tent of meeting, and the glory of the LORD filled the tabernacle.'"
+        }
+      ],
+      "key_verses": [
+        "Exod.40.34",
+        "Exod.33.18",
+        "Ezek.10.18",
+        "Isa.40.5",
+        "Ps.19.1"
+      ],
+      "related_categories": [
+        "shem",
+        "shekinah",
+        "qadosh",
+        "panim",
+        "mishkan",
+        "emet"
+      ],
+      "theological_notes": "The primary contamination vector for kavod in Western Christianity is a layered philosophical and juridical overlay that accumulated across several distinct historical moments. The first layer is the patristic synthesis of Hebrew covenantal thought with Greek metaphysical categories. The philosophical tradition inherited by early Christian theologians — especially through Origen, Ambrose, and Augustine — held that the divine is by definition incapable of being affected by or relationally changed by anything outside itself. This conviction, which patristic theology absorbed from Platonism, meant that God possesses all perfection within himself and cannot be moved toward or away from his creatures in any way that involves real change on his part. Augustine further pressed this through a Neoplatonic framework — the view that ultimate reality is a self-sufficient, unchanging One from which all lesser existence flows — in which divine glory became a quality God eternally possesses within himself rather than a presence he actively enacts toward his people in history. When kavod was read through this framework, it ceased to be a covenantal event — YHWH moving toward, dwelling within, departing from, and returning to his people — and became instead a synonym for God's eternal ontological magnificence, a property contemplated from a distance. This reading was reinforced when Jerome rendered kavod consistently as gloria in the Vulgate, and gloria in Latin rhetorical culture already carried connotations of public reputation and aesthetic splendor rather than anything corresponding to the Hebrew category of physical weight and relational presence. The second layer is medieval scholasticism, which systematized the Augustinian-Vulgate framing by treating gloria as one of God's self-sufficient attributes — debated in terms of how God's perfection and his own self-sufficient existence as the source of all being relate to his acts of creation and revelation — without recovering the Ezekiel departure-and-return structure that is kavod's irreducible covenantal logic. The third layer came from distinct streams within the Reformation. Lutheran orthodox scholasticism of the seventeenth century — which should be distinguished from Luther's own more rhetorically vivid engagement with divine presence — organized theology so thoroughly around guilt, legal imputation, and forensic justification that the category of kavod as presence-event had no natural home; doxazo in the New Testament was read through the lens of divine attribute and praise-obligation rather than eschatological arrival. Within the Reformed tradition, Calvin's own commentary engagement with Ezekiel came closer to the covenantal logic — Calvin was attentive to the departure-and-return structure and its significance for Israel's history — but the subsequent Westminster Confession tradition, focused on divine attributes and the covenant of works and grace framework, retained 'glory' as the governing English gloss without recovering the Hebrew weight category. Dutch neo-Calvinist trajectories within the Reformed stream, with their emphasis on creation-order and cultural engagement, opened somewhat different paths but did not specifically recover the Temple-theology logic of kavod either. The most significant modern recovery of kavod has come through biblical theology movements attentive to the Temple-theology trajectory from Sinai through Ezekiel through Revelation — particularly in the work of scholars like G.K. Beale on temple and presence, and N.T. Wright's treatment of shekinah return as the hermeneutical key to early Christology. For NT interpretation, the critical move is recognizing that John 1:14 ('we have seen his kavod') and the transfiguration accounts are not primarily aesthetic statements about Jesus's luminosity but covenantal declarations that the departed kavod of Ezekiel 10–11 has returned in bodily form — the long-awaited return of YHWH to Zion in the person of the Messiah.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_kardia_verses": [
+        {
+          "verse_ref": "Exod.40.34",
+          "standard_rendering": "Then the cloud covered the tent of meeting, and the glory of the LORD filled the tabernacle.",
+          "kardia_translation": "Then the cloud covered the tent of meeting, and the manifest weight of YHWH's presence filled the tabernacle."
+        },
+        {
+          "verse_ref": "Exod.33.18",
+          "standard_rendering": "Moses said, 'Please show me your glory.'",
+          "kardia_translation": "Moses said, 'Please, let me see the manifest weight of your presence.'"
+        },
+        {
+          "verse_ref": "Ezek.10.18",
+          "standard_rendering": "Then the glory of the LORD departed from over the threshold of the temple and stopped above the cherubim.",
+          "kardia_translation": "Then the manifest weight of YHWH's presence departed from over the threshold of the temple and stopped above the cherubim."
+        },
+        {
+          "verse_ref": "Isa.40.5",
+          "standard_rendering": "And the glory of the LORD will be revealed, and all mankind together will see it, for the mouth of the LORD has spoken.",
+          "kardia_translation": "And the manifest weight of YHWH's presence will be unveiled, and all flesh together will see it, for the mouth of YHWH has spoken."
+        },
+        {
+          "verse_ref": "Ps.19.1",
+          "standard_rendering": "The heavens declare the glory of God, and the sky above proclaims his handiwork.",
+          "kardia_translation": "The heavens are declaring the manifest weight of God's presence, and the expanse above is proclaiming the work of his hands."
+        }
+      ],
+      "_iterations": 3
+    },
+    {
+      "id": "lev-levav",
+      "hebrew_root": "לֵב / לֵבָב",
+      "transliteration": "lēv / lēvāv",
+      "testament_scope": "both",
+      "category_label": "Heart — The Integrated Inner Person",
+      "one_liner": "The lev is the operative center where thinking, choosing, and covenant loyalty converge to direct the whole person toward or away from YHWH.",
+      "full_definition": "In the Hebrew Bible, lev (לֵב) and its fuller form levav (לֵבָב) denote the integrated interior of a human being — not as a feeling-center but as the place where thinking, choosing, desiring, remembering, and covenantal allegiance all converge. When Moses commands Israel to love YHWH 'with all your lev' (Deut 6:5), the Shema is not calling for emotional warmth toward God. It is demanding total cognitive, volitional, and relational orientation — the entire inner person directed toward covenant loyalty. The lev is where Torah is to be written (Jer 31:33), where a person deliberates and forms plans (Prov 16:9), where faithfulness or treachery toward YHWH takes root (Jer 17:9–10), and where YHWH himself searches to discern covenantal alignment (1 Sam 16:7).\n\nThe lev encompasses what Western categories artificially separate into 'mind,' 'will,' 'emotions,' and 'conscience.' It is the organ of understanding (1 Kgs 3:9 — Solomon asks for a lev that hears/discerns), the organ of intention (Gen 6:5 — every formation of the thoughts of his lev was only evil continually), and the organ of moral direction (Ps 51:10 — create in me a clean lev). It is emphatically not a subdivision of the person set against reason. In Hebrew anthropology there is no reason-versus-emotion dualism. The lev reasons. The lev decides. The lev feels. The lev remembers. It is the whole inner person as an active agent before YHWH.\n\nBecause the lev is the site of covenantal orientation, it is also the site of covenantal failure. A 'hard lev' (Exod 7:13; Ezek 3:7) is one that has calcified against YHWH's instruction, refusing the posture of hearing and responding. A 'divided lev' (Hos 10:2) is one that tries to maintain allegiance to YHWH and to other powers simultaneously — the precise failure the Shema forbids. The prophetic hope centers on YHWH's promise to transform the lev itself: to remove the lev of stone and give a lev of flesh (Ezek 36:26), to circumcise the levav so Israel can love YHWH properly (Deut 30:6). This is not a promise to fix the emotions. It is a promise to reconstitute the entire operative interior of the covenant partner so that Torah obedience, covenant loyalty, and genuine knowledge of YHWH become the person's native orientation.\n\nThe NT Greek kardia (καρδία) inherits this full Hebrew semantic range through the Septuagint, where kardia translates lev/levav in the vast majority of occurrences. When Yeshua says 'Blessed are the pure in kardia' (Matt 5:8), or when Paul speaks of believing 'in the kardia' (Rom 10:9–10), or when the author of Hebrews describes God's word discerning 'the thoughts and intentions of the kardia' (Heb 4:12), the operative meaning is the Hebrew lev — the integrated inner person in its full cognitive, volitional, and covenantal capacity.",
+      "what_it_does": "The lev is where a person orients toward or away from YHWH. It is the operational center that processes Torah, forms intentions, directs loyalty, and generates the posture from which all covenantal action flows. YHWH searches the lev to assess covenantal alignment (Jer 17:10). Torah is to be placed upon the lev so that it shapes the person from the inside out (Deut 6:6). The lev 'hears' — meaning it discerns, understands, and responds to divine instruction (1 Kgs 3:9). It 'turns' — meaning it redirects allegiance, either toward idols or back to YHWH (1 Kgs 11:2–4; Joel 2:12–13). The lev is the site where covenant faithfulness or covenant treachery is generated before it ever becomes visible action. This is why the prophetic new-covenant promise targets the lev specifically: YHWH will write Torah on the lev (Jer 31:33), replace the stone lev with a flesh lev (Ezek 36:26), and circumcise the levav (Deut 30:6) — all describing the reconstitution of the inner person so that covenantal fidelity becomes the natural output of a renewed interior.",
+      "what_it_is_not": "The lev is not the 'emotional center' set in opposition to the rational mind — a Western dualism foreign to Hebrew anthropology. In Hebrew thought, the lev thinks, plans, decides, understands, desires, and commits. It is simultaneously the organ of intellect, intention, and loyalty. There is no faculty psychology in the Hebrew Bible — the lev is not one compartment among several but the integrated operational center of the whole inner person. When YHWH examines the lev, He is reading the total directional orientation of the person: their thoughts, loyalties, plans, memories, and covenantal posture all at once. When the psalmist prays for a 'clean lev' (Ps 51:10), he is not asking for purified emotions but for a reconstituted interior — a whole inner person realigned toward YHWH in knowledge, will, and faithful action.",
+      "second_temple_context": "In Second Temple Judaism, the lev remained the primary anthropological term for the operative interior of a person before God. The twice-daily recitation of the Shema (Deut 6:4–9) placed the lev at the center of Jewish liturgical life: loving YHWH 'with all your lev' was the foundational command rehearsed morning and evening. The synagogue context reinforced this — hearing Torah read and expounded was understood as Torah entering the lev, forming understanding and directing covenantal obedience. At Qumran, the Community Rule (1QS) speaks of those who 'seek God with all their lev and nephesh' and of the need for circumcision of the lev — echoing Deuteronomic language and applying it to the community's rigorous purity and Torah-observance discipline. The sectarian self-examination practices assumed the lev was knowable through its fruits but ultimately transparent only to God. Ben Sira (Sirach 17:6) speaks of the lev as the organ through which God gave humans the capacity to reason and discern, reinforcing the Hebrew integration of thought and moral direction. The widespread Jewish understanding of the yetzer ha-ra (the inclination toward evil) and the yetzer ha-tov (the inclination toward good) located both inclinations within the lev — not as a battle between body and soul, but as a struggle within the integrated inner person over covenantal direction. The eschatological hope drawn from Jeremiah 31 and Ezekiel 36 — that YHWH would transform the lev in the age to come — was a living expectation across diverse Second Temple communities.",
+      "kardia_rendering": "the whole inner person — seat of thought, will, and covenant loyalty",
+      "surface_vehicles": {
+        "hebrew_lexemes": [
+          "לֵב",
+          "לֵבָב"
+        ],
+        "strongs_hebrew": [
+          "H3820",
+          "H3824"
+        ],
+        "lxx_greek": [
+          "kardia"
+        ],
+        "nt_greek": [
+          "kardia"
+        ],
+        "strongs_greek": [
+          "G2588"
+        ],
+        "english_glosses": {
+          "recommended": [
+            "inner person",
+            "mind-and-will",
+            "operative center",
+            "whole inner self"
+          ],
+          "attested": [
+            {
+              "gloss": "heart",
+              "found_in": [
+                "ESV",
+                "KJV",
+                "NIV",
+                "NKJV",
+                "CSB",
+                "NASB",
+                "NLT"
+              ],
+              "loses": "In modern English 'heart' has narrowed to the emotional center, stripping the cognitive, volitional, and directional dimensions that are primary in the Hebrew. A First Century Jew hearing lev heard 'the thinking, choosing, orienting center of a person' — modern English 'heart' hears 'the feeling part.'"
+            },
+            {
+              "gloss": "mind",
+              "found_in": [
+                "NIV (occasionally)",
+                "NLT (occasionally)"
+              ],
+              "loses": "Captures the cognitive dimension but strips the volitional and relational-loyalty dimensions. The lev is not only the organ that thinks but the organ that commits, directs, and orients toward or away from YHWH."
+            },
+            {
+              "gloss": "understanding",
+              "found_in": [
+                "KJV (occasionally)"
+              ],
+              "loses": "Captures one function of the lev (discernment, comprehension) while losing the volitional and covenantal-allegiance dimensions entirely."
+            }
+          ]
+        }
+      },
+      "illustrative_renderings": [
+        {
+          "translation": "ESV",
+          "text": "Deuteronomy 6:5 — 'You shall love the LORD your God with all your heart and with all your soul and with all your might.'"
+        },
+        {
+          "translation": "KJV",
+          "text": "Proverbs 3:5 — 'Trust in the LORD with all thine heart; and lean not unto thine own understanding.'"
+        },
+        {
+          "translation": "NIV",
+          "text": "Jeremiah 31:33 — 'I will put my law in their minds and write it on their hearts.'"
+        },
+        {
+          "translation": "NKJV",
+          "text": "Ezekiel 36:26 — 'I will give you a new heart and put a new spirit within you; I will take the heart of stone out of your flesh and give you a heart of flesh.'"
+        },
+        {
+          "translation": "CSB",
+          "text": "1 Samuel 16:7 — 'The LORD does not look at the things people look at. People look at the outward appearance, but the LORD looks at the heart.'"
+        }
+      ],
+      "key_verses": [
+        "Deut.6.5",
+        "Jer.31.33",
+        "Ezek.36.26",
+        "1Sam.16.7",
+        "Ps.51.10"
+      ],
+      "related_categories": [
+        "nephesh",
+        "ruach",
+        "yetzer",
+        "torah",
+        "shema",
+        "teshuva",
+        "chadash"
+      ],
+      "theological_notes": "The translation of lev/levav as 'heart' is ancient and nearly universal — the LXX consistently renders it kardia, and the Vulgate cor. The problem is not the translation per se but the semantic drift of the receptor-language words. In English, 'heart' has progressively narrowed from the medieval period onward under the influence of faculty psychology (the theory that the soul operates through distinct, separable capacities — intellect, will, appetite — each with its own domain). The roots of this distortion lie in Plato's Republic IV, which divided the soul into three parts — the rational, the spirited, and the appetitive — assigning different functions to distinct faculties. This tripartite schema was not directly adopted by the medieval Scholastics (notably Aquinas and the Dominican-Aristotelian tradition), but the principle of faculty division was. Aristotle's De Anima (On the Soul) offered a different schema (nutritive, sensitive, rational), and it was Aristotle's framework — as mediated through Arabic commentators and systematized by Aquinas — that became the dominant faculty psychology of medieval Western thought. In both cases the effect was the same: the integrated Hebrew lev was fractured into discrete faculties, with 'heart' progressively assigned to the appetitive or affective dimension alone. By the Enlightenment, the reason/emotion binary was firmly entrenched, and 'heart' was assigned to the emotion side of the ledger. This is a catastrophic narrowing. When modern readers encounter 'heart' in Scripture, they instinctively read 'feelings' — and miss that the lev is the organ of thought, discernment, planning, moral evaluation, and covenantal commitment.\n\nThe Platonic tradition (Phaedo, Republic) contributed a further distortion through its concept of the immortal rational soul imprisoned in and seeking escape from the material body — a soul/body dualism foreign to Hebrew anthropology. This created a framework in which 'heart' could be spiritualized as the 'inner soul' detached from embodied life. But in Hebrew thought, the lev is emphatically the inner person as an embodied agent. The lev's thoughts produce bodily actions. The lev's orientation produces visible covenant faithfulness or treachery. There is no disembodied lev.\n\nThe Latin-juridical tradition — visible in Anselm's satisfaction framework (Cur Deus Homo), hardened in late-medieval penitential theology, and then reconfigured in Lutheran and Reformed forensic soteriology — compounded the problem differently. When sin became primarily a legal category (transgression of divine law producing guilt before a divine judge), the lev's role was reduced to the site of 'guilty conscience' or 'inner moral awareness.' This reduction is visible in Spener's Pia Desideria and the Halle pietists under Francke, who reduced the lev to sincerity of subjective feeling — making the lev about emotional authenticity rather than total covenantal orientation. Calvin's emphasis on the knowledge of God and self — the duplex cognitio — more closely preserved the cognitive and volitional dimensions of the lev, though even within the Reformed tradition this was reshaped by the forensic framework of justification as it developed in post-Dort Reformed orthodoxy and the Westminster confessional tradition, where the lev/kardia tended to be subordinated to the categories of assurance and effectual calling rather than treated as the integrated operative center of the covenant partner.\n\nRecovering the lev requires abandoning both the reason/emotion binary and the inner/outer binary. The lev is the whole inner person — thinking, choosing, remembering, desiring, planning, and orienting — as the operational center from which covenantal life is directed. The prophetic promise of a new lev (Ezek 36:26, Jer 31:33) is not a promise of new emotions but of a reconstituted inner person capable of sustained covenant faithfulness — Torah written on the lev so that knowing YHWH and obeying YHWH become the natural output of the person's deepest operative center.",
+      "version": "1.0",
+      "reviewed_by": "theologian-reviewed",
+      "_kardia_verses": [
+        {
+          "verse_ref": "Deut.6.5",
+          "standard_rendering": "You shall love the LORD your God with all your heart and with all your soul and with all your might.",
+          "kardia_translation": "You shall love YHWH your God with all your whole inner person — seat of thought, will, and covenant loyalty — and with all your being and with all your strength."
+        },
+        {
+          "verse_ref": "Jer.31.33",
+          "standard_rendering": "I will put my law within them, and I will write it on their hearts. And I will be their God, and they shall be my people.",
+          "kardia_translation": "I will put my instruction within them, and upon their whole inner person — seat of thought, will, and covenant loyalty — I will write it. And I will be their God, and they shall be my people."
+        },
+        {
+          "verse_ref": "Ezek.36.26",
+          "standard_rendering": "And I will give you a new heart, and a new spirit I will put within you. And I will remove the heart of stone from your flesh and give you a heart of flesh.",
+          "kardia_translation": "And I will give you a new whole inner person — seat of thought, will, and covenant loyalty — and a new spirit I will put within you. And I will remove from your flesh the whole inner person of stone and give you a whole inner person of flesh — alive in thought, will, and covenant loyalty."
+        },
+        {
+          "verse_ref": "1Sam.16.7",
+          "standard_rendering": "For the LORD sees not as man sees: man looks on the outward appearance, but the LORD looks on the heart.",
+          "kardia_translation": "For YHWH sees not as a human sees: a human looks on the outward appearance, but YHWH looks on the whole inner person — seat of thought, will, and covenant loyalty."
+        },
+        {
+          "verse_ref": "Ps.51.10",
+          "standard_rendering": "Create in me a clean heart, O God, and renew a right spirit within me.",
+          "kardia_translation": "Create in me a clean whole inner person — seat of thought, will, and covenant loyalty — O God, and renew a steadfast spirit within me."
+        }
+      ],
+      "_iterations": 4
+    }
+  ]
+}
