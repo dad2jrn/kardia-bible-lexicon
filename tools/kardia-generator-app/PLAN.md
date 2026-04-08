@@ -57,7 +57,7 @@ tools/kardia-generator-app/
 │   │   │   └── utils.ts           ← catToId, escapeHTML, etc.
 │   │   ├── hooks/
 │   │   │   ├── useApiKey.ts       ← localStorage get/set/clear
-│   │   │   └── useEntries.ts      ← fetch/create/update approved entries via /api
+│   │   │   └── useEntries.ts      ← fetch/create/update/delete approved entries via /api
 │   │   └── components/
 │   │       ├── layout/
 │   │       │   ├── Header.tsx
@@ -82,38 +82,50 @@ tools/kardia-generator-app/
     ├── index.ts                   ← Express app, listens on 3001
     ├── db.ts                      ← better-sqlite3 init + schema install
     └── routes/
-        └── entries.ts             ← GET/POST/PUT /api/entries
+        └── entries.ts             ← GET/POST/PUT/DELETE /api/entries
 ```
 
 ---
 
 ## SQLite Schema
 
-```sql
-CREATE TABLE IF NOT EXISTS entries (
-  id               TEXT PRIMARY KEY,
-  data             TEXT NOT NULL,        -- full JSON blob of the entry
-  category_label   TEXT,
-  transliteration  TEXT,
-  hebrew_root      TEXT,
-  iterations       INTEGER DEFAULT 1,
-  approved_at      TEXT DEFAULT (datetime('now'))
-);
-```
+Schema is defined in `data/schema/kardia_schema.sql` (repo root) and installed
+automatically on first server boot via `server/db.ts`. Full three-layer normalized
+design: reference tables → categories + surface vehicles → lexeme map → verse index.
+FTS5 triggers maintain `categories_fts` automatically.
 
-`data` stores the full entry JSON. The scalar columns exist only for fast queries
-(progress, list display) without parsing JSON.
+**Schema boot behaviour:**
+- On first boot: `_schema_meta` table does not exist → run full schema install → seed
+  reference tables → log "Kardia schema installed"
+- On subsequent boots: `_schema_meta` exists → skip install entirely → log "Kardia
+  schema already installed"
+- If `_schema_meta` exists but `schema_version` does not match the current SQL file:
+  log a warning ("Schema version mismatch — manual migration may be required") and
+  continue. Do not auto-migrate. Do not crash. The warning is surfaced in the server
+  console only.
+
+Two fields added to AI output in Phase 2 (the **only** permitted deviation from
+verbatim migration of `LAYER1_SCHEMA`):
+- `semantic_domain_id` — one of: `god-covenant`, `human-nature`, `relational-ethical`,
+  `worship-presence`, `sin-redemption`, `land-creation`, `leadership-vocation`,
+  `eschatology-hope`, `nt-lxx-distinctive`, `spiritual-beings-reframed`
+- `textual_layer_id` — one of: `pre-exilic`, `exilic`, `post-exilic`, `second-temple`, `nt`
+
+The AI can classify both fields correctly from entry content. No UI dropdowns needed.
 
 ---
 
 ## REST API (Express, port 3001)
 
-| Method | Path              | Description                                      |
-|--------|-------------------|--------------------------------------------------|
-| GET    | /api/entries      | Return all approved entries                      |
-| POST   | /api/entries      | Insert or replace an entry (upsert by `id`)      |
-| PUT    | /api/entries/:id  | Update an existing entry (e.g. add verse translations) |
-| DELETE | /api/entries/:id  | Remove an entry                                  |
+| Method | Path              | Description                                                  |
+|--------|-------------------|--------------------------------------------------------------|
+| GET    | /api/entries      | Return all approved entries (reconstructed from normalized tables) |
+| POST   | /api/entries      | Insert or replace an entry (upsert by `id`) — used for Approve & Save and Import |
+| PUT    | /api/entries/:id  | Patch an existing entry (kardia_verses + scalar fields) — used for verse generation |
+| DELETE | /api/entries/:id  | Remove an entry (cascades to all child tables)               |
+
+**Route semantics are strict:** Approve & Save always uses `POST` (upsert). Verse
+translation patching always uses `PUT /:id`. These must not be swapped.
 
 ---
 
@@ -129,16 +141,16 @@ CREATE TABLE IF NOT EXISTS entries (
 - [x] Vite proxy: `/api` → `http://localhost:3001` in `vite.config.ts`
 - [x] Verify `npm run dev` starts both client (5173) and server (3001) successfully
 
-### Phase 1 — Data Layer (server)
-- [ ] `server/db.ts`: open (or create) `kardia.db` in `tools/kardia-generator-app/`, run `CREATE TABLE IF NOT EXISTS entries ...` on startup
-- [ ] `server/routes/entries.ts`: implement GET, POST (upsert), PUT, DELETE
-- [ ] `server/index.ts`: mount routes, CORS for localhost:5173, JSON body parser
-- [ ] Smoke-test all endpoints with curl
+### Phase 1 — Data Layer (server) ✓
+- [x] `server/db.ts`: loads `data/schema/kardia_schema.sql` on first boot (idempotent guard on `_schema_meta`); full canonical normalized schema
+- [x] `server/routes/entries.ts`: GET (reconstruct from normalized tables), POST (full upsert transaction across all child tables), PUT (patch kardia_verses + scalar fields), DELETE (cascade)
+- [x] `server/index.ts`: no changes needed — already correctly configured
+- [x] Smoke-test all endpoints with curl — all passing
 
 ### Phase 2 — Types & Constants (client)
 - [ ] `src/types/index.ts`: interfaces for `CategoryEntry`, `ValidatorResult`, `ValidatorFlag`, `KardiaVerse`, `IllustrativeRendering`, `EnglishGlosses`
 - [ ] `src/constants/categories.ts`: `CATEGORIES` map (migrated from HTML)
-- [ ] `src/constants/prompts.ts`: `SYSTEM_PROMPT`, `LAYER1_SCHEMA`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` (migrated verbatim from HTML — do not alter wording)
+- [ ] `src/constants/prompts.ts`: migrate `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` **verbatim** from HTML — do not alter wording; then add `semantic_domain_id` and `textual_layer_id` to `LAYER1_SCHEMA` as the only permitted deviation. Confirm `KARDIA_VERSE_PROMPT` contains the full rendering principles content (natural phrasing, not gloss insertion, contextually fitted per verse — see `rendering-principles.md`) and not just the outer prompt wrapper.
 - [ ] `src/lib/utils.ts`: `catToId`, `escapeHTML`
 - [ ] `src/lib/anthropic.ts`: `callAPI`, `runGeneration`, `repairTruncatedJSON`, `runValidation`, `runKardiaVerseTranslation`
 
@@ -169,11 +181,11 @@ CREATE TABLE IF NOT EXISTS entries (
 - [ ] Truncation warning banner in JsonPanel when `entry._truncation_warning` is set
 
 ### Phase 7 — Approve & Persist
-- [ ] Approve & Save: `PUT /api/entries` (upsert), mark category complete, clear output section, update progress
+- [ ] Approve & Save: call `POST /api/entries` (upsert), mark category complete, clear output section, update progress
 - [ ] `ProgressSection.tsx`: overall bar + per-group bars from entry list
-- [ ] `DatabaseSection.tsx` + `ApprovedEntry.tsx`: accordion list of approved entries; sub-tabs JSON / Reader Preview; Copy JSON button; Generate Missing Verse Translations button
+- [ ] `DatabaseSection.tsx` + `ApprovedEntry.tsx`: accordion list of approved entries; sub-tabs JSON / Reader Preview; Copy JSON button; Generate Missing Verse Translations button; **Remove from database button** (calls `DELETE /api/entries/:id`, prompts for confirmation, removes from accordion on success)
 - [ ] Export `categories.json`: reconstruct export envelope (version, description, license, etc.) and trigger download
-- [ ] Import `categories.json`: file input, parse, upsert all entries via API, show result banner
+- [ ] Import `categories.json`: file input, parse, upsert all entries via `POST /api/entries`, show result banner (n imported, n failed)
 
 ### Phase 8 — Correction Loop
 - [ ] Flag checkboxes in `ValidatorPanel` build `autoCorrections` string on submit
@@ -186,11 +198,15 @@ CREATE TABLE IF NOT EXISTS entries (
 - [ ] Call `runKardiaVerseTranslation`, patch entry via `PUT /api/entries/:id`, re-render preview
 
 ### Phase 10 — Polish & QA
-- [ ] Verify all prompts migrated verbatim from HTML source
+- [ ] Verify all prompts migrated verbatim from HTML source — diff `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` character-for-character against the HTML
+- [ ] Verify `LAYER1_SCHEMA` matches HTML exactly except for the two added fields (`semantic_domain_id`, `textual_layer_id`)
 - [ ] Verify correction loop produces valid JSON on re-parse
 - [ ] Check all accordion/tab interactions
 - [ ] Responsive layout check
-- [ ] Confirm `npm run dev` cold-start creates `kardia.db` and schema automatically
+- [ ] Confirm `npm run dev` cold-start (no existing `kardia.db`) creates DB and installs schema automatically
+- [ ] Confirm `npm run dev` warm-start (existing `kardia.db`) skips schema install without error
+- [ ] Confirm schema version mismatch logs a warning and does not crash
+- [ ] Confirm `DELETE /api/entries/:id` cascades correctly (no orphaned child rows remain)
 - [ ] Confirm import of existing `data/categories.json` works end-to-end
 
 ---
@@ -211,4 +227,6 @@ CREATE TABLE IF NOT EXISTS entries (
 - The Express server handles **only** SQLite persistence — no AI calls, no key storage.
 - `kardia.db` should be added to `.gitignore` (local data only).
 - The `data/categories.json` in the repo root is a separate export artifact — the tool writes to it via the Export button, not automatically.
-- Do not alter the wording of any system prompt or schema. They are theological guard rails and must be migrated verbatim.
+- Do not alter the wording of any system prompt or schema. They are theological guard rails and must be migrated verbatim. The only permitted addition to `LAYER1_SCHEMA` is `semantic_domain_id` and `textual_layer_id`.
+- The route semantics for POST vs PUT are intentional and must not be conflated: POST = upsert (Approve & Save, Import), PUT = patch (verse translations only).
+- `routes/entries.ts` already has DELETE implemented (Phase 1). The UI for it is Phase 7. Do not re-implement the route.
