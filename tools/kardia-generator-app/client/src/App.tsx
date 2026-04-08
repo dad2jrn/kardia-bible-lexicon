@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 
 import { ApiKeyModal } from '@/components/ApiKeyModal'
-import { CategoryGrid, type CategorySelection } from '@/components/CategoryGrid'
+import { CategoryGrid } from '@/components/CategoryGrid'
 import { ModelSelector } from '@/components/ModelSelector'
+import { GeneratePanel } from '@/components/GeneratePanel'
+import { OutputSection } from '@/components/output/OutputSection'
 import { SettingsDrawer } from '@/components/SettingsDrawer'
 import { Footer } from '@/components/layout/Footer'
 import { Header } from '@/components/layout/Header'
@@ -10,6 +12,8 @@ import { MODEL_OPTIONS, type ModelId } from '@/constants/models'
 import { CATEGORIES } from '@/constants/categories'
 import { useApiKey } from '@/hooks/useApiKey'
 import { useEntries } from '@/hooks/useEntries'
+import { useGenerator } from '@/hooks/useGenerator'
+import type { CategorySelection } from '@/types/category'
 
 function App() {
   const { apiKey, maskedKey, isConnected, setApiKey, clearApiKey } = useApiKey()
@@ -25,6 +29,22 @@ function App() {
   const [selectedCategory, setSelectedCategory] = useState<CategorySelection | null>(null)
   const [selectedModel, setSelectedModel] = useState<ModelId>('claude-sonnet-4-6')
   const prevKey = useRef(apiKey)
+  const prevCategoryId = useRef<string | null>(null)
+  const {
+    entry,
+    validator,
+    kardiaVerses,
+    rawRecovery,
+    iteration,
+    status: generatorStatus,
+    isBusy: generatorBusy,
+    error: generatorError,
+    generateFresh,
+    regenerateWithSameParams,
+    retryAfterFailure,
+    abortInFlight,
+    resetOutputs,
+  } = useGenerator()
 
   useEffect(() => {
     if (isConnected) {
@@ -96,6 +116,41 @@ function App() {
   )
 
   const selectedModelMeta = MODEL_OPTIONS.find(option => option.id === selectedModel) ?? MODEL_OPTIONS[0]
+
+  useEffect(() => {
+    if (!selectedCategory) {
+      if (entry || rawRecovery) {
+        resetOutputs()
+      }
+      prevCategoryId.current = null
+      return
+    }
+    if (prevCategoryId.current && prevCategoryId.current !== selectedCategory.id) {
+      resetOutputs()
+    }
+    prevCategoryId.current = selectedCategory.id
+  }, [selectedCategory, resetOutputs, entry, rawRecovery])
+
+  const handleGenerate = useCallback(() => {
+    if (!selectedCategory || !apiKey) return
+    void generateFresh(selectedCategory, selectedModel, apiKey)
+  }, [selectedCategory, selectedModel, apiKey, generateFresh])
+
+  const handleCopyJson = useCallback((_json: string) => {
+    setStatusMessage('JSON copied to clipboard.')
+  }, [])
+
+  const handleApproveStub = useCallback(() => {
+    setStatusMessage('Approve & Save arrives in Phase 7.')
+  }, [])
+
+  const handleCorrections = useCallback((flagIds: number[]) => {
+    if (flagIds.length === 0) {
+      setStatusMessage('Select validator flags before drafting corrections.')
+      return
+    }
+    setStatusMessage('Corrections queued — Phase 8 will send them to Anthropic.')
+  }, [])
 
   return (
     <div className="flex min-h-screen flex-col bg-background text-foreground">
@@ -177,17 +232,33 @@ function App() {
           <p className="text-sm text-muted-foreground">
             Currently using <strong className="font-semibold">{selectedModelMeta.label}</strong> ({selectedModelMeta.costHint})
           </p>
+
+          <GeneratePanel
+            selectedCategory={selectedCategory}
+            selectedModelLabel={selectedModelMeta.label}
+            isConnected={isConnected}
+            status={generatorStatus}
+            iteration={iteration}
+            isBusy={generatorBusy}
+            error={generatorError}
+            onGenerate={handleGenerate}
+            onAbort={abortInFlight}
+            onRetry={regenerateWithSameParams}
+          />
         </section>
 
-        <section className="space-y-3 rounded-2xl border bg-card p-6 shadow-sm">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-semibold tracking-tight">Output & Validation</h2>
-            <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground">Phase 6</span>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Generation output, validator report, reader preview, and recovery tools arrive next in Phase 6.
-          </p>
-        </section>
+        <OutputSection
+          entry={entry}
+          validator={validator}
+          kardiaVerses={kardiaVerses}
+          rawRecovery={rawRecovery}
+          isBusy={generatorBusy}
+          onApprove={handleApproveStub}
+          onCopyJson={handleCopyJson}
+          onRegenerate={regenerateWithSameParams}
+          onRetryRecovery={retryAfterFailure}
+          onRequestCorrections={handleCorrections}
+        />
       </main>
 
       <Footer />

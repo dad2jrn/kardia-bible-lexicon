@@ -3,7 +3,36 @@ import '@testing-library/jest-dom/vitest'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 
+import type { CategoryEntry } from '@/types'
+import type { GeneratorStatus } from '@/hooks/useGenerator'
 import App from './App'
+
+const baseGeneratorStatus: GeneratorStatus = {
+  step: 'idle',
+  label: 'Ready',
+  helperText: '',
+  tone: 'muted',
+}
+
+const generatorMock = {
+  entry: null as CategoryEntry | null,
+  validator: null,
+  kardiaVerses: [] as CategoryEntry['_kardia_verses'] | [],
+  rawRecovery: null as string | null,
+  iteration: 0,
+  status: baseGeneratorStatus,
+  isBusy: false,
+  error: null as string | null,
+  generateFresh: vi.fn(),
+  regenerateWithSameParams: vi.fn(),
+  retryAfterFailure: vi.fn(),
+  abortInFlight: vi.fn(),
+  resetOutputs: vi.fn(),
+}
+
+vi.mock('@/hooks/useGenerator', () => ({
+  useGenerator: () => generatorMock,
+}))
 
 function makeLocalStorageMock() {
   const store: Record<string, string> = {}
@@ -23,6 +52,16 @@ function makeLocalStorageMock() {
 
 describe('App shell', () => {
   beforeEach(() => {
+    Object.assign(generatorMock, {
+      entry: null,
+      validator: null,
+      kardiaVerses: [],
+      rawRecovery: null,
+      iteration: 0,
+      status: baseGeneratorStatus,
+      isBusy: false,
+      error: null,
+    })
     vi.stubGlobal('localStorage', makeLocalStorageMock())
     vi.stubGlobal(
       'fetch',
@@ -89,5 +128,40 @@ describe('App shell', () => {
     await waitFor(() =>
       expect(screen.getByText(/No category selected/)).toBeInTheDocument(),
     )
+  })
+
+  it('renders output controls when generator has data', () => {
+    generatorMock.entry = {
+      id: 'id',
+      hebrew_root: '',
+      transliteration: '',
+      testament_scope: 'ot',
+      category_label: 'Label',
+      one_liner: '',
+      full_definition: '',
+      what_it_does: '',
+      what_it_is_not: '',
+      second_temple_context: '',
+      kardia_rendering: '',
+      surface_vehicles: {
+        hebrew_lexemes: [],
+        strongs_hebrew: [],
+        lxx_greek: [],
+        nt_greek: [],
+        strongs_greek: [],
+        english_glosses: [],
+      },
+      illustrative_renderings: [],
+      key_verses: [],
+      related_categories: [],
+      theological_notes: '',
+      semantic_domain_id: 'god-covenant',
+      textual_layer_id: 'pre-exilic',
+      version: '1.0',
+      reviewed_by: '',
+    }
+    localStorage.setItem('kardia_api_key', 'sk-ant-existing-key-9999')
+    render(<App />)
+    expect(screen.getByText(/Copy JSON/i)).toBeInTheDocument()
   })
 })

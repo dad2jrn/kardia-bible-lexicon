@@ -9,14 +9,14 @@ completed, update this file by checking the box and adding any relevant notes.
 
 ## Context & Goals
 
-**What this tool does:**  
+**What this tool does:**
 A local-only internal tool for generating Hebrew category entries for the Kardia Bible
 Lexicon. It calls the Anthropic API directly from the browser (no production deployment,
 no server-side key handling needed), runs a generation pass, a validation pass, and a
 Kardia verse translation pass per entry. Approved entries are persisted to SQLite and
 exported as `categories.json` to commit to the main repo.
 
-**Source of truth for existing logic:**  
+**Source of truth for existing logic:**
 `tools/kardia-generator-v2.html` — all prompts, schemas, generation flow, correction
 loop, and rendering logic live there. Do not invent new behavior; migrate faithfully.
 
@@ -171,15 +171,15 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] `CategoryGrid.tsx`: renders groups + buttons from `CATEGORIES`; marks completed IDs; emits `onSelect`
 - [x] `ModelSelector.tsx`: three model buttons (Sonnet 4.6, Opus 4.6, Haiku 4.5); emits `onSelect`
 
-### Phase 6 — Generation Flow
-- [ ] `GeneratePanel.tsx`: Generate button + status bar (loading/error/success states)
-- [ ] Wire generation in `App.tsx` (or a `useGenerator` hook): call `runGeneration` → `runValidation` → `runKardiaVerseTranslation` in sequence; update `currentEntry`, `currentValidator`, `iterationCount`
-- [ ] `OutputSection.tsx`: tabs wrapper (shadcn Tabs); shows only when entry exists
-- [ ] `JsonPanel.tsx`: monospace JSON display, Approve & Save / Copy JSON / Regenerate Fresh buttons
-- [ ] `ValidatorPanel.tsx`: overall badge, summary, flag list with checkboxes, select-all, queued count badge, correction textarea, Regenerate with Corrections button
-- [ ] `PreviewPanel.tsx`: rendered reader preview (Hebrew root, category label, one-liner, full definition, what-it-is-not block, Kardia rendering, gloss pills, illustrative renderings, Kardia verse translations)
-- [ ] `RecoveryPanel.tsx`: shown on JSON parse failure; displays raw text, Copy Raw / Retry buttons
-- [ ] Truncation warning banner in JsonPanel when `entry._truncation_warning` is set
+### Phase 6 — Generation Flow ✓
+- [x] `GeneratePanel.tsx`: CTA + status bar wired with spinner, cancel action, iteration badge, and retry banner — covered by `GeneratePanel.test.tsx`.
+- [x] Wire generation via new `useGenerator` hook + `App.tsx`: orchestrates generation → validator → verse translations with abort + recovery handling, surfaced through `GeneratePanel`/`OutputSection`; hook covered by dedicated Vitest suite and `App.test.tsx` mocks data to exercise rendering.
+- [x] `OutputSection.tsx`: shadcn Tabs gating JSON / Validator / Preview / Recovery views with smart defaults + placeholder copy when empty.
+- [x] `JsonPanel.tsx`: pretty JSON viewer with Approve stub, Copy, Regenerate buttons and truncation warning badge (`JsonPanel.test.tsx`).
+- [x] `ValidatorPanel.tsx`: renders summary, severity badges, checkboxes, select-all, and disabled corrections CTA (wired to Phase 8 callback) — verified in `ValidatorPanel.test.tsx`.
+- [x] `PreviewPanel.tsx`: layouts root data, what-it-does/is-not, gloss chips, illustrative renderings, and verse translations — `PreviewPanel.test.tsx`.
+- [x] `RecoveryPanel.tsx`: displays raw output, copy + retry buttons when JSON parsing fails — `RecoveryPanel.test.tsx`.
+- [x] Truncation warning + Recovery tab auto-switch implemented (`OutputSection.test.tsx` guards behavior).
 
 ### Phase 7 — Approve & Persist
 - [ ] Approve & Save: call `POST /api/entries` (upsert), mark category complete, clear output section, update progress

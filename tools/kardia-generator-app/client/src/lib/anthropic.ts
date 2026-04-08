@@ -18,6 +18,7 @@ export async function callAPI(
   system: string,
   user: string,
   model: string,
+  options?: { signal?: AbortSignal },
 ): Promise<AnthropicMessage> {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
@@ -33,6 +34,7 @@ export async function callAPI(
       system,
       messages: [{ role: 'user', content: user }],
     }),
+    signal: options?.signal,
   })
 
   if (!res.ok) {
@@ -84,8 +86,9 @@ export async function runGeneration(
   key: string,
   userPrompt: string,
   model: string,
+  options?: { signal?: AbortSignal },
 ): Promise<CategoryEntry> {
-  const res = await callAPI(key, SYSTEM_PROMPT, userPrompt, model)
+  const res = await callAPI(key, SYSTEM_PROMPT, userPrompt, model, options)
   const raw = res.content[0].text.trim()
   const stopReason = res.stop_reason
 
@@ -186,12 +189,14 @@ export async function runValidation(
   key: string,
   entry: CategoryEntry,
   model: string,
+  options?: { signal?: AbortSignal },
 ): Promise<ValidatorResult> {
   const res = await callAPI(
     key,
     VALIDATOR_PROMPT,
     `Review this Kardia Lexicon entry:\n${JSON.stringify(entry, null, 2)}`,
     model,
+    options,
   )
   const text = res.content[0].text.trim()
   try {
@@ -211,6 +216,7 @@ export async function runKardiaVerseTranslation(
   key: string,
   entry: CategoryEntry,
   model: string,
+  options?: { signal?: AbortSignal },
 ): Promise<KardiaVerse[]> {
   const verses = entry.key_verses || []
   if (verses.length === 0) return []
@@ -242,7 +248,7 @@ export async function runKardiaVerseTranslation(
     'Respond ONLY with the JSON array. No preamble, no markdown fences.'
 
   try {
-    const res = await callAPI(key, KARDIA_VERSE_PROMPT, prompt, model)
+    const res = await callAPI(key, KARDIA_VERSE_PROMPT, prompt, model, options)
     const text = res.content[0].text.trim()
     try {
       return JSON.parse(text) as KardiaVerse[]

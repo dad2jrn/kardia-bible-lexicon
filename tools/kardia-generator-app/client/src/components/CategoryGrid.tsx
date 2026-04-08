@@ -2,12 +2,7 @@ import { memo, useMemo } from 'react'
 import { Check } from 'lucide-react'
 
 import { catToId, cn } from '@/lib/utils'
-
-export interface CategorySelection {
-  id: string
-  label: string
-  group: string
-}
+import type { CategorySelection } from '@/types/category'
 
 export interface CategoryGridProps {
   groups: Record<string, string[]>
