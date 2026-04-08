@@ -155,17 +155,17 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [x] `src/lib/anthropic.ts`: `callAPI`, `runGeneration`, `repairTruncatedJSON`, `runValidation`, `runKardiaVerseTranslation`
 - [x] Vitest installed; 29 unit tests written and passing (utils.test.ts, anthropic.test.ts); TypeScript type-checks clean
 
-### Phase 3 — Hooks
-- [ ] `useApiKey`: read/write/clear key in localStorage; derive `isConnected`, `maskedKey`
-- [ ] `useEntries`: fetch entries on mount, expose `approve`, `updateEntry`, `deleteEntry`, loading/error state
+### Phase 3 — Hooks ✓
+- [x] `useApiKey`: read/write/clear key in localStorage; derive `isConnected`, `maskedKey`
+- [x] `useEntries`: fetch entries on mount, expose `approve`, `updateEntry`, `deleteEntry`, loading/error state
 
 ### Phase 4 — App Shell & API Key Flow
-- [ ] `App.tsx`: top-level layout, route state (no router needed — single page)
-- [ ] `Header.tsx`: title, API status pill, gear button
-- [ ] `Footer.tsx`: static footer text
-- [ ] `ApiKeyModal.tsx`: first-run modal (Dialog), validates `sk-ant-` prefix, saves to localStorage
-- [ ] `SettingsDrawer.tsx`: collapsible drawer under header, show/hide toggle, save button
-- [ ] Wire: show modal if no key in localStorage on mount; pill shows connected/disconnected
+- [x] `App.tsx`: top-level layout, route state (no router needed — single page) — Implemented April 8, 2026 with modal/drawer wiring plus placeholder sections (`App.test.tsx` covers status + drawer behaviour).
+- [x] `Header.tsx`: title, API status pill, gear button — Added React layout + lucide icon with tone-specific styling (`components/layout/Header.test.tsx`).
+- [x] `Footer.tsx`: static footer text — New component mirrors legacy copy (smoke-tested April 8, 2026).
+- [x] `ApiKeyModal.tsx`: first-run modal (Dialog), validates `sk-ant-` prefix, saves to localStorage — Implemented with shared validator + unit tests in `components/ApiKeyModal.test.tsx`.
+- [x] `SettingsDrawer.tsx`: collapsible drawer under header, show/hide toggle, save button — Completed with validation + CTA + tests (`components/SettingsDrawer.test.tsx`).
+- [x] Wire: show modal if no key in localStorage on mount; pill shows connected/disconnected — Observed via manual sanity run and automated coverage in `App.test.tsx`; helper validation logic covered by `src/lib/validation.test.ts`.
 
 ### Phase 5 — Category & Model Selection
 - [ ] `CategoryGrid.tsx`: renders groups + buttons from `CATEGORIES`; marks completed IDs; emits `onSelect`
