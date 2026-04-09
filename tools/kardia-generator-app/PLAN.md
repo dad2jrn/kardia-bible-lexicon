@@ -199,17 +199,16 @@ translation patching always uses `PUT /:id`. These must not be swapped.
 - [ ] Call `runKardiaVerseTranslation`, patch entry via `PUT /api/entries/:id`, re-render preview
 
 ### Phase 10 — Polish & QA
-- [ ] Verify all prompts migrated verbatim from HTML source — diff `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, `KARDIA_VERSE_PROMPT` character-for-character against the HTML
-- [ ] Verify `LAYER1_SCHEMA` matches HTML exactly except for the two added fields (`semantic_domain_id`, `textual_layer_id`)
-- [ ] Verify correction loop produces valid JSON on re-parse
-- [ ] Check all accordion/tab interactions
-- [ ] Responsive layout check
-- [ ] Confirm `npm run dev` cold-start (no existing `kardia.db`) creates DB and installs schema automatically
-- [ ] Confirm `npm run dev` warm-start (existing `kardia.db`) skips schema install without error
-- [ ] Confirm schema version mismatch logs a warning and does not crash
-- [ ] Confirm `DELETE /api/entries/:id` cascades correctly (no orphaned child rows remain)
-- [ ] Confirm import of existing `data/categories.json` works end-to-end
-
+- [x] Prompt/schema diff validation — Confirmed `SYSTEM_PROMPT`, `VALIDATOR_PROMPT`, and `KARDIA_VERSE_PROMPT` match `tools/kardia-generator-v2.html` verbatim; `LAYER1_SCHEMA` only adds `semantic_domain_id` + `textual_layer_id` per spec (Apr 8, 2026).
+- [x] Correction loop JSON integrity — `useGenerator` + `ValidatorPanel` tests cover happy path, parse failures, AbortError, and correction payload joins.
+- [x] Accordion/tab interaction audit — OutputSection auto-switch, ApprovedEntry tabs/dialogs, DatabaseSection accordion/export/import flows all exercised via RTL suites.
+- [x] Responsive layout sweep — Reviewed App shell + SettingsDrawer + ModelSelector responsive classes (mobile stack, md grid, drawer height clamp) with live Tailwind inspection.
+- [x] Cold-start schema install verification — Removing `kardia.db` and running `npm run dev` logs `[db] Schema installed from kardia_schema.sql`.
+- [x] Warm-start schema skip verification — Subsequent boot logs `[db] Schema already installed — skipping`.
+- [ ] Schema mismatch warning — Manual downgrade of `_schema_meta.schema_version` still only logs the skip message; no warning is emitted yet.
+- [x] DELETE cascade verification — Direct SQLite inserts into every child table followed by `DELETE FROM categories WHERE id='cascade-test'` removed all dependent rows (proved cascade works).
+- [ ] Import existing data/categories.json — File currently ships with `entries: []`, and the populated snapshots lack the Phase 2 `semantic_domain_id`/`textual_layer_id` fields, so API POSTs fail. Need refreshed seed data before this passes.
+- [ ] Run live smoke tests with both providers — Blocked until real Anthropic + OpenAI API keys are available for manual runs.
 ---
 
 ## How to start a new chat on this project
