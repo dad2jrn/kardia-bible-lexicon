@@ -1,8 +1,8 @@
 import { memo, useMemo } from 'react'
-import { Check } from 'lucide-react'
 
-import { catToId, cn } from '@/lib/utils'
+import { catToId } from '@/lib/utils'
 import type { CategorySelection } from '@/types/category'
+import { Pill } from '@/components/ui/pill'
 
 export interface CategoryGridProps {
   groups: Record<string, string[]>
@@ -53,36 +53,25 @@ export const CategoryGrid = memo(function CategoryGrid({
           <div className="text-xs font-semibold uppercase tracking-[0.25em] text-muted-foreground">
             {group}
           </div>
-          <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {categories.map(category => {
               const id = catToId(category)
               const isSelected = selectedId === id
               const isCompleted = completedSet.has(id)
               return (
-                <button
+                <Pill
                   key={id}
-                  type="button"
-                  className={cn(
-                    'group flex items-center justify-between rounded-xl border px-4 py-3 text-left text-sm font-medium transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2',
-                    isSelected
-                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
-                      : 'border-border bg-card text-foreground hover:border-primary/50 hover:bg-primary/5',
-                    (disabled || loading) && 'pointer-events-none opacity-50',
-                  )}
-                  aria-pressed={isSelected}
+                  label={category}
+                  description={group}
+                  selected={isSelected}
+                  completed={isCompleted}
+                  disabled={disabled || loading}
                   aria-label={`Select ${category}`}
                   onClick={() => {
                     if (disabled || loading) return
                     onSelect?.({ id, label: category, group })
                   }}
-                >
-                  <span>{category}</span>
-                  {isCompleted && (
-                    <span className="flex items-center gap-1 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-                      <Check className="h-4 w-4 text-emerald-500" aria-label="Completed" />
-                    </span>
-                  )}
-                </button>
+                />
               )
             })}
           </div>

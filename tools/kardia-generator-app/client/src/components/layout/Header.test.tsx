@@ -5,21 +5,23 @@ import { describe, expect, it, vi } from 'vitest'
 import { Header } from './Header'
 
 describe('Header component', () => {
-  it('shows connected state styling', () => {
+  it('shows connected state styling and routes clicks to drawer', () => {
+    const onToggleDrawer = vi.fn()
     render(
       <Header
         isConnected
         activeProvider="anthropic"
         statusLabel="Anthropic — Connected"
         statusTone="success"
-        onToggleDrawer={vi.fn()}
+        onToggleDrawer={onToggleDrawer}
         onRequestApiKeyModal={vi.fn()}
       />,
     )
 
     const pill = screen.getByRole('button', { name: /anthropic — connected/i })
     expect(pill).toHaveAttribute('aria-pressed', 'true')
-    expect(pill.className).toContain('bg-emerald-50')
+    fireEvent.click(pill)
+    expect(onToggleDrawer).toHaveBeenCalled()
   })
 
   it('routes clicks to the correct handlers when disconnected', () => {

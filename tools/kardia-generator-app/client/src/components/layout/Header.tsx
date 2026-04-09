@@ -17,8 +17,10 @@ export interface HeaderProps {
 }
 
 const toneClasses: Record<HeaderTone, string> = {
-  success: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-100',
-  warning: 'bg-amber-50 text-amber-800 border-amber-200 dark:bg-amber-500/10 dark:text-amber-50',
+  success:
+    'border-[color:color-mix(in_srgb,var(--kardia-success) 45%,transparent)] bg-[color:color-mix(in_srgb,var(--kardia-success) 12%,var(--kardia-card))] text-[color:var(--kardia-success)]',
+  warning:
+    'border-[color:color-mix(in_srgb,var(--kardia-warning) 45%,transparent)] bg-[color:color-mix(in_srgb,var(--kardia-warning) 12%,var(--kardia-card))] text-[color:var(--kardia-warning)]',
 }
 
 export function Header({
@@ -31,59 +33,61 @@ export function Header({
 }: HeaderProps) {
   const providerLabel = activeProvider === 'anthropic' ? 'Anthropic' : 'OpenAI'
   const pillText = statusLabel || (isConnected ? `${providerLabel} — Connected` : 'Not Connected')
+  const handleStatusClick = () => (isConnected ? onToggleDrawer() : onRequestApiKeyModal())
 
   return (
-    <header className="border-b bg-card/80 backdrop-blur px-4 py-6 shadow-sm md:px-8">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-2">
-          <span className="text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-            Kardia Lexicon Project
-          </span>
-          <div className="space-y-1">
-            <h1 className="text-3xl font-semibold tracking-tight">Category Generator</h1>
-            <p className="text-sm text-muted-foreground">
-              Second Temple Hebrew thought categories for the open source Kardia Bible
-            </p>
+    <header className="border-b border-[color:color-mix(in_srgb,var(--kardia-border) 80%,transparent)] bg-[color:color-mix(in_srgb,var(--kardia-surface) 85%,var(--kardia-bg))]/80 backdrop-blur">
+      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 py-6 md:px-8 lg:flex-row lg:items-center lg:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-[color:color-mix(in_srgb,var(--kardia-gold) 75%,#fef9f0)] text-lg font-semibold text-[color:#1b1206] shadow-[0_25px_80px_-50px_rgba(0,0,0,0.8)]">
+            K
           </div>
-          <Badge variant="secondary" className="uppercase tracking-wide">
-            v2 — updated system prompt · tiered glosses · correction loop
-          </Badge>
+          <div className="space-y-2">
+            <span className="text-xs font-semibold uppercase tracking-[0.3em] text-[color:var(--kardia-gold)]">
+              Kardia Research · Scholarly Pipeline
+            </span>
+            <div>
+              <h1 className="type-section-title">Category Generator</h1>
+              <p className="text-sm text-[color:var(--kardia-muted)]">
+                Second Temple theological categories for the open-source lexicon
+              </p>
+            </div>
+            <Badge variant="secondary" density="compact" className="uppercase tracking-[0.25em] text-[color:var(--kardia-muted)]">
+              Phase 1 · Design System
+            </Badge>
+          </div>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <button
             type="button"
             aria-pressed={isConnected}
-            onClick={() => (isConnected ? onToggleDrawer() : onRequestApiKeyModal())}
+            aria-label={pillText}
+            onClick={handleStatusClick}
             className={cn(
-              'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition',
+              'flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold uppercase tracking-[0.25em] transition shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]',
               toneClasses[statusTone],
             )}
-            title={
-              isConnected
-                ? `${providerLabel} key saved locally`
-                : 'Connect an API key to start generating'
-            }
           >
             <span
               className={cn(
                 'h-2.5 w-2.5 rounded-full',
-                isConnected ? 'bg-emerald-500' : 'bg-amber-500',
+                isConnected ? 'bg-[color:var(--kardia-success)]' : 'bg-[color:var(--kardia-warning)]',
               )}
               aria-hidden="true"
             />
-            <span>{pillText}</span>
+            {pillText}
           </button>
 
           <Button
             type="button"
-            variant="outline"
-            size="icon"
+            variant="secondary"
+            size="lg"
             aria-label="Open API settings drawer"
             onClick={onToggleDrawer}
-            title="API settings"
+            className="gap-2 text-[color:var(--kardia-text)]"
           >
-            <Settings2 className="size-4" />
+            <Settings2 className="size-4" /> Manage Keys
           </Button>
         </div>
       </div>

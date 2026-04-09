@@ -12,7 +12,6 @@ export interface ModelSelectorProps {
 
 export function ModelSelector({ provider, value, onChange, disabled, className }: ModelSelectorProps) {
   const options = MODEL_OPTIONS_BY_PROVIDER[provider]
-  const recommended = options[0]
   const helperCopy =
     provider === 'anthropic'
       ? 'Sonnet 4.6 recommended — holds complex theological guard rails reliably at roughly $0.03 per entry including validation.'

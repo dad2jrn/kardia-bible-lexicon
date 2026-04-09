@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 
 import type { CategoryEntry, KardiaVerse, ValidatorResult } from '@/types'
 import type { ApprovalState } from '@/types/ui'
@@ -7,6 +7,8 @@ import { JsonPanel } from './JsonPanel'
 import { ValidatorPanel, type CorrectionsPayload } from './ValidatorPanel'
 import { PreviewPanel } from './PreviewPanel'
 import { RecoveryPanel } from './RecoveryPanel'
+import { KardiaCard } from '@/components/ui/kardia-card'
+import { HelperText } from '@/components/ui/helper-text'
 
 export interface OutputSectionProps {
   entry: CategoryEntry | null
@@ -36,30 +38,22 @@ export function OutputSection({
   onRequestCorrections,
 }: OutputSectionProps) {
   const [tab, setTab] = useState('json')
-
-  useEffect(() => {
-    if (rawRecovery) {
-      setTab('recovery')
-    } else if (entry) {
-      setTab('json')
-    }
-  }, [rawRecovery, entry])
+  const activeTab = rawRecovery ? 'recovery' : tab
 
   if (!entry && !rawRecovery) {
     return (
-      <section className="rounded-2xl border bg-card p-6 text-sm text-muted-foreground shadow-sm">
-        <h3 className="text-lg font-semibold text-foreground">Output &amp; Validation</h3>
-        <p className="mt-2">
-          Run a generation pass to see JSON, validator notes, the reader preview, or recovery helpers
-          if parsing fails. All content from the legacy HTML tool appears here once generated.
-        </p>
-      </section>
+      <KardiaCard variant="section" className="space-y-3 text-sm text-[color:var(--kardia-muted)]">
+        <h3 className="type-card-title text-[color:var(--kardia-text)]">Output &amp; Validation</h3>
+        <HelperText>
+          Run a generation pass to see JSON, validator notes, the reader preview, or recovery helpers if parsing fails.
+        </HelperText>
+      </KardiaCard>
     )
   }
 
   return (
-    <section className="rounded-2xl border bg-card p-4 shadow-sm">
-      <Tabs value={tab} onValueChange={setTab}>
+    <KardiaCard variant="section" className="p-5">
+      <Tabs value={activeTab} onValueChange={setTab}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="json">JSON</TabsTrigger>
           <TabsTrigger value="validator">Validator</TabsTrigger>
@@ -96,6 +90,6 @@ export function OutputSection({
           />
         </TabsContent>
       </Tabs>
-    </section>
+    </KardiaCard>
   )
 }

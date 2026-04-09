@@ -5,8 +5,11 @@ import type { CategoryEntry } from '@/types'
 import type { ImportSummary } from '@/hooks/useEntries'
 import { Button } from '@/components/ui/button'
 import { Accordion } from '@/components/ui/accordion'
+import { KardiaCard } from '@/components/ui/kardia-card'
+import { HelperText } from '@/components/ui/helper-text'
 import { ApprovedEntry } from './ApprovedEntry'
 import { buildExportPayload, extractEntriesFromData } from '@/lib/persistence'
+import { cn } from '@/lib/utils'
 
 export interface DatabaseSectionProps {
   entries: CategoryEntry[]
@@ -80,16 +83,16 @@ export function DatabaseSection({
   }
 
   return (
-    <section className="relative rounded-2xl border bg-card p-6 shadow-sm">
+    <KardiaCard variant="surface" className="relative space-y-6">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <div>
-          <div className="flex items-center gap-2 text-sm font-semibold">
-            <Database className="h-4 w-4 text-primary" />
+          <div className="flex items-center gap-2 text-sm font-semibold text-[color:var(--kardia-text)]">
+            <Database className="h-4 w-4 text-[color:var(--kardia-gold)]" />
             Approved Entries
           </div>
-          <p className="text-xs text-muted-foreground">
+          <HelperText>
             {entries.length} entries saved · {totalCategories - entries.length} remaining
-          </p>
+          </HelperText>
         </div>
         <div className="flex flex-wrap gap-3">
           <Button type="button" onClick={handleExport} variant="outline">
@@ -114,26 +117,27 @@ export function DatabaseSection({
         </div>
       </div>
 
-      {error && <p className="mt-3 text-sm text-destructive">Unable to load entries: {error}</p>}
+      {error && <p className="text-sm text-[color:var(--kardia-danger)]">Unable to load entries: {error}</p>}
 
       {importState.message && (
         <p
-          className={`mt-3 text-sm ${
+          className={cn(
+            'text-sm',
             importState.status === 'error'
-              ? 'text-destructive'
-              : 'text-emerald-600'
-          }`}
+              ? 'text-[color:var(--kardia-danger)]'
+              : 'text-[color:var(--kardia-success)]',
+          )}
         >
           {importState.message}
         </p>
       )}
 
       {sortedEntries.length === 0 ? (
-        <p className="mt-6 rounded-xl border border-dashed bg-muted/30 p-6 text-center text-sm text-muted-foreground">
+        <p className="rounded-2xl border border-dashed border-[color:color-mix(in_srgb,var(--kardia-border) 60%,transparent)] bg-[color:color-mix(in_srgb,var(--kardia-card) 75%,var(--kardia-bg))] p-6 text-center text-sm text-[color:var(--kardia-muted)]">
           No approved entries yet. Approve a generated entry to populate SQLite.
         </p>
       ) : (
-        <Accordion type="multiple" className="mt-6 space-y-4">
+        <Accordion type="multiple" className="space-y-4">
           {sortedEntries.map(entry => (
             <ApprovedEntry
               key={entry.id}
@@ -148,10 +152,10 @@ export function DatabaseSection({
       )}
 
       {loading && (
-        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-2xl bg-background/80 backdrop-blur">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-muted border-t-primary" aria-label="Loading database" />
+        <div className="pointer-events-none absolute inset-0 flex items-center justify-center rounded-[var(--radius-xl)] bg-[color:var(--kardia-overlay)] backdrop-blur">
+          <div className="h-10 w-10 animate-spin rounded-full border-2 border-[color:var(--kardia-border)] border-t-[color:var(--kardia-gold)]" aria-label="Loading database" />
         </div>
       )}
-    </section>
+    </KardiaCard>
   )
 }
