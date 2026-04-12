@@ -1,0 +1,132 @@
+KARDIA LEXICON
+
+**Stream 4 — Tooling ****&**** Developer Experience**
+
+**Purpose: **Make the lexicon queryable, maintainable, and trustworthy without requiring direct JSON editing. This stream builds the CLI, the generator integration pipeline, and the editorial review workflow that scholars and developers will actually touch day to day.
+
+## **1. CLI Lookup Tool**
+
+The kardia CLI provides the primary programmatic interface to the lexicon for developers and scholars who do not want to parse JSON directly.
+
+### **1.1 Core commands**
+
+| **Command** | **Description** | **Example** |
+| --- | --- | --- |
+| kardia lookup <strongsId> | Return category entry for a Strong's ID | kardia lookup H2617 |
+| kardia lookup --word <hebrew> | Lookup by Hebrew or Greek word | kardia lookup --word חֶסֶד |
+| kardia lookup --category <id> | Return full category entry | kardia lookup --category chesed |
+| kardia verse <osisRef> | Return tagged words for a verse | kardia verse Gen.1.1 |
+| kardia search <query> | Full-text search across coreMeaning fields | kardia search "covenantal loyalty" |
+| kardia lint [file] | Run guard-rail linter on a category file | kardia lint categories.json |
+| kardia validate [layer] | Run JSON Schema validation | kardia validate all |
+| kardia generate <category> | Invoke generator for a seed category | kardia generate chesed |
+| kardia status | Show completion status for all 30 seeds | kardia status |
+
+### **1.2 Output formats**
+
+All commands support --format json | yaml | table | markdown. Default is table for human-readable output, json for piped output (detected via TTY). The --quiet flag suppresses all output except the result.
+
+### **1.3 Configuration**
+
+The CLI reads from kardia.config.json in the project root or ~/.kardia/config.json for user-level config. Config keys:
+
+- dataDir: path to the data directory (default: ./data)
+
+- schemasDir: path to schemas (default: ./schemas)
+
+- defaultFormat: output format preference
+
+- editorCommand: used by kardia edit <id> to open in preferred editor
+
+## **2. Generator Integration Pipeline**
+
+The Kardia generator (the Claude-powered artifact) produces candidate category entries. The integration pipeline handles moving those entries from raw output to validated, version-controlled data.
+
+### **2.1 Pipeline stages**
+
+- Generate: generator produces a candidate categories.json entry
+
+- Auto-lint: CLI runs guard-rail linter on the candidate — hard failures are reported immediately with remediation guidance
+
+- Auto-validate: JSON Schema validation on the candidate entry
+
+- Staging: passing candidates are written to /data/staging/<category-id>.json
+
+- Editorial review: reviewer runs kardia review <category-id> to open the entry with diff view against any prior version
+
+- Approve: reviewer runs kardia approve <category-id> — entry moves to /data/categories/
+
+- Lexeme map update: kardia map-update <category-id> prompts for Strong's ID assignments and writes to lexeme-map.json
+
+- CI: full validation suite runs on the PR
+
+### **2.2 Auto-lint remediation**
+
+When the linter flags a contamination rule, the CLI outputs:
+
+- The rule ID and watch-point name
+
+- The flagged text (quoted, with position)
+
+- A one-sentence remediation note drawn from the watch-point definitions
+
+- A suggested re-framing (non-prescriptive)
+
+The generator can be re-invoked with the lint report appended to the prompt, creating a tight feedback loop without human intervention for structural violations.
+
+## **3. Editorial Review Workflow**
+
+Not all validation is automatable. The editorial review step is where theological judgment is applied. This workflow is designed for scholars who may not be developers.
+
+### **3.1 Reviewer roles**
+
+| **Role** | **Responsibility** | **CLI access level** |
+| --- | --- | --- |
+| Generator | Produces candidate entries via AI-assisted tool | generate, lint, validate |
+| Editor | Reviews candidates for theological accuracy and completeness | review, annotate, request-changes |
+| Approver | Has final sign-off authority; understands guard rails fully | approve, reject, override-warning |
+| Maintainer | Manages schemas, linter rules, versioning | all commands + schema-edit, release |
+
+### **3.2 Review checklist (per entry)**
+
+The kardia review command presents this checklist interactively. All items must be checked before approval is possible:
+
+- coreMeaning grounds the word in Second Temple Jewish embodied life — not abstract doctrine
+
+- secondTemplePerspective passes the 1st-century Torah-steeped reader test
+
+- No Augustinian, Platonic, or Reformation categories present as primary framing
+
+- All 6 watch points checked if this word is adjacent to a watch-point category
+
+- keyVerses actually demonstrate the category as defined (not just contain the word)
+
+- lxxAntecedents accurately reflect LXX usage (verified against NETS or BDB)
+
+- shortGloss communicates in 6 words or fewer without reductionism
+
+### **3.3 Change log**
+
+Every approved entry includes a changelog array. Each change entry records: date, author, summary of change, and whether the change was a semantic revision (which triggers a minor version bump) or editorial (spelling, formatting — no version bump).
+
+## **4. Versioning and Stability**
+
+The lexicon uses semantic versioning at two levels:
+
+- Entry-level: each category entry has its own semver (in the version field). Generator outputs start at 0.1.0. Editorial approval bumps to 1.0.0. Subsequent semantic revisions increment minor version.
+
+- Corpus-level: the full lexicon has a release version in package.json. A corpus release is cut when a meaningful set of entries reaches 1.0.0 status.
+
+**Stability contract: **category IDs and Strong's ID mappings are treated as stable identifiers once an entry reaches 1.0.0. Downstream apps that build on the lexicon can pin to a corpus release and receive only additive changes.
+
+## **5. Testing**
+
+The tooling suite has its own test coverage requirements:
+
+| **Test type** | **Coverage target** | **Notes** |
+| --- | --- | --- |
+| Unit tests (linter rules) | 100% | Every GR-* and WRN-* rule has a positive and negative test fixture |
+| Unit tests (schema validation) | 100% of required fields | Invalid entries for each required field |
+| Integration tests (CLI commands) | All core commands | Against fixture data set including known violations |
+| Golden file tests (generator output) | All 30 seed categories | Approved entries used as golden files for regression |
+| Performance tests (verse-index query) | P95 < 50ms | On full verse index, single verse lookup |

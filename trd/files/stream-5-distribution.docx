@@ -1,0 +1,169 @@
+KARDIA LEXICON
+
+**Stream 5 — Distribution ****&**** Open-Source Packaging**
+
+**Purpose: **Make the Kardia Lexicon genuinely accessible to anyone — scholars, developers, pastors, and lay readers. The distribution strategy covers GitHub structure, package releases, CDN delivery, and documentation. The goal is a lexicon that another developer can integrate in under an hour.
+
+## **1. Open-Source Commitment**
+
+The Kardia Lexicon data and tooling are fully open-source. The license choice is deliberate: the theological content must be freely available to anyone building Bible study tools, scholarly resources, or ministry applications — not locked to the Kardia app. Derivative works that maintain the guard rails are welcome; derivative works that violate the guard rails must be clearly distinguished from the canonical Kardia Lexicon.
+
+| **Component** | **License** | **Rationale** |
+| --- | --- | --- |
+| Lexicon data (all 3 layers) | CC BY 4.0 | Maximum reuse; attribution preserves source integrity |
+| CLI and tooling | MIT | Frictionless developer adoption |
+| JSON schemas | CC0 (public domain) | Standards should have no friction |
+| Documentation | CC BY 4.0 | Attribution maintains theological traceability |
+| Guard-rail linter rules | MIT | Others can fork and extend without restriction |
+
+## **2. GitHub Repository Structure**
+
+The project lives in a single mono-repository. Structure:
+
+| **Path** | **Contents** |
+| --- | --- |
+| /data/categories/ | One JSON file per approved category entry |
+| /data/categories.json | Compiled single-file index of all category entries |
+| /data/lexeme-map.json | Full Strong's ID → category bridge |
+| /data/verse-index/ | Verse index split by book (66 files) |
+| /data/verse-index.json | Full compiled verse index (generated artifact) |
+| /schemas/ | JSON Schema files for all 3 layers |
+| /tools/linter/ | Guard-rail linter source |
+| /tools/cli/ | kardia CLI source |
+| /tools/generator/ | Generator integration scripts |
+| /tools/build/ | Verse index build scripts |
+| /docs/ | Documentation source (Markdown) |
+| /packages/ | npm and Python package source |
+| /.github/workflows/ | CI/CD pipelines |
+| /CONTRIBUTING.md | Contribution guide — includes guard-rail summary |
+| /GUARD_RAILS.md | Full theological guard-rail documentation |
+| /LICENSE | License file (CC BY 4.0 for data, MIT for code) |
+
+## **3. Package Releases**
+
+### **3.1 npm package: @kardia/lexicon**
+
+Targets JavaScript/TypeScript developers building web and Node.js applications.
+
+| **Export** | **Description** |
+| --- | --- |
+| import { getCategory } from '@kardia/lexicon' | Look up a category entry by id or Hebrew word |
+| import { resolveStrongsId } from '@kardia/lexicon' | Resolve a Strong's ID to a category |
+| import { getVerseIndex } from '@kardia/lexicon' | Get tagged word data for an OSIS reference |
+| import categories from '@kardia/lexicon/data' | Raw JSON for bundler-friendly tree shaking |
+| import lexemeMap from '@kardia/lexicon/lexeme-map' | Raw lexeme map JSON |
+
+### **3.2 Python package: kardia-lexicon**
+
+Targets scholars and researchers working in Python, Jupyter notebooks, and NLP pipelines.
+
+- from kardia import get_category, resolve_strongs_id, get_verse_index
+
+- Pandas DataFrame export: kardia.to_dataframe() for analysis workflows
+
+- Published on PyPI: pip install kardia-lexicon
+
+### **3.3 Raw JSON via CDN**
+
+For direct embedding in web apps without a build step:
+
+- https://cdn.kardia.bible/v1/categories.json — full categories index
+
+- https://cdn.kardia.bible/v1/lexeme-map.json — full lexeme map
+
+- https://cdn.kardia.bible/v1/verse-index/{book}.json — per-book verse index
+
+- https://cdn.kardia.bible/v1/category/{id}.json — single category lookup
+
+All CDN endpoints are versioned by major release. v1 URLs are stable once published. Breaking changes get a new major version URL.
+
+### **3.4 SQLite distribution**
+
+For mobile, embedded, and offline use cases, a compiled SQLite database is released alongside the JSON. Tables mirror the three JSON layers. A full-text search index is included on the coreMeaning and secondTemplePerspective fields. File size target: under 20 MB for the full OT + NT index.
+
+## **4. Documentation Site**
+
+Documentation lives at docs.kardia.bible (or equivalent). It is generated from the /docs/ directory using a static site generator. Required documentation:
+
+### **4.1 For scholars and pastors**
+
+- What is a Hebrew thought category and why does it matter?
+
+- The guard rails explained: why the six contamination watch points
+
+- How to read a category entry
+
+- The Second Temple Jewish reader test — method and examples
+
+- Browse all 30 seed categories with full entries
+
+- Reading list: sources that inform the Kardia methodology
+
+### **4.2 For developers**
+
+- Quickstart: integrate in under 10 minutes
+
+- API reference: all npm and Python exports with TypeScript signatures
+
+- JSON Schema reference: all fields with examples
+
+- CLI reference: all commands with flags and examples
+
+- The three-layer architecture explained
+
+- How translation-independent resolution works
+
+- Contributing guide: how to submit new entries or corrections
+
+### **4.3 For contributors**
+
+- Generator usage guide
+
+- Guard-rail reference with examples of correct and incorrect framing
+
+- Editorial review checklist (interactive online version)
+
+- How to add LXX antecedent data
+
+- Versioning and stability commitments
+
+## **5. Contribution Model**
+
+The project is open to contributions from scholars, developers, and ministry practitioners. The contribution pipeline:
+
+- Fork the repo and run the kardia CLI locally
+
+- Use the generator (or author manually) to produce a candidate category entry
+
+- Run kardia lint and kardia validate — fix all hard failures before submitting
+
+- Open a pull request with the candidate entry in /data/staging/
+
+- At least one Approver with theological competency reviews and either approves, requests changes, or rejects with written rationale
+
+- CI must pass (all three validation stages)
+
+- On approval, Maintainer merges and runs lexeme-map update for the new entry
+
+**Quality commitment: **The guard rails are non-negotiable for contributions. Entries that import Augustinian categories, use Greek philosophical framing as primary, or fail the Second Temple Jewish reader test will not be approved regardless of scholarly credentials. The guard rails are the project's theological constitution.
+
+## **6. Release Cadence**
+
+| **Release type** | **Trigger** | **Includes** |
+| --- | --- | --- |
+| Patch (x.x.1) | Editorial corrections, typo fixes | No semantic changes to category definitions |
+| Minor (x.1.0) | New approved category entries, new lexeme map entries | Additive only — no breaking changes to existing entries |
+| Major (1.0.0) | Breaking schema changes, semantic revision of approved entries | Migration guide required; CDN v-prefix bumped |
+| Corpus release | All 30 seed categories at 1.0.0 status | Announced as the foundational stable release |
+
+## **7. Community and Governance**
+
+The Kardia Lexicon is a project of Kardia Bible, open to the global community of Hebrew scholars, biblical theologians, and Bible technology developers. Governance:
+
+- Theological council: 3 scholars with expertise in Second Temple Judaism, Hebrew lexicography, and NT background — responsible for guard-rail definitions and Approver certification
+
+- Technical maintainers: 2 developers responsible for schemas, tooling, CI, and releases
+
+- Editorial board: rotating panel of Approvers drawn from the contributor community
+
+- Public RFC process for any proposed changes to the guard rails or schema

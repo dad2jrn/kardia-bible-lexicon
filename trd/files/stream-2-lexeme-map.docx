@@ -1,0 +1,109 @@
+KARDIA LEXICON
+
+**Stream 2 — Lexeme Map (Layer 2)**
+
+**Purpose: **Build the Strong's ID to Hebrew category bridge that makes the lexicon machine-queryable. This is the translation-independence mechanism — every lexeme in the original-language text resolves to a Hebrew thought category, regardless of which English translation the reader holds.
+
+## **1. The Hebrew-Primary Principle in Code**
+
+The lexeme map encodes the project's core hermeneutical commitment: Greek is the vehicle, Hebrew is the thought. Every NT Greek lemma in the lexeme map must trace back to a Hebrew category via its LXX antecedent chain. Greek lemmas that do NOT have a Hebrew antecedent (Hellenistic Greek loanwords with no OT resonance) are out of scope for the lexeme map.
+
+**Mapping direction: **Strong's ID → primaryCategory (Hebrew category id). Never map a Hebrew category directly to a Greek category. The Greek entry points to the Hebrew entry; the Hebrew entry is the definition.
+
+## **2. Seed Category Mapping (Phase 1)**
+
+Phase 1 covers the 30 seed categories. For each seed category, the lexeme map must include:
+
+- The primary Hebrew Strong's entry (e.g. H2617 for chesed)
+
+- All Hebrew Strong's variants and cognates that share the same semantic domain
+
+- The LXX Greek Strong's entries that translate this Hebrew lemma (e.g. G1656 eleos for chesed)
+
+- Any NT Greek entries that carry the same Hebrew category via LXX antecedent
+
+### **2.1 Seed category mapping status**
+
+| **Category** | **Hebrew Strong****'****s** | **LXX Greek Strong****'****s** | **NT occurrences** | **Status** |
+| --- | --- | --- | --- | --- |
+| chesed | H2617 | G1656 (eleos) | ~200 NT uses of eleos/eleeo | Pending |
+| emeth | H0571 | G0225 (aletheia) | ~100 NT uses | Pending |
+| berith | H1285 | G1242 (diatheke) | ~33 NT uses | Pending |
+| nephesh | H5315 | G5590 (psuche) | ~100 NT uses | Pending |
+| lev/levav | H3820/H3824 | G2588 (kardia) | ~150 NT uses | Pending |
+| shalom | H7965 | G1515 (eirene) | ~100 NT uses | Pending |
+| mishpat | H4941 | G2920 (krisis/krima) | ~80 NT uses | Pending |
+| kaphar | H3722 | G2433 (hilaskomai) | ~10 NT uses | Pending |
+| [all 30 seeds] | ... | ... | ... | Pending |
+
+## **3. LXX Antecedent Methodology**
+
+Establishing LXX antecedents is the scholarly core of the lexeme map. The procedure for each NT Greek entry:
+
+- Identify the Greek lemma's primary OT usage in the LXX (use NETS and Murakami's Greek-English Lexicon of the LXX)
+
+- Identify which Hebrew lemma(s) the LXX Greek word most commonly renders
+
+- Map that Hebrew lemma to its Kardia category
+
+- Assign the NT Greek entry to that same category via lxxSource: true and hebrewSourceId
+
+- Document exceptions: where NT usage diverges significantly from LXX antecedent, add a contextRules entry
+
+**Guard rail: **LXX antecedent mapping is how we prevent Greek philosophical categories from colonising NT theology. If pneuma is mapped via its LXX antecedent in ruach, it carries the Hebrew category of ruach — not Stoic pneuma. The lxxSource field is not optional for Greek entries.
+
+## **4. Polysemy Handling**
+
+Some Hebrew and Greek words span multiple semantic domains. The lexeme map handles this through ordered secondary categories and context rules.
+
+### **4.1 Ordered secondary categories**
+
+When a word has multiple valid category mappings, list them in order of frequency in the canonical corpus. The primaryCategory is always the most common. For example:
+
+| **Lemma** | **primaryCategory** | **secondaryCategories (ordered)** | **Notes** |
+| --- | --- | --- | --- |
+| ruach (H7307) | ruach (human spirit) | dabar (prophetic breath), elohim (divine spirit) | Spirit of God = category elohim; human breath = ruach |
+| dabar (H1697) | dabar (word/act) | emeth (covenantal truth) | In prophetic formula "word of YHWH" → dabar primary |
+| psuche (G5590) | nephesh (whole person) | Varies by context | Never Platonic soul without contextRule override |
+| pneuma (G4151) | ruach (spirit/breath) | qodesh (divine holiness) | "Holy Spirit" → qodesh secondary active |
+
+### **4.2 Context rules**
+
+Context rules allow the lexeme map to return a different category based on syntactic or literary context. A context rule specifies:
+
+- condition: a description of the syntactic pattern (e.g. "followed by YHWH as genitive")
+
+- overrideCategory: the category to use when the condition is met
+
+- examples: at least two OSIS references demonstrating the rule
+
+**Example: **ruach followed by the genitive "of God" or "of YHWH" triggers an override to the elohim category rather than the default ruach category. Context rules are evaluated before primaryCategory assignment at render time.
+
+## **5. Phase 2 — Full OT/NT Expansion**
+
+After the 30 seed categories are mapped, Phase 2 expands the lexeme map to cover the full Hebrew and Greek lexical inventory. Priority order for expansion:
+
+- All Strong's entries that appear in verses tagged by the verse index (Layer 3)
+
+- All Strong's entries that share a root with a seed category
+
+- Remaining OT Hebrew inventory by frequency
+
+- Remaining NT Greek inventory by LXX antecedent coverage
+
+## **6. Data Sources and Licensing**
+
+The lexeme map is compiled from the following sources. All source data must be either public domain, open license, or independently derived:
+
+| **Source** | **Usage** | **License** |
+| --- | --- | --- |
+| Brown-Driver-Briggs (BDB) | Hebrew lemma definitions, semantic range | Public domain |
+| NETS (New English Translation of the Septuagint) | LXX antecedent identification | Methodology only — not text reproduction |
+| OpenScriptures Hebrew Bible | Strong's ID assignments | CC BY 4.0 |
+| MorphGNT | Greek morphology and Strong's IDs | CC BY-SA 3.0 |
+| BDAG (Bauer-Danker-Arndt-Gingrich) | NT Greek semantic range | Methodology only — not text reproduction |
+| Kardia editorial team | Category assignments, context rules | Project IP |
+
+## **7. File Location and Format**
+
+The lexeme map lives at /data/lexeme-map.json. It is an array of objects, one per Strong's ID, sorted by language (Hebrew first, then Greek) and then numerically by ID. The file is validated against /schemas/lexeme-map.schema.json on every commit.

@@ -1,0 +1,335 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://kardia.bible/schemas/categories.schema.json",
+  "title": "Kardia Lexicon — Category Entry",
+  "description": "Schema for a single Hebrew thought category entry in the Kardia Lexicon (Layer 1). Field names follow the actual entry structure. Every field in the canonical entry format is represented here.",
+  "type": "object",
+  "required": [
+    "id",
+    "hebrew_root",
+    "transliteration",
+    "testament_scope",
+    "semantic_domain",
+    "textual_layer",
+    "category_label",
+    "one_liner",
+    "full_definition",
+    "what_it_does",
+    "what_it_is_not",
+    "second_temple_context",
+    "kardia_rendering",
+    "surface_vehicles",
+    "key_verses",
+    "related_categories",
+    "theological_notes",
+    "watch_point_flag",
+    "status",
+    "version",
+    "license",
+    "last_updated"
+  ],
+  "additionalProperties": false,
+  "properties": {
+
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$",
+      "description": "Kebab-case unique identifier, e.g. 'chesed', 'lev-levav'. Stable once entry reaches 1.0.0 status."
+    },
+
+    "hebrew_root": {
+      "type": "string",
+      "description": "Primary Hebrew (or Greek for NT/LXX entries) word in original script."
+    },
+
+    "transliteration": {
+      "type": "string",
+      "description": "Standard academic transliteration of the primary lemma."
+    },
+
+    "testament_scope": {
+      "type": "string",
+      "enum": ["ot", "nt", "both"],
+      "description": "Whether the category is attested in OT only, NT only, or both corpora."
+    },
+
+    "semantic_domain": {
+      "type": "string",
+      "enum": [
+        "god-covenant",
+        "human-nature",
+        "relational-ethical",
+        "worship-presence",
+        "sin-redemption",
+        "land-creation",
+        "leadership-vocation",
+        "eschatology-hope",
+        "nt-lxx-distinctive",
+        "spiritual-beings-reframed"
+      ],
+      "description": "The semantic group this category belongs to. Governs which guard-rail tier applies and which GR-11 rules are active."
+    },
+
+    "textual_layer": {
+      "type": "string",
+      "enum": ["pre-exilic", "exilic", "post-exilic", "second-temple", "nt"],
+      "description": "The textual stratum of the primary entry. Governs GR-11 tier: pre-exilic/exilic/post-exilic = Tier 1 (physical/human primary); second-temple = Tier 2 (developmental); nt = Tier 3 (first-century frame)."
+    },
+
+    "category_label": {
+      "type": "string",
+      "maxLength": 80,
+      "description": "Human-readable display label for the category. More descriptive than the id. Not used as a translation gloss."
+    },
+
+    "one_liner": {
+      "type": "string",
+      "maxLength": 300,
+      "description": "A single sentence that captures the irreducible core of the category. Must be Hebrew-primary framed — no Augustinian, Platonic, or Reformation categories."
+    },
+
+    "full_definition": {
+      "type": "string",
+      "minLength": 80,
+      "description": "The authoritative Hebrew-primary theological definition. Minimum 80 words. Must pass all guard-rail rules GR-01 through GR-11. The LXX antecedent chain for NT entries must be addressed here or in surface_vehicles."
+    },
+
+    "what_it_does": {
+      "type": "string",
+      "minLength": 40,
+      "description": "Functional description: how this category operates within covenant life, worship, community, and history. Grounds the category in embodied, communal, relational action."
+    },
+
+    "what_it_is_not": {
+      "type": "string",
+      "minLength": 40,
+      "description": "The primary contamination framing(s) this category must be distinguished from. Names the Western, Greek philosophical, or Reformation category that most distorts this word and explains why it fails."
+    },
+
+    "second_temple_context": {
+      "type": "string",
+      "minLength": 60,
+      "description": "What a First Century Torah-steeped Jewish reader would have understood this word to mean in their body, community, and covenant history. The Second Temple Jewish reader test. Required for all entries."
+    },
+
+    "kardia_rendering": {
+      "type": "string",
+      "description": "The preferred Kardia translation rendering. Should be a natural English phrase that carries the Hebrew category meaning without inserting a label. Contextually driven — must feel like translation, not annotation. See rendering-principles.md."
+    },
+
+    "surface_vehicles": {
+      "type": "object",
+      "required": ["hebrew_lexemes", "strongs_hebrew", "english_glosses"],
+      "additionalProperties": false,
+      "description": "The lexical vehicles through which this Hebrew category travels across languages.",
+      "properties": {
+
+        "hebrew_lexemes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1,
+          "description": "Hebrew lemmas in original script that belong to this category."
+        },
+
+        "strongs_hebrew": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^H[0-9]+$"
+          },
+          "minItems": 1,
+          "description": "Strong's Hebrew IDs for all lemmas in this category. Must match entries in lexeme-map.json."
+        },
+
+        "lxx_greek": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Greek lemmas (transliterated) used by the LXX to render this Hebrew category."
+        },
+
+        "nt_greek": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "NT Greek lemmas (transliterated) that carry this Hebrew category via LXX antecedent chain."
+        },
+
+        "strongs_greek": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^G[0-9]+$"
+          },
+          "description": "Strong's Greek IDs for LXX and NT vehicles. Required when lxx_greek or nt_greek is present."
+        },
+
+        "english_glosses": {
+          "type": "object",
+          "required": ["recommended", "attested"],
+          "additionalProperties": false,
+          "properties": {
+            "recommended": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1,
+              "description": "Preferred English renderings. Must not flatten the Hebrew category to its weakest gloss."
+            },
+            "attested": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["gloss", "found_in", "loses"],
+                "additionalProperties": false,
+                "properties": {
+                  "gloss": { "type": "string" },
+                  "found_in": {
+                    "type": "array",
+                    "items": { "type": "string" }
+                  },
+                  "loses": {
+                    "type": "string",
+                    "description": "Explanation of what this gloss loses from the Hebrew category. Must be specific."
+                  }
+                }
+              },
+              "description": "Existing translation glosses with analysis of what each loses."
+            }
+          }
+        }
+      }
+    },
+
+    "illustrative_renderings": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["translation", "text"],
+        "additionalProperties": false,
+        "properties": {
+          "translation": { "type": "string" },
+          "text": { "type": "string" }
+        }
+      },
+      "description": "Existing translation renderings of key verses, for comparison. Optional but recommended."
+    },
+
+    "key_verses": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+$"
+      },
+      "minItems": 3,
+      "description": "OSIS references (e.g. Gen.1.1) demonstrating the category as defined — not merely containing the word. Minimum 3."
+    },
+
+    "related_categories": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "IDs of related Kardia category entries. Should reflect genuine semantic or covenantal proximity, not loose word association."
+    },
+
+    "theological_notes": {
+      "type": "string",
+      "minLength": 80,
+      "description": "Scholarly annotation covering translation history, contamination vectors, and reception history. Must identify specific traditions by name — not generic 'Western theology' without specificity. Must distinguish Reformation from post-Reformation scholasticism where relevant."
+    },
+
+    "watch_point_flag": {
+      "type": "boolean",
+      "description": "true if this entry is one of the six contamination watch points (nephesh, sarx/basar, yirah, mishpat, kaphar, chesed) or a GR-11 watch-point word. Triggers additional linter checks."
+    },
+
+    "developmental_note": {
+      "type": "string",
+      "description": "Required for all entries in the spiritual-beings-reframed semantic domain. Explains the contamination source, the development trajectory (Zoroastrian contact, Second Temple apocalyptic, medieval angelology, etc.), and the textual layer at which the development entered. Not required for other domains."
+    },
+
+    "status": {
+      "type": "string",
+      "enum": ["draft", "reviewed", "approved"],
+      "description": "Editorial status. 'draft' = generator output, not reviewed. 'reviewed' = editorial review passed. 'approved' = Approver sign-off complete, entry is stable."
+    },
+
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$",
+      "description": "Semantic version of this entry. Generator outputs start at 0.1.0. Editorial approval bumps to 1.0.0. Subsequent semantic revisions increment minor version. Formatting-only changes do not bump version."
+    },
+
+    "license": {
+      "type": "string",
+      "const": "MIT",
+      "description": "License for this entry. Must be MIT."
+    },
+
+    "last_updated": {
+      "type": "string",
+      "format": "date",
+      "description": "ISO 8601 date of last edit, e.g. 2025-04-07."
+    },
+
+    "changelog": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["date", "author", "summary", "semantic_change"],
+        "additionalProperties": false,
+        "properties": {
+          "date": { "type": "string", "format": "date" },
+          "author": { "type": "string" },
+          "summary": { "type": "string" },
+          "semantic_change": {
+            "type": "boolean",
+            "description": "true if this change alters meaning (triggers minor version bump). false for editorial fixes (spelling, formatting — no bump)."
+          }
+        }
+      },
+      "description": "Audit trail of all changes after 1.0.0. Required for approved entries once revised."
+    },
+
+    "_kardia_verses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["verse_ref", "standard_rendering", "kardia_translation"],
+        "additionalProperties": false,
+        "properties": {
+          "verse_ref": {
+            "type": "string",
+            "pattern": "^[A-Za-z0-9]+\\.[0-9]+\\.[0-9]+$"
+          },
+          "standard_rendering": {
+            "type": "string",
+            "description": "The ESV or most common English rendering for comparison."
+          },
+          "kardia_translation": {
+            "type": "string",
+            "description": "Kardia rendering. Contextually driven natural English carrying the Hebrew category meaning. Must not mechanically insert the category_label or kardia_rendering as a gloss. See rendering-principles.md."
+          }
+        }
+      },
+      "description": "Sample Kardia translations for key verses. Underscore prefix marks this as a working artifact, not part of the canonical lexicon data layer."
+    },
+
+    "_iterations": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of generator iterations used to produce this entry. Internal tracking field."
+    },
+
+    "reviewed_by": {
+      "type": "string",
+      "description": "Role or identifier of reviewer. Used for editorial audit trail."
+    }
+  },
+
+  "if": {
+    "properties": {
+      "semantic_domain": { "const": "spiritual-beings-reframed" }
+    },
+    "required": ["semantic_domain"]
+  },
+  "then": {
+    "required": ["developmental_note"]
+  }
+}

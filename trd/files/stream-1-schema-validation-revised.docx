@@ -1,0 +1,185 @@
+KARDIA LEXICON
+
+**Stream 1 — Schema ****&**** Validation**
+
+*Revised — GR-11 Physical-Realm Primacy added*
+
+**Purpose: **Define and enforce the structural and theological contract for all three JSON layers. Schema validation is the machine-readable expression of the guard rails.
+
+## **1. Overview**
+
+The Kardia Lexicon is built on three JSON layers. Each layer must conform to a formal JSON Schema (Draft 7) that enforces both structural correctness and theological integrity. Schema validation runs in CI on every pull request and on every artifact produced by the generator.
+
+## **2. JSON Schema Specifications**
+
+### **2.1 categories.json (Layer 1)**
+
+Each entry is the authoritative record for one Hebrew thought category. Required fields:
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| id | string | Yes | Kebab-case identifier, e.g. chesed |
+| hebrewWord | string | Yes | Hebrew or Greek script |
+| transliteration | string | Yes | Standard academic transliteration |
+| shortGloss | string | Yes | Max 6 words. Never the weakest English gloss |
+| semanticDomain | string enum | Yes | god-covenant │ human-nature │ relational-ethical │ worship-presence │ sin-redemption │ land-creation │ leadership-vocation │ eschatology-hope │ nt-lxx-distinctive │ spiritual-beings-reframed |
+| textualLayer | string enum | Yes | pre-exilic │ exilic │ post-exilic │ second-temple │ nt — governs which GR-11 tier applies |
+| coreMeaning | string | Yes | Min 80 words. Hebrew-primary framing required |
+| secondTemplePerspective | string | Yes | What a 1st-century Torah-steeped reader understood |
+| contrastWithGreekPhilosophy | string | Optional | Contrast only — never primary definition |
+| developmentalNote | string | Conditional | Required for spiritual-beings-reframed domain — explains contamination source and development history |
+| watchPointFlag | boolean | Yes | true if one of the watch-point words |
+| lxxAntecedents | array of string | Optional | Greek lemmas the LXX uses to render this Hebrew category |
+| keyVerses | array of string | Yes | Min 3. OSIS references |
+| status | string enum | Yes | draft │ reviewed │ approved |
+| version | string | Yes | Semver, e.g. 1.0.0 |
+| lastUpdated | string (date) | Yes | ISO 8601 |
+
+### **2.2 lexeme-map.json (Layer 2)**
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| strongsId | string | Yes | H or G prefix + number |
+| lemma | string | Yes | Hebrew or Greek lemma in original script |
+| language | string enum | Yes | hebrew │ aramaic │ greek |
+| primaryCategory | string | Yes | Ref to categories.json id — always Hebrew category |
+| secondaryCategories | array of string | Optional | For polysemous words |
+| contextRules | array of object | Optional | Conditional category assignment |
+| lxxSource | boolean | Yes (Greek) | true if Greek lemma is LXX translation of Hebrew |
+| hebrewSourceId | string | Conditional | Required if lxxSource is true |
+| notes | string | Optional | Scholarly annotation, max 200 words |
+
+### **2.3 verse-index.json (Layer 3)**
+
+NO translation property at any level. Resolution to English happens at render time.
+
+| **Field** | **Type** | **Required** | **Description** |
+| --- | --- | --- | --- |
+| osisRef | string | Yes | OSIS reference, e.g. Gen.1.1 |
+| words | array of object | Yes | One entry per original-language word |
+| words[].position | integer | Yes | Zero-indexed word position |
+| words[].strongsId | string | Yes | Matches lexeme-map.json strongsId |
+| words[].morphology | string | Optional | OpenScriptures morphology code |
+| words[].categoryId | string | Optional | Pre-resolved category for performance |
+
+## **3. Guard-Rail Linter**
+
+The guard-rail linter runs after JSON Schema validation. It operates on categories.json entries (Layer 1). Hard failures block merge. Warnings are reported but non-blocking.
+
+### **3.1 Contamination rules — original six (hard fail)**
+
+| **Rule ID** | **Watch point** | **Pattern flagged** | **Correct framing** |
+| --- | --- | --- | --- |
+| GR-01 | nephesh | immortal soul, disembodied spirit, soul leaving body | Whole animated person, breath-body unity |
+| GR-02 | sarx / basar | sinful nature, corrupt flesh, bodily evil | Creaturely limitation and mortality |
+| GR-03 | yirah | dread, terror, fear of punishment | Reverent awe producing willing alignment |
+| GR-04 | mishpat | punitive judgment, condemnation, legal verdict | Right-ordering of relationship and community |
+| GR-05 | kaphar | penal substitution, satisfying divine wrath | Covenantal restoration, covering, cleansing |
+| GR-06 | chesed | unconditional love, sentiment, feeling | Covenantal loyalty expressed in concrete action |
+
+### **3.2 Structural contamination rules (hard fail)**
+
+- **GR-07: **Greek-primary framing in coreMeaning — if contrastWithGreekPhilosophy content appears as primary definition
+
+- **GR-08: **Augustinian imports — "inherited guilt", "original sin as legal status", "concupiscence"
+
+- **GR-09: **Reformation grid — "TULIP", "total depravity as category", "imputed righteousness as primary"
+
+- **GR-10: **Weak gloss — shortGloss matches a known reductive translation in linter config
+
+### **3.3 GR-11 — Physical-realm primacy ****&**** demonological development awareness (hard fail)**
+
+**Theological foundation: **Hebrew thought knows no nature/supernature divide in the Greek sense. YHWH is the sole source of life. His heavenly realm participates in his incorruptibility. A created being that derives existence entirely from an incorruptible source cannot be ontologically corruptible without contradicting that source — rebellion requires an independence of being that Hebrew monotheism cannot accommodate. The "fallen angel" framework entered the tradition through exilic Zoroastrian contact and was elaborated in Second Temple apocalyptic literature (1 Enoch, Jubilees). It is not native to the Hebrew conceptual world and must never be the default interpretive frame.
+
+This guard rail operates in three tiers corresponding to the textual layer of the entry under review (enforced via the **textualLayer** field):
+
+| **Tier** | **Textual layer** | **Rule** |
+| --- | --- | --- |
+| Tier 1 | pre-exilic │ exilic │ post-exilic | Physical/human/natural reading is always primary. A supernatural-being reading requires logically unavoidable textual warrant — absence of a physical explanation is not sufficient. The test is: does the text itself force the supernatural reading, or does the reader bring that frame to it? |
+| Tier 2 | second-temple | The demonological development is acknowledged as a historically documented response to exilic trauma and cultural contact with Mesopotamian and Zoroastrian frameworks. It is treated as developmental, not definitional. Second Temple apocalyptic (1 Enoch, Jubilees) must never be used as a primary interpreter of Torah texts. The medical/social function of possession language is explicitly named — epilepsy, convulsions, psychosis, and similar conditions had no clinical framework in the first century. |
+| Tier 3 | nt | NT usage is read within its own first-century Jewish conceptual world. Exorcism and healing accounts name Jesus's authority over conditions that disrupt human flourishing — they are not cosmological tutorials on demonic ontology. Principalities and powers name real forces of systemic social and political oppression. Systematic demonology must not be built from pastoral or narrative accounts. |
+
+**GR-11a — Retrojection hard fail **(applies to Tier 1 entries):
+
+- "Satan" as grammatical subject of any pre-exilic text (Gen 3, Gen 6, Job without definite article acknowledgment)
+
+- "fallen angel(s)" appearing in coreMeaning or secondTemplePerspective of a pre-exilic entry
+
+- "angelic rebellion", "angels who sinned" as interpretive frame for Torah without developmental caveat
+
+- "demonic" applied to pre-exilic beings without explicit acknowledgment that the term is anachronistic
+
+- "hybrid" offspring of angels and humans presented as historical events
+
+**GR-11b — Second Temple development hard fail **(applies to all tiers):
+
+- "1 Enoch explains" or "Jubilees clarifies" used as primary interpretive authority over Torah
+
+- Watcher mythology presented as the straightforward or natural reading of Genesis 6
+
+- Second Temple apocalyptic tradition treated as equivalent in authority to pre-exilic text
+
+**GR-11c — NT demonological taxonomy hard fail **(applies to Tier 3 entries):
+
+- "demon(s) of [category]" used as a taxonomic ontological claim
+
+- "hierarchy of demonic powers", "ranks of fallen angels", "angelic species" language
+
+- Exorcism or healing accounts used to establish ontology rather than demonstrate authority
+
+- Medieval angelology (Pseudo-Dionysius ranks, Aquinas angelic species) imported as interpretive frame
+
+### **3.4 GR-11 watch-point words**
+
+| **Rule** | **Word** | **Pattern flagged** | **Correct framing** |
+| --- | --- | --- | --- |
+| GR-11/WP-01 | nachash (H5175) | Identified as Satan, spiritual being, or cosmic adversary in Gen 3 | Cunning creature of the field — the text names it explicitly as a creature YHWH God made (Gen 3:1) |
+| GR-11/WP-02 | bene ha-elohim | "Sons of God = angels" in Gen 6 as primary reading without covenantal-human alternative | Seth line — covenantal humans who call on YHWH's name (Gen 4:26), contrasted with daughters of men outside covenant |
+| GR-11/WP-03 | nephilim (H5303) | Hybrid angelic-human beings; giants of cosmic disruption; alien framework | Formidable people — Num 13:33 is the interpretive control; the spies use the term to justify fear and unbelief |
+| GR-11/WP-04 | ha-satan | Proper name "Satan" in pre-exilic texts; independent cosmic power; fallen archangel narrative | Adversary/accuser — role title with definite article (ha-). Prosecutorial function entirely within YHWH's sovereignty |
+| GR-11/WP-05 | daimonion (G1140) | Ontological demon taxonomy built from healing narratives; systematic demonology | First-century explanatory framework for medical conditions now clinically understood. The Gospel claim is Jesus's authority, not demonic ontology. |
+| GR-11/WP-06 | archai/exousiai | Medieval spirit hierarchy; systematic ranking of demonic forces; species of fallen beings | Systemic forces of social, political, and structural oppression named as powers of the present age. Paul's concern is their defeat in Christ. |
+
+### **3.5 Warning rules (non-blocking)**
+
+- coreMeaning under 80 words → WRN-01
+
+- keyVerses fewer than 3 → WRN-02
+
+- No lxxAntecedents on a watch-point word → WRN-03
+
+- secondTemplePerspective missing on any entry → WRN-04
+
+- spiritual-beings-reframed domain entry missing developmentalNote field → WRN-05
+
+- textualLayer field absent on any entry → WRN-06
+
+## **4. CI Integration**
+
+All validations run in sequence on every PR touching any JSON layer file:
+
+- JSON Schema validation (ajv) — structural correctness, including new textualLayer and developmentalNote fields
+
+- Guard-rail linter GR-01 through GR-10 — original contamination checks
+
+- Guard-rail linter GR-11a/b/c — physical-realm primacy checks, tier-sensitive
+
+- Cross-reference integrity — every categoryId in lexeme-map.json and verse-index.json must exist in categories.json
+
+**Fail behaviour: **Any hard-fail rule (GR-01 through GR-11c) blocks merge. Warnings (WRN-01 through WRN-06) are reported in the PR comment but do not block. The generator must produce entries that pass all hard-fail rules before they can land in main.
+
+## **5. Schema Versioning**
+
+Addition of GR-11 and the textualLayer / developmentalNote fields constitutes a minor version bump (0.x.0 → 0.(x+1).0) because the fields are additive. Existing entries without textualLayer will trigger WRN-06 but will not be blocked. A migration script will back-fill textualLayer values for existing approved entries based on their keyVerses dates.
+
+## **6. File Locations**
+
+| **Artifact** | **Path** | **Notes** |
+| --- | --- | --- |
+| Layer 1 schema | /schemas/categories.schema.json | JSON Schema Draft 7 — includes textualLayer and developmentalNote |
+| Layer 2 schema | /schemas/lexeme-map.schema.json | JSON Schema Draft 7 |
+| Layer 3 schema | /schemas/verse-index.schema.json | JSON Schema Draft 7 |
+| Guard-rail linter | /tools/linter/index.js | Node.js — implements GR-01 through GR-11c |
+| Linter config | /tools/linter/rules.json | Weak-gloss list, GR-11 pattern lists, rule overrides |
+| CI workflow | /.github/workflows/validate.yml | Runs on PR and push to main |
+| GUARD_RAILS.md | /GUARD_RAILS.md | Human-readable guard-rail documentation — canonical reference |

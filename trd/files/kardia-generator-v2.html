@@ -1,0 +1,1378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kardia Lexicon Generator v2</title>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400;0,500;1,400&family=JetBrains+Mono:wght@400;500&family=Cinzel:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --ink: #1a1410; --ink-mid: #3d2f20; --ink-light: #7a6352; --ink-faint: #b8a898;
+    --parchment: #f7f2ea; --parchment-dark: #ede5d8; --parchment-deeper: #e0d4c0;
+    --gold: #b8860b; --gold-pale: #f0e4b0;
+    --red-deep: #8b1a1a; --green-deep: #1a4a2a; --blue-deep: #1a2a4a;
+    --border: rgba(90,60,20,0.18); --border-strong: rgba(90,60,20,0.35);
+    --shadow: 0 2px 12px rgba(40,20,5,0.10);
+  }
+  body { font-family:'EB Garamond',Georgia,serif; background:var(--parchment); color:var(--ink); min-height:100vh; font-size:17px; line-height:1.7; }
+  body::before { content:''; position:fixed; inset:0; background-image:repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(90,60,20,0.015) 28px,rgba(90,60,20,0.015) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(90,60,20,0.008) 28px,rgba(90,60,20,0.008) 29px); pointer-events:none; z-index:0; }
+  .app { position:relative; z-index:1; max-width:900px; margin:0 auto; padding:0 24px 80px; }
+  header { text-align:center; padding:52px 0 36px; border-bottom:1px solid var(--border-strong); margin-bottom:40px; }
+  .header-emblem { font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.25em; color:var(--gold); text-transform:uppercase; margin-bottom:12px; display:block; }
+  h1 { font-family:'Cinzel',serif; font-size:32px; font-weight:400; color:var(--ink); letter-spacing:0.04em; line-height:1.2; margin-bottom:8px; }
+  .header-sub { font-style:italic; color:var(--ink-light); font-size:16px; }
+  .version-badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; background:var(--gold-pale); border:1px solid var(--gold); border-radius:2px; padding:2px 8px; color:var(--gold); margin-top:8px; }
+  .section-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.2em; text-transform:uppercase; color:var(--gold); margin-bottom:12px; display:flex; align-items:center; gap:12px; }
+  .section-label::after { content:''; flex:1; height:1px; background:var(--border); }
+  .card { background:rgba(255,252,245,0.7); border:1px solid var(--border); border-radius:3px; padding:24px 28px; margin-bottom:24px; box-shadow:var(--shadow); }
+  .key-row { display:flex; gap:10px; align-items:center; }
+  input[type="password"], input[type="text"], textarea {
+    font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--parchment-dark);
+    border:1px solid var(--border-strong); border-radius:2px; padding:10px 14px;
+    color:var(--ink); outline:none; transition:border-color 0.2s; width:100%;
+  }
+  input[type="password"] { flex:1; width:auto; }
+  input[type="text"] { flex:1; width:auto; }
+  input[type="password"]:focus, input[type="text"]:focus, textarea:focus { border-color:var(--gold); background:var(--parchment); }
+  textarea { resize:vertical; min-height:100px; font-family:'EB Garamond',Georgia,serif; font-size:15px; line-height:1.6; }
+  .toggle-key { font-family:'JetBrains Mono',monospace; font-size:11px; background:transparent; border:1px solid var(--border-strong); border-radius:2px; padding:10px 14px; color:var(--ink-light); cursor:pointer; white-space:nowrap; transition:all 0.2s; }
+  .toggle-key:hover { background:var(--parchment-dark); color:var(--ink); }
+  .category-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(130px,1fr)); gap:8px; margin-bottom:20px; }
+  .cat-btn { font-family:'EB Garamond',serif; font-size:15px; font-style:italic; background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; padding:8px 12px; color:var(--ink-mid); cursor:pointer; text-align:left; transition:all 0.15s; position:relative; }
+  .cat-btn:hover { background:var(--gold-pale); border-color:var(--gold); color:var(--ink); }
+  .cat-btn.selected { background:var(--gold-pale); border-color:var(--gold); color:var(--ink); font-weight:500; }
+  .cat-btn.complete { opacity:0.45; }
+  .cat-btn.complete::after { content:'✓'; position:absolute; right:8px; top:50%; transform:translateY(-50%); font-size:11px; color:var(--green-deep); font-style:normal; }
+  .group-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; color:var(--ink-faint); margin:16px 0 8px; grid-column:1/-1; }
+  .model-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+  .model-btn { font-family:'JetBrains Mono',monospace; font-size:12px; background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; padding:7px 14px; color:var(--ink-light); cursor:pointer; transition:all 0.15s; }
+  .model-btn:hover { background:var(--gold-pale); border-color:var(--gold); color:var(--ink); }
+  .model-btn.selected { background:var(--gold-pale); border-color:var(--gold); color:var(--ink); }
+  .model-label { font-size:10px; color:var(--ink-faint); display:block; margin-top:2px; }
+  .generate-btn { font-family:'Cinzel',serif; font-size:14px; letter-spacing:0.12em; background:var(--ink); color:var(--parchment); border:none; border-radius:2px; padding:14px 36px; cursor:pointer; transition:all 0.2s; display:flex; align-items:center; gap:10px; }
+  .generate-btn:hover { background:var(--ink-mid); }
+  .generate-btn:disabled { opacity:0.4; cursor:not-allowed; }
+  .status-bar { display:none; align-items:center; gap:10px; padding:12px 16px; background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; margin-bottom:24px; font-size:14px; color:var(--ink-light); }
+  .status-bar.visible { display:flex; }
+  .status-bar.error { border-color:var(--red-deep); color:var(--red-deep); background:#fff5f5; }
+  .status-bar.success { border-color:var(--green-deep); color:var(--green-deep); background:#f5fff8; }
+  .spinner { width:14px; height:14px; border:2px solid var(--border-strong); border-top-color:var(--gold); border-radius:50%; animation:spin 0.8s linear infinite; flex-shrink:0; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .output-section { display:none; }
+  .output-section.visible { display:block; }
+  .output-tabs { display:flex; gap:0; border-bottom:1px solid var(--border-strong); margin-bottom:0; }
+  .out-tab { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:10px 20px; border:1px solid transparent; border-bottom:none; background:transparent; color:var(--ink-faint); cursor:pointer; transition:all 0.15s; margin-bottom:-1px; }
+  .out-tab:hover { color:var(--ink-mid); }
+  .out-tab.active { background:rgba(255,252,245,0.7); border-color:var(--border-strong); color:var(--ink); }
+  .out-panel { display:none; background:rgba(255,252,245,0.7); border:1px solid var(--border-strong); border-top:none; border-radius:0 0 3px 3px; padding:24px 28px; }
+  .out-panel.active { display:block; }
+  .json-display { font-family:'JetBrains Mono',monospace; font-size:12.5px; line-height:1.65; color:var(--ink-mid); white-space:pre-wrap; word-break:break-all; max-height:520px; overflow-y:auto; padding-right:8px; }
+  .validator-display { font-size:15px; line-height:1.75; color:var(--ink-mid); }
+  .flag-item { border-left:3px solid var(--red-deep); padding:10px 16px; margin-bottom:12px; background:#fff8f8; border-radius:0 2px 2px 0; }
+  .flag-item.clear { border-left-color:var(--green-deep); background:#f8fff9; }
+  .flag-label { font-family:'Cinzel',serif; font-size:11px; letter-spacing:0.1em; text-transform:uppercase; margin-bottom:4px; }
+  .flag-label.red { color:var(--red-deep); }
+  .flag-label.green { color:var(--green-deep); }
+  .correction-box { margin-top:24px; border-top:1px solid var(--border); padding-top:20px; }
+  .correction-label { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; color:var(--gold); margin-bottom:8px; display:block; }
+  .correction-hint { font-size:13px; color:var(--ink-light); font-style:italic; margin-bottom:10px; }
+  .correction-actions { display:flex; gap:10px; margin-top:12px; flex-wrap:wrap; }
+  .action-btn { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:10px 20px; border-radius:2px; cursor:pointer; transition:all 0.15s; }
+  .action-btn.primary { background:var(--green-deep); color:var(--parchment); border:none; }
+  .action-btn.primary:hover { background:#1f5c32; }
+  .action-btn.secondary { background:transparent; color:var(--ink-mid); border:1px solid var(--border-strong); }
+  .action-btn.secondary:hover { background:var(--parchment-dark); }
+  .action-btn.warning { background:var(--gold); color:var(--parchment); border:none; }
+  .action-btn.warning:hover { background:var(--gold-light,#c49a14); }
+  .action-btn.danger { background:transparent; color:var(--red-deep); border:1px solid rgba(139,26,26,0.3); }
+  .action-btn.danger:hover { background:#fff5f5; }
+  .action-row { display:flex; gap:10px; margin-top:20px; flex-wrap:wrap; }
+  .progress-card { background:rgba(255,252,245,0.7); border:1px solid var(--border); border-radius:3px; padding:20px 24px; margin-bottom:24px; }
+  .progress-groups { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  .progress-group-name { font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:6px; }
+  .progress-bar-wrap { height:4px; background:var(--parchment-deeper); border-radius:2px; overflow:hidden; margin-top:4px; }
+  .progress-bar-fill { height:100%; background:var(--gold); border-radius:2px; transition:width 0.4s ease; }
+  .progress-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint); margin-top:4px; }
+  .approved-item { border-bottom:1px solid var(--border); font-size:15px; }
+  .approved-item:last-child { border-bottom:none; }
+  .approved-item-header { display:flex; align-items:center; justify-content:space-between; padding:10px 0; cursor:pointer; user-select:none; transition:background 0.15s; border-radius:2px; }
+  .approved-item-header:hover .approved-name { color:var(--gold); }
+  .approved-left { display:flex; align-items:center; gap:0; flex-wrap:wrap; }
+  .approved-name { font-style:italic; color:var(--ink-mid); transition:color 0.15s; }
+  .approved-chevron { font-size:11px; color:var(--ink-faint); transition:transform 0.25s; margin-left:10px; }
+  .approved-chevron.open { transform:rotate(90deg); }
+  .approved-meta { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--ink-faint); }
+  .approved-body { max-height:0; overflow:hidden; transition:max-height 0.4s ease, opacity 0.3s ease; opacity:0; }
+  .approved-body.open { max-height:9999px; opacity:1; }
+  .approved-sub-tabs { display:flex; gap:0; border-bottom:1px solid var(--border-strong); margin-bottom:0; }
+  .approved-sub-tab { font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.15em; text-transform:uppercase; padding:7px 16px; border:1px solid transparent; border-bottom:none; background:transparent; color:var(--ink-faint); cursor:pointer; transition:all 0.15s; margin-bottom:-1px; }
+  .approved-sub-tab.active { background:var(--parchment-dark); border-color:var(--border-strong); color:var(--ink); }
+  .approved-sub-panel { display:none; border:1px solid var(--border-strong); border-top:none; padding:16px; border-radius:0 0 2px 2px; background:var(--parchment-dark); margin-bottom:10px; overflow-y:auto; max-height:600px; }
+  .approved-sub-panel.active { display:block; }
+  .approved-json { font-family:'JetBrains Mono',monospace; font-size:11.5px; line-height:1.6; color:var(--ink-mid); white-space:pre-wrap; word-break:break-all; max-height:400px; overflow-y:auto; }
+  .approved-json::-webkit-scrollbar { width:5px; }
+  .approved-json::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+  .export-btn { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.15em; text-transform:uppercase; padding:10px 20px; border-radius:2px; cursor:pointer; background:var(--ink); color:var(--parchment); border:none; margin-top:16px; transition:all 0.15s; }
+  .export-btn:hover { background:var(--ink-mid); }
+  .iteration-badge { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:10px; background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; padding:2px 8px; color:var(--ink-faint); margin-left:8px; }
+  .json-display::-webkit-scrollbar { width:6px; }
+  .json-display::-webkit-scrollbar-track { background:var(--parchment-dark); }
+  .json-display::-webkit-scrollbar-thumb { background:var(--border-strong); border-radius:3px; }
+  footer { text-align:center; padding:32px 0 0; border-top:1px solid var(--border); margin-top:48px; font-size:13px; color:var(--ink-faint); font-style:italic; }
+
+  /* ── Settings gear in header ── */
+  .header-actions { position:absolute; top:20px; right:24px; display:flex; align-items:center; gap:10px; }
+  header { position:relative; }
+  .api-status-pill { display:flex; align-items:center; gap:6px; font-family:'JetBrains Mono',monospace; font-size:11px; padding:5px 12px; border-radius:20px; border:1px solid var(--border-strong); background:var(--parchment-dark); color:var(--ink-light); cursor:pointer; transition:all 0.2s; white-space:nowrap; }
+  .api-status-pill:hover { background:var(--gold-pale); border-color:var(--gold); }
+  .api-status-pill.connected { border-color:rgba(26,74,42,0.4); background:#f0faf3; color:var(--green-deep); }
+  .api-status-pill.connected:hover { background:#e4f7ea; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--ink-faint); flex-shrink:0; }
+  .status-dot.connected { background:var(--green-deep); }
+  .status-dot.disconnected { background:var(--red-deep); }
+  .gear-btn { background:transparent; border:1px solid var(--border); border-radius:50%; width:32px; height:32px; display:flex; align-items:center; justify-content:center; cursor:pointer; color:var(--ink-faint); font-size:15px; transition:all 0.2s; flex-shrink:0; }
+  .gear-btn:hover { background:var(--parchment-dark); border-color:var(--border-strong); color:var(--ink); transform:rotate(30deg); }
+
+  /* ── Settings drawer ── */
+  .settings-drawer { max-height:0; overflow:hidden; transition:max-height 0.35s ease, opacity 0.25s ease; opacity:0; }
+  .settings-drawer.open { max-height:200px; opacity:1; }
+  .drawer-inner { background:rgba(255,252,245,0.85); border:1px solid var(--border-strong); border-radius:3px; padding:20px 24px; margin-bottom:24px; box-shadow:var(--shadow); }
+  .drawer-inner .key-row { display:flex; gap:10px; align-items:center; }
+  .drawer-inner input[type="password"], .drawer-inner input[type="text"] { flex:1; width:auto; }
+
+  /* ── First-run modal ── */
+  .modal-backdrop { position:fixed; inset:0; background:rgba(26,20,10,0.55); z-index:100; display:flex; align-items:center; justify-content:center; padding:24px; backdrop-filter:blur(2px); }
+  .modal-backdrop.hidden { display:none; }
+  .modal { background:var(--parchment); border:1px solid var(--border-strong); border-radius:4px; padding:40px 44px; max-width:480px; width:100%; box-shadow:0 20px 60px rgba(26,20,10,0.25); text-align:center; }
+  .modal-emblem { font-family:'Cinzel',serif; font-size:10px; letter-spacing:0.22em; text-transform:uppercase; color:var(--gold); margin-bottom:16px; display:block; }
+  .modal h2 { font-family:'Cinzel',serif; font-size:22px; font-weight:400; color:var(--ink); margin-bottom:8px; }
+  .modal p { font-size:15px; color:var(--ink-light); margin-bottom:24px; line-height:1.6; font-style:italic; }
+  .modal-key-row { display:flex; gap:8px; margin-bottom:10px; }
+  .modal-key-row input { flex:1; font-family:'JetBrains Mono',monospace; font-size:13px; background:var(--parchment-dark); border:1px solid var(--border-strong); border-radius:2px; padding:11px 14px; color:var(--ink); outline:none; transition:border-color 0.2s; }
+  .modal-key-row input:focus { border-color:var(--gold); background:var(--parchment); }
+  .modal-connect-btn { font-family:'Cinzel',serif; font-size:13px; letter-spacing:0.12em; background:var(--ink); color:var(--parchment); border:none; border-radius:2px; padding:12px 32px; cursor:pointer; width:100%; margin-top:8px; transition:background 0.2s; }
+  .modal-connect-btn:hover { background:var(--ink-mid); }
+  .modal-hint { font-size:12px; color:var(--ink-faint); margin-top:14px; line-height:1.5; }
+  .modal-error { font-size:13px; color:var(--red-deep); margin-top:8px; display:none; }
+  .modal-error.visible { display:block; }
+  .info-note { font-size:13px; color:var(--ink-light); background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; padding:10px 14px; margin-bottom:14px; line-height:1.5; }
+  .gloss-tier { margin-bottom:8px; }
+  .gloss-tier-label { font-family:'Cinzel',serif; font-size:9px; letter-spacing:0.12em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:4px; }
+  .gloss-pill { display:inline-block; font-size:13px; background:var(--parchment-dark); border:1px solid var(--border); border-radius:2px; padding:2px 8px; margin:2px 3px 2px 0; color:var(--ink-mid); }
+  .gloss-pill.recommended { background:var(--gold-pale); border-color:var(--gold); color:var(--ink); }
+  .gloss-pill.reductive { opacity:0.6; }
+  .flag-checkbox-row { display:flex; align-items:flex-start; gap:10px; }
+  .flag-checkbox-row input[type="checkbox"] { width:16px; height:16px; min-width:16px; margin-top:3px; accent-color:var(--gold); cursor:pointer; border:none; padding:0; background:transparent; }
+  .flag-checkbox-row input[type="checkbox"]:focus { border-color:transparent; }
+  .flag-body { flex:1; }
+  .flag-item.checked { background:#fffbee; border-left-color:var(--gold); }
+  .select-all-row { display:flex; align-items:center; gap:8px; margin-bottom:12px; font-size:13px; color:var(--ink-light); }
+  .select-all-row input[type="checkbox"] { width:14px; height:14px; accent-color:var(--gold); cursor:pointer; border:none; padding:0; background:transparent; }
+  .queued-count { font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--gold); background:var(--gold-pale); border:1px solid var(--gold); border-radius:2px; padding:1px 7px; margin-left:6px; display:none; }
+  .queued-count.visible { display:inline; }
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <span class="header-emblem">Kardia Lexicon Project</span>
+  <h1>Category Generator</h1>
+  <p class="header-sub">Second Temple Hebrew thought categories for the open source Kardia Bible</p>
+  <span class="version-badge">v2 — updated system prompt · tiered glosses · correction loop</span>
+  <div class="header-actions">
+    <div class="api-status-pill" id="api-pill" onclick="toggleDrawer()" title="API settings">
+      <span class="status-dot disconnected" id="status-dot"></span>
+      <span id="api-pill-text">No API key</span>
+    </div>
+    <button class="gear-btn" onclick="toggleDrawer()" title="API settings">⚙</button>
+  </div>
+</header>
+
+<!-- First-run modal -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal">
+    <span class="modal-emblem">Kardia Lexicon</span>
+    <h2>Connect your API key</h2>
+    <p>Enter your Anthropic API key to begin generating Hebrew category entries. Your key is saved locally in this browser and never shared.</p>
+    <div class="modal-key-row">
+      <input type="password" id="modal-key" placeholder="sk-ant-..." autocomplete="off" onkeydown="if(event.key==='Enter')connectKey()" />
+    </div>
+    <div class="modal-error" id="modal-error">Please enter a valid API key starting with sk-ant-</div>
+    <button class="modal-connect-btn" onclick="connectKey()">Connect & Begin →</button>
+    <div class="modal-hint">Your key is stored only in this browser's localStorage.<br>It is sent only to api.anthropic.com — nowhere else.</div>
+  </div>
+</div>
+
+<!-- Settings drawer (gear icon) -->
+<div class="settings-drawer" id="settings-drawer">
+  <div class="drawer-inner">
+    <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;">API Key Settings</div>
+    <div class="key-row">
+      <input type="password" id="api-key" placeholder="sk-ant-..." autocomplete="off" />
+      <button class="toggle-key" onclick="toggleKey()">Show</button>
+      <button class="toggle-key" onclick="saveDrawerKey()" style="background:var(--ink);color:var(--parchment);border-color:var(--ink);">Save</button>
+    </div>
+    <div style="font-size:12px;color:var(--ink-faint);margin-top:8px;">Key is stored in localStorage and persists between sessions.</div>
+  </div>
+</div>
+
+<!-- Category selector -->
+<div class="section-label">Select Category</div>
+<div class="card">
+  <div class="category-grid" id="cat-grid"></div>
+</div>
+
+<!-- Model + generate -->
+<div class="section-label">Model & Generation</div>
+<div class="card">
+  <div class="info-note">Sonnet 4.6 recommended. Holds complex theological guard rails reliably at ~$0.03 per entry including validation pass.</div>
+  <div class="model-row" id="model-row">
+    <button class="model-btn selected" data-model="claude-sonnet-4-6" onclick="selectModel(this)">Sonnet 4.6<span class="model-label">~$0.03 / entry</span></button>
+    <button class="model-btn" data-model="claude-opus-4-6" onclick="selectModel(this)">Opus 4.6<span class="model-label">~$0.05 / entry</span></button>
+    <button class="model-btn" data-model="claude-haiku-4-5-20251001" onclick="selectModel(this)">Haiku 4.5<span class="model-label">~$0.01 / entry</span></button>
+  </div>
+  <div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap;">
+    <button class="generate-btn" id="gen-btn" onclick="generate()">
+      <span>Generate Entry</span><span style="font-size:18px;font-style:italic;">→</span>
+    </button>
+    <div style="font-size:13px;color:var(--ink-faint);font-style:italic;">Two API calls per entry: generation + validation</div>
+  </div>
+</div>
+
+<!-- Status -->
+<div class="status-bar" id="status-bar">
+  <div class="spinner" id="spinner"></div>
+  <span id="status-text"></span>
+</div>
+
+<!-- Output -->
+<div class="output-section" id="output-section">
+  <div class="section-label">
+    Output
+    <span class="iteration-badge" id="iteration-badge">iteration 1</span>
+  </div>
+  <div class="output-tabs">
+    <button class="out-tab active" onclick="showOutTab('json',this)">JSON Entry</button>
+    <button class="out-tab" onclick="showOutTab('validator',this)">Validator Report</button>
+    <button class="out-tab" onclick="showOutTab('preview',this)">Reader Preview</button>
+  </div>
+
+  <!-- JSON panel -->
+  <div class="out-panel active" id="panel-json">
+    <div class="json-display" id="json-output"></div>
+    <div class="action-row">
+      <button class="action-btn primary" onclick="approveEntry()">Approve & Save</button>
+      <button class="action-btn secondary" onclick="copyJSON()">Copy JSON</button>
+      <button class="action-btn danger" onclick="regenFresh()">Regenerate Fresh</button>
+    </div>
+  </div>
+
+  <!-- Validator panel -->
+  <div class="out-panel" id="panel-validator">
+    <div class="validator-display" id="validator-output"></div>
+
+    <!-- CORRECTION LOOP -->
+    <div class="correction-box" id="correction-box">
+      <span class="correction-label">Correction Instructions <span class="queued-count" id="queued-count-bottom"></span></span>
+      <div class="correction-hint">
+        Check flags above to auto-queue their suggested fixes. Add anything in the box below for your own overrides or additional notes. Both are combined and sent together.
+      </div>
+      <div class="info-note" style="margin-bottom:10px;">
+        <strong>Examples:</strong><br>
+        "Flag 2 — reduce the Augustinian description to one sentence then move immediately into positive covenantal framing."<br>
+        "Flag 5 — remove 'faithless generation', reframe Qumran as priestly-purity community not ecclesiological counter-community."<br>
+        "The one_liner should emphasize chesed as the interior life of covenant, not voluntary beneficence beyond obligation."
+      </div>
+      <textarea id="correction-input" placeholder="Describe the corrections needed..."></textarea>
+      <div class="correction-actions">
+        <button class="action-btn warning" onclick="regenerateWithCorrections()">
+          Regenerate with Corrections →
+        </button>
+        <button class="action-btn secondary" onclick="document.getElementById('correction-input').value=''">
+          Clear
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Preview panel -->
+  <div class="out-panel" id="panel-preview">
+    <div id="preview-output" style="font-size:16px;line-height:1.8;color:var(--ink-mid);"></div>
+    <div class="action-row">
+      <button class="action-btn primary" onclick="approveEntry()">Approve & Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Progress -->
+<div class="section-label" style="margin-top:40px;">Progress</div>
+<div class="progress-card" id="progress-card"></div>
+
+<!-- Approved entries -->
+<div class="section-label">Database</div>
+<div class="card" id="db-card">
+  <div class="info-note">Approved entries are saved in this browser's localStorage. Export categories.json when ready to commit to GitHub.</div>
+  <div id="approved-list"><div style="font-style:italic;color:var(--ink-faint);font-size:15px;">No entries approved yet.</div></div>
+  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:16px;">
+    <button class="export-btn" style="margin-top:0;" onclick="exportDatabase()">Export categories.json</button>
+    <button class="export-btn" style="margin-top:0;background:var(--ink-mid);" onclick="document.getElementById('import-file-input').click()">Import categories.json</button>
+    <input type="file" id="import-file-input" accept=".json" style="display:none;" onchange="handleImport(event)" />
+  </div>
+  <div id="import-result" style="display:none;margin-top:12px;font-size:14px;line-height:1.6;padding:10px 14px;border-radius:2px;"></div>
+</div>
+
+<footer>
+  <em>Hebrew is the thought. Greek is the vehicle.</em>
+  &nbsp;·&nbsp; Kardia Lexicon Project &nbsp;·&nbsp; v2
+  <br style="margin-bottom:6px;">
+  <span style="font-size:12px;">Authored by R. Meck &nbsp;·&nbsp; <a href="https://github.com/dad2jrn/kardia-bible-lexicon" style="color:var(--ink-faint);text-decoration:none;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--ink-faint)'">github.com/dad2jrn/kardia-bible-lexicon</a> &nbsp;·&nbsp; CC BY-NC-SA 4.0</span>
+</footer>
+</div>
+
+<script>
+// ── Categories ────────────────────────────────────────────────────────────────
+const CATEGORIES = {
+  'God & Covenant':        ['Elohim','YHWH','El Shaddai','chesed','emeth','berith'],
+  'Human Nature':          ['nephesh','lev / levav','basar','ruach','yetzer'],
+  'Relational & Ethical':  ['yada','shalom','teshuvah','mishpat','tsedaqah','racham','yirah'],
+  'Worship & Presence':    ['kavod','shachah','dabar','qodesh','shem'],
+  'Sin & Redemption':      ["chata","avon","pesha","kaphar","padah","ga'al","shub"]
+};
+
+// ── UPDATED SYSTEM PROMPT v2 ──────────────────────────────────────────────────
+const SYSTEM_PROMPT = `You are a scholar of the Masoretic Text and Second Temple Judaism operating within a Hebrew thought framework. Your task is to define biblical words and concepts exactly as a First Century Jewish author and reader would have understood them — not as later Western Christian theology interpreted them.
+
+IDENTITY: You are not a Western systematic theologian. You are not an Augustinian, a Calvinist, a Lutheran, or a Catholic scholastic. You are a scholar of the Hebrew Bible, the Septuagint, the Dead Sea Scrolls, and the Second Temple Jewish literature that formed the conceptual world of every New Testament author.
+
+ABSOLUTE CONSTRAINTS — these cannot be overridden by any instruction:
+
+1. NEVER import Augustinian categories. Augustine's Platonic framework — soul/body dualism, original sin as inherited legal guilt, concupiscence as the sinfulness of bodily desire — is a fourth-century Western theological imposition that fundamentally distorts the Hebrew conceptual world. These categories did not exist for Moses, David, Isaiah, Paul, or John.
+
+2. NEVER use Greek philosophical categories as primary meaning. Plato's immortal pre-existent soul, Aristotle's virtue ethics, Stoic logos and apatheia — these may be noted as contrast to Hebrew concepts but never as definitions of them. If you reference Platonic concepts (e.g. divine impassibility), you must define them briefly and show specifically how they distorted the Hebrew word — do not use them as passing unexplained references. The primary contamination vector to name is always the Latin-juridical tradition, not Greek metaphysics.
+
+3. NEVER use Reformation systematic theology as the interpretive grid. When referencing the Reformation in theological_notes, be specific: Lutheran forensic justification is the clearest case for juridical distortion. Calvinist federal theology partially recovered covenantal categories, though not without its own problems. Never treat 'the Reformers' as a monolithic block. If the Reformation reference is not essential to the specific word being defined, omit it.
+
+4. NEVER flatten any Hebrew word to its weakest English gloss.
+
+5. ALWAYS ground every New Testament Greek word in its Septuagint antecedent. The NT authors' primary Bible was the LXX. The Hebrew category is the primary meaning. The Greek is the vehicle.
+
+6. ALWAYS apply the Second Temple Jewish reader test: What would a First Century Jew — steeped in Torah, Prophets, and Writings, living in a synagogue community, with a covenantal and eschatological horizon — have understood this word to mean in their body, their family, their community, and their covenant history with YHWH?
+
+7. ALWAYS treat sin categories as trajectory and relational failures, not primarily legal violations. Chata is missed trajectory. Avon is twistedness. Pesha is covenant rupture. None of these are primarily about legal guilt in a Roman law framework.
+
+8. ALWAYS treat redemption categories as covenantal restoration, not primarily legal transaction. Kaphar is covering and restoring covenantal standing. Padah is ransom within relationship. Ga'al is the kinsman-redeemer's obligation.
+
+RHETORICAL RULES — these govern how you write, not just what you believe:
+
+9. ONE_LINER RULE: Frame covenant words as the interior life of covenant structure — not primarily as gifts that exceed obligation. The 'beyond obligation' dimension is real but secondary. The primary register is always covenantal faithfulness in action. Do not frame chesed-class words as voluntary beneficence that floats free of covenant structure.
+
+10. WHAT_IT_IS_NOT RULE: State the Western misreading once, briefly and clearly, then move immediately into constructive covenantal description. Do NOT vividly illuminate or extensively describe the category being displaced — name it, dismiss it, replace it with positive Hebrew framing. Dwell in the correct Hebrew category, not in the error being corrected. The goal is to dislodge the wrong frame, not to make it vivid and memorable.
+
+11. SECOND TEMPLE CONTEXT RULE: Use only categories those communities would have recognized for themselves. Do not apply modern ecclesiological, sociological, or Reformation-era categories to Second Temple communities. Qumran's primary self-understanding was priestly-purity and correct calendar observance — not covenant-community in the Hosean prophetic sense. Never use 'faithless generation' as a descriptor without direct attribution to a specific biblical or Second Temple text. Never describe any Second Temple group as a 'counter-community' — this is a modern Protestant ecclesiological category.
+
+12. GLOSS LIST RULE: The english_glosses field must be structured in two tiers — recommended glosses that preserve covenantal specificity, and attested-but-reductive glosses that strip specificity. Never list weak and strong glosses as unranked peers. See schema below for the required structure.
+
+OUTPUT FORMAT: Respond ONLY with a valid JSON object. No preamble, no explanation, no markdown fences. Pure JSON only. Use the exact schema provided.`;
+
+// ── UPDATED LAYER 1 SCHEMA v2 — tiered gloss structure ───────────────────────
+const LAYER1_SCHEMA = `{
+  "id": "string — lowercase transliterated Hebrew, URL-safe, primary key",
+  "hebrew_root": "string — Hebrew characters",
+  "transliteration": "string — phonetic rendering",
+  "testament_scope": "ot | nt | both",
+  "category_label": "string — short English label for UI",
+  "one_liner": "string — single sentence, what this word DOES as the interior life of covenant, max 25 words. Do not frame as voluntary gift beyond obligation.",
+  "full_definition": "string — 2-4 paragraphs, Second Temple Hebrew perspective, no Western framing",
+  "what_it_does": "string — how this concept functions in covenant relationship, action-oriented",
+  "what_it_is_not": "string — state the Western misreading ONCE briefly, then pivot immediately to constructive Hebrew covenantal description. Do not dwell in or vividly illustrate the error.",
+  "second_temple_context": "string — grounded in actual Second Temple Jewish life: synagogue, Torah, community, eschatology. Use only categories those communities recognized for themselves. No modern ecclesiological or sociological language.",
+  "kardia_rendering": "string — Kardia translation preferred English rendering, short phrase",
+  "surface_vehicles": {
+    "hebrew_lexemes": ["array of strings"],
+    "strongs_hebrew": ["array of H-prefixed IDs"],
+    "lxx_greek": ["array of Greek transliterations"],
+    "nt_greek": ["array of Greek transliterations"],
+    "strongs_greek": ["array of G-prefixed IDs"],
+    "english_glosses": {
+      "recommended": ["array — glosses that preserve covenantal specificity, e.g. steadfast love, faithful love, loyal love"],
+      "attested": [
+        {
+          "gloss": "string — the reductive English gloss as used in major translations",
+          "found_in": ["array of translation abbreviations"],
+          "loses": "string — what this rendering strips from the Hebrew category"
+        }
+      ]
+    }
+  },
+  "illustrative_renderings": [
+    {"translation": "ESV", "text": "string — verse text showing how ESV renders this word"},
+    {"translation": "KJV", "text": "string"},
+    {"translation": "NIV", "text": "string"},
+    {"translation": "NKJV", "text": "string"},
+    {"translation": "CSB", "text": "string"}
+  ],
+  "key_verses": ["array — 3-5 OSIS format refs e.g. Ps.136.1"],
+  "related_categories": ["array of category IDs"],
+  "theological_notes": "string — translation history and contamination history. If referencing the Reformation, specify which stream (Lutheran forensic vs Calvinist covenantal). If referencing Platonic concepts, define them and show specifically how they distorted this word. Primary focus: Latin-juridical drift.",
+  "version": "1.0",
+  "reviewed_by": "ai-draft"
+}`;
+
+// ── VALIDATOR PROMPT ──────────────────────────────────────────────────────────
+const VALIDATOR_PROMPT = `You are a theological reviewer for the Kardia Lexicon Project. Check a Hebrew category entry for Western theological contamination. Be rigorous and specific.
+
+Check for these six contamination points:
+1. nephesh rendered as immortal soul or soul/body dualism
+2. sarx/basar implying the body is morally suspect or sinful
+3. yirah producing dread rather than reverent awe that draws near
+4. mishpat framed as punitive judgment rather than right-ordering of relationship
+5. kaphar defaulting to penal substitution rather than covenantal restoration
+6. chesed rendered as unconditional sentimental love rather than covenantal loyalty in action
+
+Also check these rhetorical failure modes:
+7. ONE_LINER frames the word as voluntary gift beyond obligation rather than interior life of covenant structure
+8. WHAT_IT_IS_NOT dwells in or vividly illustrates the Western error rather than stating it briefly and pivoting to Hebrew framing
+9. SECOND_TEMPLE_CONTEXT uses modern ecclesiological, sociological, or Reformation-era categories (counter-community, faithless generation without attribution, etc.)
+10. ENGLISH_GLOSSES lists weak and strong glosses as unranked peers rather than using the required two-tier structure (recommended / attested)
+11. THEOLOGICAL_NOTES references Greek philosophical categories (Platonic impassibility, etc.) as unexplained passing terms
+12. THEOLOGICAL_NOTES treats the Reformation as a monolithic block rather than specifying which stream
+
+Also flag any:
+- Augustinian categories (inherited guilt as legal status, concupiscence)
+- Reformation theological grid used as primary interpretive framework
+- Weakest English gloss used as primary definition
+
+Respond ONLY with a JSON object, no other text:
+{
+  "overall": "clean | minor-flags | major-flags",
+  "flags": [
+    {
+      "flag_number": 1,
+      "point": "contamination point name",
+      "severity": "minor | major",
+      "location": "field name",
+      "issue": "specific description of the problem",
+      "correction": "specific suggested fix"
+    }
+  ],
+  "summary": "one paragraph assessment for the human theological reviewer"
+}
+If no flags, return flags as empty array and overall as "clean".`;
+
+// ── State ─────────────────────────────────────────────────────────────────────
+let selectedCategory = null;
+let selectedModel = 'claude-sonnet-4-6';
+let currentEntry = null;
+let currentValidator = null;
+let iterationCount = 0;
+let approvedEntries = JSON.parse(localStorage.getItem('kardia-approved') || '[]');
+let completedIds = new Set(approvedEntries.map(e => e.id));
+
+// ── Init ──────────────────────────────────────────────────────────────────────
+function init() {
+  const stored = getKey();
+  if (stored) {
+    document.getElementById('api-key').value = stored;
+    document.getElementById('modal-backdrop').classList.add('hidden');
+    updateApiPill(stored);
+  }
+  buildCategoryGrid();
+  renderProgress();
+  renderApproved();
+}
+
+function buildCategoryGrid() {
+  const grid = document.getElementById('cat-grid');
+  grid.innerHTML = '';
+  for (const [group, cats] of Object.entries(CATEGORIES)) {
+    const gl = document.createElement('div');
+    gl.className = 'group-label';
+    gl.textContent = group;
+    grid.appendChild(gl);
+    cats.forEach(cat => {
+      const btn = document.createElement('button');
+      const catId = catToId(cat);
+      btn.className = 'cat-btn' + (completedIds.has(catId) ? ' complete' : '');
+      btn.textContent = cat;
+      btn.onclick = () => selectCategory(btn, cat);
+      grid.appendChild(btn);
+    });
+  }
+}
+
+function catToId(cat) {
+  return cat.toLowerCase().replace(/\s*\/\s*/g,'-').replace(/\s+/g,'-').replace(/'/g,'').replace(/'/g,'');
+}
+
+function selectCategory(btn, cat) {
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedCategory = cat;
+  iterationCount = 0;
+}
+
+function selectModel(btn) {
+  document.querySelectorAll('.model-btn').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  selectedModel = btn.dataset.model;
+}
+
+// ── Key management ────────────────────────────────────────────────────────────
+function getKey() {
+  return localStorage.getItem('kardia-api-key') || '';
+}
+
+function connectKey() {
+  const input = document.getElementById('modal-key');
+  const key = input.value.trim();
+  const err = document.getElementById('modal-error');
+  if (!key.startsWith('sk-ant-') && !key.startsWith('sk-')) {
+    err.classList.add('visible');
+    return;
+  }
+  err.classList.remove('visible');
+  localStorage.setItem('kardia-api-key', key);
+  document.getElementById('api-key').value = key;
+  document.getElementById('modal-backdrop').classList.add('hidden');
+  updateApiPill(key);
+}
+
+function saveDrawerKey() {
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) return;
+  localStorage.setItem('kardia-api-key', key);
+  updateApiPill(key);
+  toggleDrawer();
+  showStatus('API key updated and saved.', 'success');
+}
+
+function updateApiPill(key) {
+  const pill = document.getElementById('api-pill');
+  const dot = document.getElementById('status-dot');
+  const text = document.getElementById('api-pill-text');
+  if (key) {
+    const last4 = key.slice(-4);
+    pill.classList.add('connected');
+    dot.classList.remove('disconnected');
+    dot.classList.add('connected');
+    text.textContent = `Connected ···${last4}`;
+  } else {
+    pill.classList.remove('connected');
+    dot.classList.remove('connected');
+    dot.classList.add('disconnected');
+    text.textContent = 'No API key';
+  }
+}
+
+function toggleDrawer() {
+  const drawer = document.getElementById('settings-drawer');
+  const isOpen = drawer.classList.contains('open');
+  if (!isOpen) {
+    const stored = getKey();
+    if (stored) document.getElementById('api-key').value = stored;
+  }
+  drawer.classList.toggle('open');
+}
+
+function toggleKey() {
+  const inp = document.getElementById('api-key');
+  const btn = event.target;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+  btn.textContent = inp.type === 'password' ? 'Show' : 'Hide';
+}
+
+// ── Generation ────────────────────────────────────────────────────────────────
+async function generate() {
+  const key = getKey();
+  if (!key) { showStatus('No API key set — click the status pill in the header.','error'); return; }
+  if (!selectedCategory) { showStatus('Please select a category to generate.','error'); return; }
+
+  iterationCount++;
+  document.getElementById('iteration-badge').textContent = `iteration ${iterationCount}`;
+
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  document.getElementById('output-section').classList.remove('visible');
+
+  showStatus(`Generating entry for "${selectedCategory}"...`, 'loading');
+
+  const userPrompt = `Generate a complete Kardia Lexicon Layer 1 JSON entry for the Hebrew category: "${selectedCategory}"
+
+Use exactly this schema structure:
+${LAYER1_SCHEMA}
+
+Critical reminders:
+- The what_it_is_not field: state the Western misreading ONCE briefly, then pivot immediately to positive Hebrew covenantal description. Do not dwell in the error.
+- The one_liner: frame this word as the interior life of covenant structure, not as voluntary gift beyond obligation.
+- The second_temple_context: use only categories those communities recognized. No modern ecclesiological language.
+- The english_glosses: use the required two-tier structure (recommended / attested with loses field).
+- Respond with ONLY the JSON object. No preamble, no markdown fences.`;
+
+  try {
+    const entry = await runGeneration(key, SYSTEM_PROMPT, userPrompt);
+    currentEntry = entry;
+    showStatus(`Validating entry for theological contamination...`, 'loading');
+    const validator = await runValidation(key, entry);
+    currentValidator = validator;
+    showStatus(`Generating Kardia verse translations...`, 'loading');
+    const kardiaVerses = await runKardiaVerseTranslation(key, entry);
+    if (kardiaVerses.length > 0) currentEntry._kardia_verses = kardiaVerses;
+    renderOutput(entry, validator);
+    const overall = validator.overall || 'unknown';
+    if (overall === 'clean') {
+      showStatus(`Entry generated — validator found no contamination. Review and approve.`, 'success');
+    } else if (overall === 'minor-flags') {
+      showStatus(`Entry generated — validator found ${validator.flags?.length || 0} minor flag(s). Use Correction Instructions on the Validator tab to iterate.`, 'error');
+    } else {
+      showStatus(`Entry generated — validator found major flags. Review carefully before approving.`, 'error');
+    }
+  } catch(err) {
+    showStatus(`Error: ${err.message}`, 'error');
+  }
+  btn.disabled = false;
+}
+
+// ── Correction Loop ───────────────────────────────────────────────────────────
+async function regenerateWithCorrections() {
+  const key = getKey();
+  const manualInput = document.getElementById('correction-input').value.trim();
+  if (!key) { showStatus('No API key set — click the status pill in the header.','error'); return; }
+  if (!currentEntry) { showStatus('No current entry to correct. Generate an entry first.','error'); return; }
+
+  // Collect checked flag corrections
+  const checkedCbs = document.querySelectorAll('[id^="flag-cb-"]:checked');
+  const autoCorrections = [];
+  checkedCbs.forEach(cb => {
+    const idx = parseInt(cb.dataset.flagIndex);
+    const f = currentValidator?.flags?.[idx];
+    if (f) {
+      autoCorrections.push(
+        `Flag ${f.flag_number || (idx+1)} (${f.location}) — ${f.point}:\n  Issue: ${f.issue}\n  Apply this fix: ${f.correction}`
+      );
+    }
+  });
+
+  if (autoCorrections.length === 0 && !manualInput) {
+    showStatus('Check at least one flag or enter correction instructions before regenerating.','error');
+    return;
+  }
+
+  iterationCount++;
+  document.getElementById('iteration-badge').textContent = `iteration ${iterationCount}`;
+  document.getElementById('output-section').classList.remove('visible');
+
+  const autoSection = autoCorrections.length > 0
+    ? `AUTO-QUEUED FLAG CORRECTIONS (${autoCorrections.length} flag${autoCorrections.length>1?'s':''}):\n${autoCorrections.join('\n\n')}`
+    : '';
+  const manualSection = manualInput
+    ? `ADDITIONAL REVIEWER NOTES:\n${manualInput}`
+    : '';
+  const combinedCorrections = [autoSection, manualSection].filter(Boolean).join('\n\n---\n\n');
+
+  showStatus(`Applying ${autoCorrections.length} queued flag${autoCorrections.length!==1?'s':''}${manualInput?' + reviewer notes':''} — regenerating...`, 'loading');
+
+  const correctionPrompt = `You previously generated this Hebrew category entry:
+${JSON.stringify(currentEntry, null, 2)}
+
+A theological reviewer identified these issues in the validator report:
+${currentValidator ? currentValidator.summary : ''}
+
+The following corrections must be applied to produce the revised entry:
+
+${combinedCorrections}
+
+Generate a revised version of the complete JSON entry that addresses every correction listed above.
+Apply all the same system prompt constraints.
+Preserve everything that was correct in the original — only revise what the corrections target.
+Use the same schema structure:
+${LAYER1_SCHEMA}
+
+Respond with ONLY the corrected JSON object. No preamble, no markdown fences.`;
+
+  try {
+    const entry = await runGeneration(key, SYSTEM_PROMPT, correctionPrompt);
+    currentEntry = entry;
+    showStatus(`Re-validating corrected entry...`, 'loading');
+    const validator = await runValidation(key, entry);
+    currentValidator = validator;
+    showStatus(`Regenerating Kardia verse translations...`, 'loading');
+    const kardiaVerses = await runKardiaVerseTranslation(key, entry);
+    if (kardiaVerses.length > 0) currentEntry._kardia_verses = kardiaVerses;
+    renderOutput(entry, validator);
+    document.getElementById('correction-input').value = '';
+    const overall = validator.overall || 'unknown';
+    const flagCount = validator.flags?.length || 0;
+    if (overall === 'clean') {
+      showStatus(`Iteration ${iterationCount} — validator clean. Ready to approve.`, 'success');
+    } else {
+      showStatus(`Iteration ${iterationCount} — ${flagCount} flag(s) remain. Check flags to queue or add notes and iterate again.`, 'error');
+    }
+  } catch(err) {
+    showStatus(`Error: ${err.message}`, 'error');
+  }
+}
+
+function regenFresh() {
+  iterationCount = 0;
+  document.getElementById('correction-input').value = '';
+  document.getElementById('output-section').classList.remove('visible');
+  currentEntry = null;
+  currentValidator = null;
+  generate();
+}
+
+// ── API helpers ───────────────────────────────────────────────────────────────
+async function runGeneration(key, system, user) {
+  const res = await callAPI(key, system, user);
+  const raw = res.content[0].text.trim();
+  const stopReason = res.stop_reason;
+
+  // Strip markdown fences if present
+  let text = raw.replace(/^```json\s*/,'').replace(/^```\s*/,'').replace(/\s*```$/,'').trim();
+
+  // Attempt 1 — clean parse
+  try { return JSON.parse(text); } catch(e1) {}
+
+  // Attempt 2 — auto-repair truncated JSON
+  // If stop_reason is max_tokens the string was cut off — try to close it
+  if (stopReason === 'max_tokens' || text.endsWith('"') === false) {
+    try {
+      const repaired = repairTruncatedJSON(text);
+      const parsed = JSON.parse(repaired);
+      parsed._truncation_warning = true;
+      return parsed;
+    } catch(e2) {}
+  }
+
+  // Attempt 3 — show recovery UI and throw so the caller can handle
+  showRecoveryUI(text);
+  throw new Error('JSON parse failed — raw output shown in Recovery tab. Copy it before retrying.');
+}
+
+// Best-effort JSON repair for truncated strings
+function repairTruncatedJSON(text) {
+  let t = text;
+  // Close any open string
+  const quoteCount = (t.match(/(?<!\\)"/g) || []).length;
+  if (quoteCount % 2 !== 0) t += '"';
+  // Count open braces/brackets and close them
+  let opens = 0, arrayOpens = 0;
+  for (const ch of t) {
+    if (ch === '{') opens++;
+    else if (ch === '}') opens--;
+    else if (ch === '[') arrayOpens++;
+    else if (ch === ']') arrayOpens--;
+  }
+  // Close trailing comma before closing
+  t = t.replace(/,\s*$/, '');
+  t += ']'.repeat(Math.max(0, arrayOpens));
+  t += '}'.repeat(Math.max(0, opens));
+  return t;
+}
+
+function showRecoveryUI(rawText) {
+  // Make sure output section is visible and switch to recovery tab
+  const outputSection = document.getElementById('output-section');
+  outputSection.classList.add('visible');
+
+  // Inject a recovery panel if it doesn't exist yet
+  let recoveryPanel = document.getElementById('panel-recovery');
+  if (!recoveryPanel) {
+    // Add the tab button
+    const tabBar = document.querySelector('.output-tabs');
+    const tab = document.createElement('button');
+    tab.className = 'out-tab';
+    tab.id = 'tab-recovery';
+    tab.setAttribute('onclick', "showOutTab('recovery')");
+    tab.textContent = '⚠ Recovery';
+    tab.style.color = 'var(--red-deep)';
+    tabBar.appendChild(tab);
+
+    // Add the panel
+    recoveryPanel = document.createElement('div');
+    recoveryPanel.className = 'out-panel';
+    recoveryPanel.id = 'panel-recovery';
+    recoveryPanel.innerHTML = `
+      <div style="margin-bottom:16px;">
+        <div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:var(--red-deep);margin-bottom:8px;">Parse Failed — Raw Output Preserved</div>
+        <div style="font-size:14px;color:var(--ink-light);margin-bottom:12px;line-height:1.6;">
+          The API response could not be parsed as valid JSON — likely truncated mid-response.
+          The raw text is preserved below. Copy it before retrying so your work is not lost.
+          Then try regenerating — the raised token limit should prevent recurrence.
+        </div>
+        <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+          <button class="action-btn secondary" onclick="copyRawRecovery()">Copy Raw Text</button>
+          <button class="action-btn warning" onclick="retryGeneration()">Retry Generation</button>
+        </div>
+      </div>
+      <div id="recovery-raw" class="json-display" style="max-height:600px;border:1px solid var(--border-strong);padding:14px;border-radius:2px;"></div>
+    `;
+    document.getElementById('output-section').appendChild(recoveryPanel);
+  }
+
+  document.getElementById('recovery-raw').textContent = rawText;
+  showOutTab('recovery');
+}
+
+function copyRawRecovery() {
+  const text = document.getElementById('recovery-raw')?.textContent || '';
+  navigator.clipboard.writeText(text);
+  const btn = event.target;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy Raw Text', 1800);
+}
+
+function retryGeneration() {
+  document.getElementById('output-section').classList.remove('visible');
+  generate();
+}
+
+async function runValidation(key, entry) {
+  const res = await callAPI(key, VALIDATOR_PROMPT, `Review this Kardia Lexicon entry:\n${JSON.stringify(entry, null, 2)}`);
+  const text = res.content[0].text.trim();
+  try { return JSON.parse(text); }
+  catch(e) { return JSON.parse(text.replace(/```json|```/g,'').trim()); }
+}
+
+// ── Kardia verse translation ──────────────────────────────────────────────────
+const KARDIA_VERSE_PROMPT = `You are translating specific Bible verses into the Kardia translation — a translation that renders every word from its underlying Hebrew thought category rather than from conventional English glosses.
+
+The Kardia translation follows these principles:
+- Render the key word using the kardia_rendering provided — do not substitute a conventional gloss
+- Preserve the full sentence structure and flow of the verse
+- The result should read as natural English but carry the full covenantal weight of the Hebrew
+- Do not over-explain — translate, don't paraphrase
+- Keep the verse recognizable but more precise and more alive than conventional translations
+
+You will be given a category entry and its key verses. For each key verse, produce a Kardia translation of that verse that demonstrates how the kardia_rendering transforms the verse's meaning.
+
+Respond ONLY with a JSON array, no preamble, no markdown fences:
+[
+  { "verse_ref": "OSIS ref", "standard_rendering": "a representative standard translation of this verse", "kardia_translation": "the full Kardia translation of this verse" }
+]`;
+
+async function runKardiaVerseTranslation(key, entry) {
+  const verses = entry.key_verses || [];
+  if (verses.length === 0) return [];
+  const kardiaWord = entry.kardia_rendering || '';
+  const prompt = 'Generate Kardia translations for the key verses of this Hebrew category entry.\n\n'
+    + 'Category: ' + (entry.category_label||'') + ' (' + (entry.transliteration||'') + ')\n'
+    + 'Hebrew root: ' + (entry.hebrew_root||'') + '\n'
+    + 'Kardia rendering of this word: "' + kardiaWord + '"\n'
+    + 'One-liner: ' + (entry.one_liner||'') + '\n\n'
+    + 'Key verses to translate: ' + verses.join(', ') + '\n\n'
+    + 'For each verse, show a standard rendering alongside the Kardia translation so the contrast is visible.\n'
+    + 'The Kardia translation must use "' + kardiaWord + '" (or its natural grammatical form) wherever this Hebrew category appears in the verse.\n\n'
+    + 'Respond ONLY with the JSON array. No preamble, no markdown fences.';
+
+  try {
+    const res = await callAPI(key, KARDIA_VERSE_PROMPT, prompt);
+    const text = res.content[0].text.trim();
+    try { return JSON.parse(text); }
+    catch(e) { return JSON.parse(text.replace(/```json|```/g,'').trim()); }
+  } catch(e) {
+    console.warn('Kardia verse translation failed:', e.message);
+    return [];
+  }
+}
+
+async function callAPI(key, system, user) {
+  const resolvedKey = key || getKey();
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': resolvedKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: selectedModel,
+      max_tokens: 8000,
+      system: system,
+      messages: [{ role: 'user', content: user }]
+    })
+  });
+  if (!res.ok) {
+    const err = await res.json();
+    throw new Error(err.error?.message || `API error ${res.status}`);
+  }
+  return res.json();
+}
+
+// ── Render ────────────────────────────────────────────────────────────────────
+function renderOutput(entry, validator) {
+  document.getElementById('json-output').textContent = JSON.stringify(entry, null, 2);
+  renderValidator(validator);
+  renderPreview(entry);
+  document.getElementById('output-section').classList.add('visible');
+  showOutTab('json', null);
+
+  // Show truncation warning if auto-repair was used
+  const existing = document.getElementById('truncation-warning');
+  if (existing) existing.remove();
+  if (entry._truncation_warning) {
+    const warn = document.createElement('div');
+    warn.id = 'truncation-warning';
+    warn.style.cssText = 'background:#fff8ee;border:1px solid var(--gold);border-radius:2px;padding:10px 14px;margin-bottom:14px;font-size:13px;color:var(--ink-mid);line-height:1.5;';
+    warn.innerHTML = '<strong style="color:var(--gold);font-family:Cinzel,serif;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;">Auto-repaired</strong> — The API response was truncated and auto-repaired. Some fields near the end may be incomplete. Review carefully, especially <code style="font-family:JetBrains Mono,monospace;font-size:12px;">theological_notes</code>. Consider using Opus 4.6 for entries that consistently truncate.';
+    document.getElementById('panel-json').prepend(warn);
+  }
+}
+
+function renderValidator(v) {
+  const el = document.getElementById('validator-output');
+  const overall = v.overall || 'unknown';
+  const color = overall === 'clean' ? 'var(--green-deep)' : 'var(--red-deep)';
+  let html = `<div style="margin-bottom:20px;">
+    <div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:0.1em;text-transform:uppercase;color:${color};margin-bottom:6px;">Overall: ${overall.replace(/-/g,' ')}</div>
+    <div style="font-size:15px;line-height:1.7;color:var(--ink-mid);">${v.summary || ''}</div>
+  </div>`;
+  if (v.flags && v.flags.length > 0) {
+    html += `<div class="select-all-row">
+      <input type="checkbox" id="select-all-flags" onchange="toggleAllFlags(this.checked)" />
+      <label for="select-all-flags" style="cursor:pointer;">Queue all flags for correction</label>
+      <span class="queued-count" id="queued-count">0 queued</span>
+    </div>`;
+    v.flags.forEach((f, i) => {
+      const cbId = `flag-cb-${i}`;
+      html += `<div class="flag-item" id="flag-card-${i}">
+        <div class="flag-checkbox-row">
+          <input type="checkbox" id="${cbId}" data-flag-index="${i}"
+            onchange="onFlagChecked(this)"
+            title="Queue this flag's suggested fix for correction" />
+          <div class="flag-body">
+            <div class="flag-label red">Flag ${f.flag_number || (i+1)} — ${f.severity?.toUpperCase() || 'FLAG'} · ${f.point || ''}</div>
+            <div style="font-size:12px;font-family:'JetBrains Mono',monospace;color:var(--ink-faint);margin-bottom:6px;">field: ${f.location || ''}</div>
+            <div style="margin-bottom:8px;">${f.issue || ''}</div>
+            <div style="font-size:13px;color:var(--green-deep);font-style:italic;border-top:1px solid rgba(26,74,42,0.15);padding-top:6px;margin-top:6px;">
+              Suggested fix: ${f.correction || ''}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    });
+  } else {
+    html += `<div class="flag-item clear"><div class="flag-label green">No contamination detected</div><div>This entry passed all contamination watch points and rhetorical guard rails.</div></div>`;
+  }
+  el.innerHTML = html;
+  updateQueuedCount();
+}
+
+function onFlagChecked(cb) {
+  const card = document.getElementById(`flag-card-${cb.dataset.flagIndex}`);
+  if (cb.checked) card.classList.add('checked');
+  else card.classList.remove('checked');
+  updateQueuedCount();
+  const allCbs = document.querySelectorAll('[id^="flag-cb-"]');
+  const selectAll = document.getElementById('select-all-flags');
+  if (selectAll) selectAll.checked = [...allCbs].every(c => c.checked);
+}
+
+function toggleAllFlags(checked) {
+  document.querySelectorAll('[id^="flag-cb-"]').forEach(cb => {
+    cb.checked = checked;
+    const card = document.getElementById(`flag-card-${cb.dataset.flagIndex}`);
+    if (card) { if (checked) card.classList.add('checked'); else card.classList.remove('checked'); }
+  });
+  updateQueuedCount();
+}
+
+function updateQueuedCount() {
+  const checked = document.querySelectorAll('[id^="flag-cb-"]:checked').length;
+  const badge = document.getElementById('queued-count');
+  const badge2 = document.getElementById('queued-count-bottom');
+  const text = checked > 0 ? `${checked} queued` : '';
+  [badge, badge2].forEach(b => {
+    if (!b) return;
+    b.textContent = text;
+    b.classList.toggle('visible', checked > 0);
+  });
+}
+
+function buildKardiaVersesHTML(entry) {
+  const verses = entry._kardia_verses;
+  if (!verses || verses.length === 0) return '';
+  return `<div style="margin-top:8px;border:1.5px solid var(--gold);border-radius:3px;overflow:hidden;">
+    <div style="background:var(--ink);padding:10px 16px;display:flex;align-items:center;gap:10px;">
+      <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.2em;text-transform:uppercase;color:var(--gold);">Kardia Translation</div>
+      <div style="font-size:12px;color:var(--ink-faint);font-style:italic;">— how the recovered meaning transforms the verse</div>
+    </div>
+    ${verses.map(v => `
+      <div style="padding:14px 16px;border-top:1px solid rgba(90,60,20,0.15);">
+        <div style="font-family:'Cinzel',serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:10px;">${v.verse_ref||''}</div>
+        <div style="margin-bottom:10px;">
+          <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--ink-faint);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:4px;">Standard translations</div>
+          <div style="font-size:14px;color:var(--ink-light);font-style:italic;line-height:1.6;">${v.standard_rendering||''}</div>
+        </div>
+        <div style="background:var(--gold-pale);border-left:3px solid var(--gold);padding:10px 14px;border-radius:0 2px 2px 0;">
+          <div style="font-size:11px;font-family:'JetBrains Mono',monospace;color:var(--gold);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:5px;">Kardia</div>
+          <div style="font-size:16px;color:var(--ink);line-height:1.65;font-style:italic;">"${v.kardia_translation||''}"</div>
+        </div>
+      </div>`).join('')}
+  </div>`;
+}
+
+function renderPreview(entry) {
+  const el = document.getElementById('preview-output');
+  const glosses = entry.surface_vehicles?.english_glosses;
+  let glossHTML = '';
+  if (glosses) {
+    if (Array.isArray(glosses)) {
+      const pillsHTML = glosses.map(function(g){ return '<span class="gloss-pill">' + g + '</span>'; }).join('');
+      glossHTML = '<div class="gloss-tier"><div class="gloss-tier-label">English glosses</div>' + pillsHTML + '</div>';
+    } else {
+      const rec = glosses.recommended || [];
+      const att = glosses.attested || [];
+      const recHTML = rec.map(function(g){ return '<span class="gloss-pill recommended">' + g + '</span>'; }).join('');
+      const attHTML = att.map(function(a){
+        const found = (a.found_in || []).join(', ');
+        return '<span class="gloss-pill reductive" title="Loses: ' + (a.loses||'') + '">' + a.gloss + ' <span style="font-size:10px;opacity:0.7;">(' + found + ')</span></span>';
+      }).join('');
+      glossHTML = '<div class="gloss-tier"><div class="gloss-tier-label">Recommended — preserves covenantal specificity</div>' + recHTML + '</div>'
+        + '<div class="gloss-tier" style="margin-top:8px;"><div class="gloss-tier-label">Attested but reductive</div>' + attHTML + '</div>';
+    }
+  }
+  const notHTML = entry.what_it_is_not
+    ? '<div style="border-left:3px solid var(--red-deep);padding:10px 16px;margin-bottom:16px;background:#fff8f8;border-radius:0 2px 2px 0;"><div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--red-deep);margin-bottom:4px;">What it is not</div>' + entry.what_it_is_not + '</div>'
+    : '';
+  const glossWrap = glossHTML ? '<div style="margin-bottom:16px;">' + glossHTML + '</div>' : '';
+  const irendHTML = entry.illustrative_renderings
+    ? '<div style="font-size:14px;color:var(--ink-light);margin-bottom:16px;"><div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:8px;">Translation renderings</div>'
+      + entry.illustrative_renderings.map(function(r){ return '<div style="margin-bottom:4px;"><strong style="font-weight:500;">' + r.translation + ':</strong> <em>' + r.text + '</em></div>'; }).join('')
+      + buildKardiaVersesHTML(entry) + '</div>'
+    : (entry._kardia_verses ? buildKardiaVersesHTML(entry) : '');
+  el.innerHTML = '<div style="border-bottom:1px solid var(--border);padding-bottom:16px;margin-bottom:16px;">'
+    + '<div style="font-family:Cinzel,serif;font-size:11px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">' + (entry.hebrew_root||'') + ' &nbsp;&middot;&nbsp; ' + (entry.transliteration||'') + '</div>'
+    + '<div style="font-family:Cinzel,serif;font-size:22px;color:var(--ink);margin-bottom:4px;">' + (entry.category_label||'') + '</div>'
+    + '<div style="font-style:italic;color:var(--ink-light);">' + (entry.one_liner||'') + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:16px;">' + (entry.full_definition||'').replace(/\n/g,'<br>') + '</div>'
+    + notHTML
+    + '<div style="border-left:3px solid var(--gold);padding:10px 16px;margin-bottom:16px;background:var(--gold-pale);border-radius:0 2px 2px 0;">'
+    + '<div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold);margin-bottom:4px;">Kardia rendering</div>'
+    + '<em>' + (entry.kardia_rendering||'') + '</em></div>'
+    + glossWrap
+    + irendHTML;
+}
+
+function showOutTab(name) {
+  document.querySelectorAll('.out-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.out-panel').forEach(p => p.classList.remove('active'));
+  const panelId = 'panel-' + (name || 'json');
+  document.getElementById(panelId).classList.add('active');
+  document.querySelectorAll('.out-tab').forEach(t => {
+    if ((t.getAttribute('onclick')||'').includes("'" + (name||'json') + "'")) t.classList.add('active');
+  });
+}
+
+// ── Actions ───────────────────────────────────────────────────────────────────
+function approveEntry() {
+  if (!currentEntry) return;
+  currentEntry.reviewed_by = 'theologian-reviewed';
+  currentEntry._iterations = iterationCount;
+  const exists = approvedEntries.findIndex(e => e.id === currentEntry.id);
+  if (exists >= 0) approvedEntries[exists] = currentEntry;
+  else approvedEntries.push(currentEntry);
+  completedIds.add(currentEntry.id);
+  localStorage.setItem('kardia-approved', JSON.stringify(approvedEntries));
+  buildCategoryGrid();
+  renderProgress();
+  renderApproved();
+  showStatus(`"${currentEntry.category_label}" approved and saved. Export categories.json when ready to commit to GitHub.`, 'success');
+  document.getElementById('output-section').classList.remove('visible');
+  currentEntry = null;
+  currentValidator = null;
+  selectedCategory = null;
+  iterationCount = 0;
+}
+
+function copyJSON() {
+  if (!currentEntry) return;
+  navigator.clipboard.writeText(JSON.stringify(currentEntry, null, 2));
+  const btn = event.target;
+  const orig = btn.textContent;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = orig, 1800);
+}
+
+function handleImport(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const resultEl = document.getElementById('import-result');
+    try {
+      const data = JSON.parse(e.target.result);
+      // Accept either a full export envelope or a bare array
+      const incoming = Array.isArray(data) ? data : (data.entries || []);
+      if (!Array.isArray(incoming) || incoming.length === 0) {
+        showImportResult('No valid entries found in the selected file. Make sure it is an exported categories.json.', 'error');
+        return;
+      }
+      // Merge: imported wins on conflict
+      let added = 0, updated = 0;
+      incoming.forEach(entry => {
+        if (!entry.id) return;
+        const idx = approvedEntries.findIndex(e => e.id === entry.id);
+        if (idx >= 0) { approvedEntries[idx] = entry; updated++; }
+        else { approvedEntries.push(entry); added++; }
+        completedIds.add(entry.id);
+      });
+      localStorage.setItem('kardia-approved', JSON.stringify(approvedEntries));
+      buildCategoryGrid();
+      renderProgress();
+      renderApproved();
+      const total = 30 - approvedEntries.length;
+      const parts = [];
+      if (added > 0) parts.push(added + ' new entr' + (added === 1 ? 'y' : 'ies') + ' added');
+      if (updated > 0) parts.push(updated + ' existing entr' + (updated === 1 ? 'y' : 'ies') + ' updated');
+      showImportResult(parts.join(', ') + '. ' + total + ' categor' + (total === 1 ? 'y' : 'ies') + ' remaining.', 'success');
+    } catch(err) {
+      showImportResult('Could not parse file: ' + err.message, 'error');
+    }
+    // Reset input so the same file can be re-imported if needed
+    event.target.value = '';
+  };
+  reader.readAsText(file);
+}
+
+function showImportResult(msg, type) {
+  const el = document.getElementById('import-result');
+  el.style.display = 'block';
+  el.style.background = type === 'success' ? '#f5fff8' : '#fff5f5';
+  el.style.border = '1px solid ' + (type === 'success' ? 'var(--green-deep)' : 'var(--red-deep)');
+  el.style.color = type === 'success' ? 'var(--green-deep)' : 'var(--red-deep)';
+  el.textContent = msg;
+  setTimeout(() => { el.style.display = 'none'; }, 6000);
+}
+
+function exportDatabase() {
+  const clean = approvedEntries.map(e => {
+    const { _truncation_warning, ...rest } = e;
+    return rest;
+  });
+  const data = JSON.stringify({
+    version: '1.0',
+    description: 'Kardia Lexicon — Hebrew thought category database',
+    license: 'CC BY-NC-SA 4.0',
+    project: 'https://github.com/dad2jrn/kardia-bible-lexicon',
+    generated: new Date().toISOString(),
+    status: { total_seed_categories: 30, complete: clean.length, pending: 30 - clean.length },
+    entries: clean
+  }, null, 2);
+  const blob = new Blob([data], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'categories.json'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+// ── Progress ──────────────────────────────────────────────────────────────────
+function renderProgress() {
+  const card = document.getElementById('progress-card');
+  const totalDone = approvedEntries.length;
+  const totalAll = Object.values(CATEGORIES).flat().length;
+  let html = `<div style="margin-bottom:16px;">
+    <div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:6px;">Overall — ${totalDone} / ${totalAll} complete</div>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.round(totalDone/totalAll*100)}%"></div></div>
+  </div><div class="progress-groups">`;
+  for (const [group, cats] of Object.entries(CATEGORIES)) {
+    const done = cats.filter(c => completedIds.has(catToId(c))).length;
+    html += `<div>
+      <div class="progress-group-name">${group}</div>
+      <div class="progress-bar-wrap"><div class="progress-bar-fill" style="width:${Math.round(done/cats.length*100)}%"></div></div>
+      <div class="progress-count">${done} / ${cats.length}</div>
+    </div>`;
+  }
+  html += '</div>';
+  card.innerHTML = html;
+}
+
+function renderApproved() {
+  const list = document.getElementById('approved-list');
+  if (approvedEntries.length === 0) {
+    list.innerHTML = '<div style="font-style:italic;color:var(--ink-faint);font-size:15px;">No entries approved yet.</div>';
+    return;
+  }
+  list.innerHTML = approvedEntries.map(function(e, i) {
+    var missingVerses = !e._kardia_verses || e._kardia_verses.length === 0;
+    var iterBadge = (e._iterations > 1)
+      ? '<span style="margin-left:8px;font-family:JetBrains Mono,monospace;font-size:10px;color:var(--ink-faint);">' + e._iterations + ' iterations</span>'
+      : '';
+    var missingBadge = missingVerses
+      ? '<span style="margin-left:8px;font-size:10px;color:var(--gold);background:var(--gold-pale);border:1px solid var(--gold);border-radius:2px;padding:1px 6px;">no verse translations</span>'
+      : '';
+    var verseBtn = missingVerses
+      ? '<button class="approved-sub-tab" id="acc-verse-btn-' + i + '" onclick="generateMissingVerses(' + i + ',event)" style="color:var(--gold);border-color:var(--gold);">+ Generate Verse Translations</button>'
+      : '';
+    var jsonContent = escapeHTML(JSON.stringify(e, null, 2));
+    var previewContent = buildApprovedPreview(e);
+    return '<div class="approved-item" id="acc-item-' + i + '">'
+      + '<div class="approved-item-header" onclick="toggleAccordion(' + i + ')">'
+        + '<div class="approved-left">'
+          + '<span class="approved-name">' + (e.transliteration || e.id) + '</span>'
+          + '<span style="margin-left:10px;font-size:14px;color:var(--ink-faint);">' + (e.category_label || '') + '</span>'
+          + iterBadge + missingBadge
+          + '<span class="approved-chevron" id="acc-chevron-' + i + '">\u203a</span>'
+        + '</div>'
+        + '<div class="approved-meta">' + (e.hebrew_root || '') + '</div>'
+      + '</div>'
+      + '<div class="approved-body" id="acc-body-' + i + '">'
+        + '<div class="approved-sub-tabs">'
+          + '<button class="approved-sub-tab active" id="acc-tab-json-' + i + '" onclick="switchAccTab(' + i + ',\'json\',event)">JSON</button>'
+          + '<button class="approved-sub-tab" id="acc-tab-preview-' + i + '" onclick="switchAccTab(' + i + ',\'preview\',event)">Reader Preview</button>'
+          + '<button class="approved-sub-tab" onclick="copyApprovedJSON(' + i + ',event)" style="margin-left:auto;">Copy JSON</button>'
+          + verseBtn
+        + '</div>'
+        + '<div class="approved-sub-panel active" id="acc-panel-json-' + i + '">'
+          + '<div class="approved-json" id="acc-json-' + i + '">' + jsonContent + '</div>'
+        + '</div>'
+        + '<div class="approved-sub-panel" id="acc-panel-preview-' + i + '">'
+          + '<div id="acc-preview-inner-' + i + '">' + previewContent + '</div>'
+        + '</div>'
+      + '</div>'
+    + '</div>';
+  }).join('');
+}
+
+async function generateMissingVerses(i, e) {
+  e.stopPropagation();
+  const key = getKey();
+  if (!key) { showStatus('No API key set — click the status pill in the header.', 'error'); return; }
+
+  const entry = approvedEntries[i];
+  if (!entry) return;
+
+  const btn = document.getElementById(`acc-verse-btn-${i}`);
+  if (btn) { btn.textContent = 'Generating...'; btn.disabled = true; btn.style.opacity = '0.5'; }
+
+  showStatus(`Generating Kardia verse translations for ${entry.transliteration}...`, 'loading');
+
+  try {
+    const kardiaVerses = await runKardiaVerseTranslation(key, entry);
+    if (kardiaVerses.length > 0) {
+      // Patch the entry in place — no other fields touched
+      approvedEntries[i]._kardia_verses = kardiaVerses;
+      localStorage.setItem('kardia-approved', JSON.stringify(approvedEntries));
+
+      // Update the JSON display in place
+      const jsonEl = document.getElementById(`acc-json-${i}`);
+      if (jsonEl) jsonEl.textContent = JSON.stringify(approvedEntries[i], null, 2);
+
+      // Update the preview in place
+      const previewEl = document.getElementById(`acc-preview-inner-${i}`);
+      if (previewEl) previewEl.innerHTML = buildApprovedPreview(approvedEntries[i]);
+
+      // Remove the button and the badge
+      if (btn) btn.remove();
+      const badge = document.querySelector(`#acc-item-${i} .approved-left span[style*="no verse"]`);
+      if (badge) badge.remove();
+
+      showStatus(`Kardia verse translations added to ${entry.transliteration} — export to save to GitHub.`, 'success');
+    } else {
+      showStatus(`Verse translation returned empty — check your API key and try again.`, 'error');
+      if (btn) { btn.textContent = '+ Generate Verse Translations'; btn.disabled = false; btn.style.opacity = '1'; }
+    }
+  } catch(err) {
+    showStatus(`Error generating verse translations: ${err.message}`, 'error');
+    if (btn) { btn.textContent = '+ Generate Verse Translations'; btn.disabled = false; btn.style.opacity = '1'; }
+  }
+}
+
+function toggleAccordion(i) {
+  const body = document.getElementById(`acc-body-${i}`);
+  const chevron = document.getElementById(`acc-chevron-${i}`);
+  const isOpen = body.classList.contains('open');
+
+  // Close all open accordions first
+  approvedEntries.forEach((_, idx) => {
+    const b = document.getElementById(`acc-body-${idx}`);
+    const c = document.getElementById(`acc-chevron-${idx}`);
+    if (b) b.classList.remove('open');
+    if (c) c.classList.remove('open');
+  });
+
+  // If this one was closed, open it; if it was open, leave it closed (toggle off)
+  if (!isOpen) {
+    body.classList.add('open');
+    chevron.classList.add('open');
+  }
+}
+
+function switchAccTab(i, name, e) {
+  e.stopPropagation();
+  ['json','preview'].forEach(t => {
+    document.getElementById(`acc-tab-${t}-${i}`)?.classList.toggle('active', t === name);
+    document.getElementById(`acc-panel-${t}-${i}`)?.classList.toggle('active', t === name);
+  });
+}
+
+function copyApprovedJSON(i, e) {
+  e.stopPropagation();
+  const entry = approvedEntries[i];
+  if (!entry) return;
+  navigator.clipboard.writeText(JSON.stringify(entry, null, 2));
+  const btn = e.target;
+  btn.textContent = 'Copied!';
+  setTimeout(() => btn.textContent = 'Copy JSON', 1800);
+}
+
+function escapeHTML(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function buildApprovedPreview(entry) {
+  const glosses = entry.surface_vehicles?.english_glosses;
+  let glossHTML = '';
+  if (glosses) {
+    if (Array.isArray(glosses)) {
+      const pillsHTML = glosses.map(function(g){ return '<span class="gloss-pill">' + g + '</span>'; }).join('');
+      glossHTML = '<div style="margin-bottom:10px;">' + pillsHTML + '</div>';
+    } else {
+      const rec = glosses.recommended || [];
+      const att = glosses.attested || [];
+      const recHTML = rec.map(function(g){ return '<span class="gloss-pill recommended">' + g + '</span>'; }).join('');
+      const attHTML = att.map(function(a){ return '<span class="gloss-pill reductive" title="Loses: ' + (a.loses||'') + '">' + a.gloss + '</span>'; }).join('');
+      glossHTML = '<div style="margin-bottom:6px;">' + recHTML + '</div><div>' + attHTML + '</div>';
+    }
+  }
+  const notHTML = entry.what_it_is_not
+    ? '<div style="border-left:3px solid var(--red-deep);padding:8px 14px;margin-bottom:12px;background:#fff8f8;border-radius:0 2px 2px 0;font-size:13px;"><div style="font-family:Cinzel,serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--red-deep);margin-bottom:3px;">What it is not</div>' + entry.what_it_is_not + '</div>'
+    : '';
+  const glossWrap = glossHTML ? '<div style="margin-bottom:10px;">' + glossHTML + '</div>' : '';
+  const irendHTML = entry.illustrative_renderings
+    ? '<div style="font-size:13px;color:var(--ink-light);margin-bottom:10px;"><div style="font-family:Cinzel,serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink-faint);margin-bottom:6px;">Translation renderings</div>'
+      + entry.illustrative_renderings.map(function(r){ return '<div style="margin-bottom:3px;"><strong style="font-weight:500;">' + r.translation + ':</strong> <em>' + r.text + '</em></div>'; }).join('')
+      + buildKardiaVersesHTML(entry) + '</div>'
+    : buildKardiaVersesHTML(entry);
+  return '<div style="font-size:15px;line-height:1.75;color:var(--ink-mid);">'
+    + '<div style="border-bottom:1px solid var(--border);padding-bottom:12px;margin-bottom:12px;">'
+    + '<div style="font-family:Cinzel,serif;font-size:10px;letter-spacing:0.15em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;">' + (entry.hebrew_root||'') + ' \u00b7 ' + (entry.transliteration||'') + '</div>'
+    + '<div style="font-family:Cinzel,serif;font-size:18px;color:var(--ink);margin-bottom:3px;">' + (entry.category_label||'') + '</div>'
+    + '<div style="font-style:italic;color:var(--ink-light);font-size:14px;">' + (entry.one_liner||'') + '</div>'
+    + '</div>'
+    + '<div style="margin-bottom:12px;font-size:14px;">' + (entry.full_definition||'').replace(/\n/g,'<br>') + '</div>'
+    + notHTML
+    + '<div style="border-left:3px solid var(--gold);padding:8px 14px;margin-bottom:12px;background:var(--gold-pale);border-radius:0 2px 2px 0;font-size:14px;">'
+    + '<div style="font-family:Cinzel,serif;font-size:9px;letter-spacing:0.1em;text-transform:uppercase;color:var(--gold);margin-bottom:3px;">Kardia rendering</div>'
+    + '<em>' + (entry.kardia_rendering||'') + '</em></div>'
+    + glossWrap + irendHTML
+    + '</div>';
+}
+
+function showStatus(msg, type) {
+  const bar = document.getElementById('status-bar');
+  const spinner = document.getElementById('spinner');
+  const text = document.getElementById('status-text');
+  bar.className = 'status-bar visible' + (type==='error' ? ' error' : type==='success' ? ' success' : '');
+  spinner.style.display = type === 'loading' ? 'block' : 'none';
+  text.textContent = msg;
+}
+
+init();
+</script>
+</body>
+</html>
